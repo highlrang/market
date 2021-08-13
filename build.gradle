@@ -1,0 +1,63 @@
+buildscript{
+    ext{
+        springBootVersion = '2.5.3.RELEASE'
+    }
+    repositories{
+        mavenCentral()
+    }
+    dependencies{
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.5.3"
+        classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+subprojects{ // allprojects
+    group 'com.myproject'
+    version '1.0'
+
+    apply plugin: 'java'
+    apply plugin: "org.springframework.boot"
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = 1.8
+
+    repositories{
+        mavenCentral()
+    }
+
+    dependencies{
+        implementation 'org.projectlombok:lombok'
+    }
+}
+
+project(':batch'){
+    dependencies{
+        // compile project(':core') // jar 형식으로
+    }
+}
+
+project(':internal-api'){
+    dependencies{
+        // complie project(':core')
+    }
+}
+
+group 'com.myproject'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

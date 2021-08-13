@@ -1,0 +1,6 @@
+rootProject.name = 'community'
+include 'core'
+include 'batch'
+include 'internal-api'
+include 'external-api'
+

@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.myproject'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    // quartz는 나중에
+}
+
+test {
+    useJUnitPlatform()
+}
