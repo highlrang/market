@@ -1,4 +1,4 @@
-rootProject.name = 'community'
+rootProject.name = 'market'
 include 'core'
 include 'batch'
 include 'internal-api'
