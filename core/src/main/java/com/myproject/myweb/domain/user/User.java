@@ -1,6 +1,7 @@
 package com.myproject.myweb.domain.user;
 
-import com.myproject.myweb.domain.Board;
+import com.myproject.myweb.domain.Cart;
+import com.myproject.myweb.domain.Order;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,10 +21,15 @@ public class User { // member는 모듈 분리할까?
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-    private List<Board> boardList;
+    @Embedded
+    private Address address;
 
     // Cart
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id") // 필요??
+    private Cart cart;
 
     // Order
+    @OneToMany(mappedBy = "user")
+    private List<Order> orderList;
 }

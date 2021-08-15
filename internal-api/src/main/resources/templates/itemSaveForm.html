@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <form action="/item/save" method="post"><!-- 후에 ajax로 -->
+        <div>
+            <input type="file" name="" th:field="${itemRequestDto.photoList}">
+        </div>
+    </form>
+
+</body>
+</html>

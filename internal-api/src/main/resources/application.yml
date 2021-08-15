@@ -1,5 +1,28 @@
 server:
   port: 8081
 
+# db 설정
 spring:
+  jpa:
+    database: mysql
+    # generate-ddl: true
+    hibernate:
+      ddl-auto: update # create-drop none
+
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+
   datasource:
+    url: jdbc:mysql://localhost:3306/market?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: spring5
+    password: spring5
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
+

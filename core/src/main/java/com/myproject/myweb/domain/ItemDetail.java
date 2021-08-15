@@ -1,5 +1,6 @@
 package com.myproject.myweb.domain;
 
+import com.myproject.myweb.domain.Photo;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Embeddable // @Inheritance 공부하기
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,16 +23,16 @@ public class ItemDetail { // 옷 컬러별로 있을 경우 달라지는 정보�
     private Size size;
 
     @Embedded
-    private File file;
+    private List<Photo> photoList;
 
     @ColumnDefault("false")
     private Boolean soldOut;
 
     @Builder
-    public ItemDetail(int stock, Size size, File file){
+    public ItemDetail(int stock, Size size, List<Photo> photoList){
         this.stock = stock;
         this.size = size;
-        this.file = file;
+        this.photoList = photoList;
         soldOut = false; // default
     }
 
@@ -44,5 +46,9 @@ public class ItemDetail { // 옷 컬러별로 있을 경우 달라지는 정보�
 
     public void removeStrock(int stockQuantity){
         stock -= stockQuantity;
+    }
+
+    public void addPhotoList(List<Photo> photos){
+        this.photoList = photos;
     }
 }

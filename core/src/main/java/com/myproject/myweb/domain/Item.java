@@ -19,6 +19,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private String name;
 
     @NotNull
@@ -31,12 +35,11 @@ public class Item {
     private List<ItemDetail> itemDetails; // List 가능?
 
     @Builder
-    public Item(String name, int price, String description, List<ItemDetail> itemDetails){
+    public Item(Category category, String name, int price, String description, List<ItemDetail> itemDetails){
+        this.category = category;
         this.name = name;
         this.price = price;
         this.description = description;
         this.itemDetails = itemDetails;
     }
-
-    // update 용 도메인 메서드
 }

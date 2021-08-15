@@ -11,14 +11,14 @@ import javax.persistence.Entity;
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class File {
+public class Photo {
 
-    private String originName;
-    private String name;
-    private String path;
+    private String originName; // 원본 파일명
+    private String name; // 저장 파일명
+    private String path; // 저장 경로
 
     @Builder
-    public File(String originName, String name, String path){
+    public Photo(String originName, String name, String path){
         this.originName = originName;
         this.name = name;
         this.path = path;
