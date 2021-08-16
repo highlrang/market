@@ -3,17 +3,19 @@ package com.myproject.myweb.handler;
 import com.myproject.myweb.domain.ItemDetail;
 import com.myproject.myweb.domain.Photo;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class FileHandler {
 
-    private List<Photo> getPhotoName(List<Photo> photos){
+    private Map<Integer, List<Photo>> getPhotoName(Map<Integer, List<File>> photos){
         List<Photo> finalPhotoList = photos.stream()
                 .map(photo -> {
                     String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -42,14 +44,11 @@ public class FileHandler {
     }
 
     // file 있을 때만 호출
-    public List<ItemDetail> photoProcess(List<ItemDetail> itemDetails){
+    public Map<Integer, List<Photo>> photoProcess(Map<Integer, List<File>> photos){
 
-        itemDetails.forEach(
-                itemDetail ->
-                itemDetail.addPhotoList(getPhotoName(itemDetail.getPhotoList()))
-        );
+        Map<Integer, List<Photo>> namedPhotos = getPhotoName(photos);
 
-        return itemDetails;
+        return namedPhotos;
     }
 
 }

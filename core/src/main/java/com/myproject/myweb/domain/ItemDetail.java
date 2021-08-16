@@ -2,13 +2,11 @@ package com.myproject.myweb.domain;
 
 import com.myproject.myweb.domain.Photo;
 import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.util.List;
 
 @Embeddable // @Inheritance 공부하기
@@ -20,6 +18,9 @@ public class ItemDetail { // 옷 컬러별로 있을 경우 달라지는 정보�
     private int stock;
 
     @Enumerated(EnumType.STRING)
+    private Color color;
+
+    @Enumerated(EnumType.STRING)
     private Size size;
 
     @Embedded
@@ -29,8 +30,9 @@ public class ItemDetail { // 옷 컬러별로 있을 경우 달라지는 정보�
     private Boolean soldOut;
 
     @Builder
-    public ItemDetail(int stock, Size size, List<Photo> photoList){
+    public ItemDetail(int stock, Color color, Size size, List<Photo> photoList){
         this.stock = stock;
+        this.color = color;
         this.size = size;
         this.photoList = photoList;
         soldOut = false; // default

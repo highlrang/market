@@ -5,10 +5,13 @@ import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.domain.ItemDetail;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 public class ItemRequestDto {
     private Category category;
     private String name;
@@ -20,7 +23,7 @@ public class ItemRequestDto {
     private int stock;
     private Size size;
     private File file;
-     */
+    */
 
     @Builder
     public ItemRequestDto(Category category, String name, int price, String description, List<ItemDetail> itemDetails){

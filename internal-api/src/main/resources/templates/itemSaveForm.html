@@ -6,10 +6,28 @@
 </head>
 <body>
 
-    <form action="/item/save" method="post"><!-- 후에 ajax로 -->
+    <form action="/item/save" method="post"><!-- 후에 ajax로, form도 따로 만들기?? -->
         <div>
-            <input type="file" name="" th:field="${itemRequestDto.photoList}">
+            <input type="text" name="price" placeholder="가격">
         </div>
+        <div>
+            <input type="button" onclick="addItem()" value="상품 종류 추가">
+
+            <div id="itemArea">
+                <div>
+                    <input type="text" name="stock" placeholder="수량">
+                </div>
+
+                <div>
+                    <input type="button" onclick="addPhoto()" value="사진 추가">
+                </div>
+                <div id="photoArea">
+                    <input type="text" name="photo">
+                </div>
+            </div>
+        </div>
+
+
     </form>
 
 </body>

@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Size {
 
-
+    SMALL, MEDIUM, LARGE
 }

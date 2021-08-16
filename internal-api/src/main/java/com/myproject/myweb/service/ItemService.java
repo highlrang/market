@@ -14,6 +14,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     public ItemResponseDto findById(Long id){
+
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 

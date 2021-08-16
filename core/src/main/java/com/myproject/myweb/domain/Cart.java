@@ -17,6 +17,6 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany // 일단 mappedBy 안 해줄려고 함
-    private List<Item> itemList;
+    // @OneToMany // 일단 mappedBy 안 해줄려고 함 >> 그랬더니 테이블 생김
+    // private List<Item> itemList;
 }

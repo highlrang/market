@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <form action="/item/save" method="post"><!-- 후에 ajax로 -->
+        <div>
+            <input type="text" th:field="${itemRequestDto.price}">
+        </div>
+        <div>
+            <span th:object="${itemRequestDto.itemDetails}">
+                <input type="text" th:field="*{stock}">
+                <span th:object="*{photoList}">
+                    <input type="file" th:field="*{originName}">
+                </span>
+            </span>
+
+        </div>
+    </form>
+
+</body>
+</html>
