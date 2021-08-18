@@ -2,15 +2,17 @@ package com.myproject.myweb.dto.item;
 
 import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.ItemDetail;
+import com.myproject.myweb.domain.Photo;
+import com.myproject.myweb.domain.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.awt.*;
 import java.util.List;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 public class ItemRequestDto {
     private Category category;
@@ -18,35 +20,27 @@ public class ItemRequestDto {
     private int price;
     private String description;
 
-    private List<ItemDetail> itemDetails;
-    /*
     private int stock;
     private Size size;
-    private File file;
-    */
+    private Color color;
+    private List<Photo> photos;
 
     @Builder
-    public ItemRequestDto(Category category, String name, int price, String description, List<ItemDetail> itemDetails){
-        this.category = category;
+    public ItemRequestDto(String name, int stock, int price, List<Photo> photos){
         this.name = name;
+        this.stock = stock;
         this.price = price;
-        this.description = description;
-        this.itemDetails = itemDetails;
+        this.photos = photos;
     }
 
     public Item toEntity(){
         return Item.builder()
-                .category(category)
                 .name(name)
-                .description(description)
+                .stock(stock)
                 .price(price)
-                .itemDetails(itemDetails)
+                .photoList(photos)
                 .build();
 
-    }
-
-    public void addItemDetails(List<ItemDetail> itemDetails){
-        this.itemDetails = itemDetails;
     }
 
 }

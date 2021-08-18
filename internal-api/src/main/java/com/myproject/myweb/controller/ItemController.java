@@ -1,27 +1,21 @@
 package com.myproject.myweb.controller;
 
 import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.ItemDetail;
 import com.myproject.myweb.domain.Photo;
 import com.myproject.myweb.domain.Size;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -33,51 +27,26 @@ public class ItemController {
     private final FileHandler fileHandler;
 
     @GetMapping("/save")
-    public String saveForm(@ModelAttribute ItemForm itemForm){
+    public String saveForm(){
         return "itemSaveForm";
     }
 
-    @Getter @NoArgsConstructor
-    static class ItemForm {
-        int price;
-        List<ItemDetailForm> itemDetail;
-    }
-    @Getter @NoArgsConstructor
-    static class ItemDetailForm {
-        int index;
-        Color color;
-        Size size;
-        int stock;
-        List<File> photos; // File ??
-    }
 
     @PostMapping("/save")
-    public String save(ItemForm itemForm){
-                       // @RequestParam(value="photo") List<MultipartFile> photos
+    public String save(@RequestParam(value="name") String name,
+                       @RequestParam(value="price") int price,
+                       @RequestParam(value="stock") int stock,
+                       @RequestParam(value="file") List<MultipartFile> files){
 
-        Map<Integer, List<File>> photosByIndex = itemForm.getItemDetail().stream()
-                .collect(Collectors.toMap(ItemDetailForm::getIndex, ItemDetailForm::getPhotos));
-
-        Map<Integer, List<Photo>> namedPhotos = fileHandler.photoProcess(photosByIndex);
-
-        List<ItemDetail> itemDetails = new ArrayList<>();
-
-        itemForm.getItemDetail().forEach(item -> {
-                    List<Photo> photos = namedPhotos.get(item.getIndex());
-                    itemDetails.add(
-                        ItemDetail.builder()
-                                .color(item.getColor())
-                                .size(item.getSize())
-                                .stock(item.getStock())
-                                .photoList(photos)
-                                .build()
-                    );
-                });
+        List<Photo> namedPhotos = fileHandler.photoProcess(files);
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
-                .price(itemForm.getPrice())
-                .itemDetails(itemDetails)
+                .name(name)
+                .price(price)
+                .stock(stock)
+                .photos(namedPhotos)
                 .build();
+
         itemService.save(itemRequestDto);
 
         return "redirect:/";

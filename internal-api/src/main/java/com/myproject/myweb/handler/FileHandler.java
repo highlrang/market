@@ -1,54 +1,82 @@
 package com.myproject.myweb.handler;
 
-import com.myproject.myweb.domain.ItemDetail;
 import com.myproject.myweb.domain.Photo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class FileHandler {
 
-    private Map<Integer, List<Photo>> getPhotoName(Map<Integer, List<File>> photos){
-        List<Photo> finalPhotoList = photos.stream()
-                .map(photo -> {
+    public List<Photo> photoProcess(List<MultipartFile> photos){
+
+        List<Photo> namedPhotos = new ArrayList<>();
+
+        photos.forEach(
+            photo -> {
+                if(!photo.isEmpty()) {
+
                     String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                    String path = "images/" + now;
+                    String path = "images/" + now; // images/20210817
                     File file = new File(path);
-                    if(!file.exists()) file.mkdirs();
+                    if (!file.exists()) file.mkdirs();
 
-                    String name = path + "/" + System.nanoTime(); // + 확장자;
-                    Photo finalPhoto = Photo.builder()
-                            .originName(photo.getOriginName())
-                            .name(name)
-                            .path(path)
-                            .build();
+                    String extension = extractedContentType(photo.getContentType());
 
+                    String name = path + "/" + System.nanoTime() + extension; // images/202010817/nanoTime.png
+                    namedPhotos.add(
+                            Photo.builder()
+                                    .originName(photo.getOriginalFilename())
+                                    .name(name)
+                                    .path(path)
+                                    .build()
+                    );
 
                     String absolutePath = new File("").getAbsolutePath() + "\\";
                     file = new File(absolutePath + name);
-                    // multipartFile.transferTo(file);
 
-                    return finalPhoto;
-                })
-                .collect(Collectors.toList());
+                    try {
+                        photo.transferTo(file);
+                    } catch (IOException e) {
+                        // log 처리
+                        // getCause getStacktrace getMessage
+                    }
+                }
+            }
+        );
 
-        return finalPhotoList;
+        return namedPhotos;
 
     }
 
-    // file 있을 때만 호출
-    public Map<Integer, List<Photo>> photoProcess(Map<Integer, List<File>> photos){
-
-        Map<Integer, List<Photo>> namedPhotos = getPhotoName(photos);
-
-        return namedPhotos;
+    private String extractedContentType(String contentType) {
+        String extension;
+        switch (contentType) {
+            case "image/jpeg":
+                extension = ".jpg";
+                break;
+            case "image/png":
+                extension = ".png";
+                break;
+            case "image/bmp":
+                extension = ".bmp";
+                break;
+            case "image/gif":
+                extension = ".gif";
+                break;
+            default:
+                extension = "";
+                break;
+        }
+        return extension;
     }
 
 }

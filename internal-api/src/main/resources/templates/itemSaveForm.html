@@ -3,31 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
+    <script>
+        function addItem(){
+            var itemArea = $("#itemArea");
+            var item = $("#item");
 
-    <form action="/item/save" method="post"><!-- 후에 ajax로, form도 따로 만들기?? -->
+            var item2 = item.clone();
+            itemArea.append(item2);
+        }
+
+        function addPhoto(){
+            var photoArea = $("#photoArea");
+            var photo = $("#photo");
+
+            var photo2 = photo.clone();
+            photoArea.append(photo2);
+        }
+    </script>
+
+    <form action="/item/save" method="post" enctype="multipart/form-data">
+        <div>
+            <input type="text" name="name" placeholder="상품명">
+        </div>
         <div>
             <input type="text" name="price" placeholder="가격">
         </div>
+
         <div>
-            <input type="button" onclick="addItem()" value="상품 종류 추가">
-
-            <div id="itemArea">
-                <div>
-                    <input type="text" name="stock" placeholder="수량">
-                </div>
-
-                <div>
-                    <input type="button" onclick="addPhoto()" value="사진 추가">
-                </div>
-                <div id="photoArea">
-                    <input type="text" name="photo">
-                </div>
-            </div>
+            <input type="text" name="stock" placeholder="수량">
         </div>
 
+        <div>
+            <input multiple="multiple" type="file" name="file">
+        </div>
 
+        <div><input type="submit" value="save"></div>
     </form>
 
 </body>

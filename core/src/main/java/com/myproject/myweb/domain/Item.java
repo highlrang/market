@@ -4,10 +4,12 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.util.List;
 
 @Getter
@@ -31,15 +33,47 @@ public class Item {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Embedded
-    private List<ItemDetail> itemDetails; // List 가능?
+    private int stock;
+
+    @Enumerated(EnumType.STRING)
+    private Color color;
+
+    @Enumerated(EnumType.STRING)
+    private Size size;
+
+    @Embedded // list 가능?
+    private List<Photo> photoList;
+
+    @ColumnDefault("false")
+    private Boolean soldOut;
 
     @Builder
-    public Item(Category category, String name, int price, String description, List<ItemDetail> itemDetails){
+    public Item(Category category, String name, int price, String description,
+                int stock, Color color, Size size, List<Photo> photoList){
         this.category = category;
         this.name = name;
         this.price = price;
         this.description = description;
-        this.itemDetails = itemDetails;
+        this.stock = stock;
+        this.color = color;
+        this.size = size;
+        this.photoList = photoList;
+        soldOut = false; // default;
+    }
+
+    public void soldout_complete(){ // stock 0 또는 사용자 지정
+        soldOut = true;
+    }
+
+    public void addStock(int stockQuantity){
+        stock += stockQuantity;
+    }
+
+    public void removeStrock(int stockQuantity){
+        stock -= stockQuantity;
+    }
+
+    public void addPhotoList(List<Photo> photos){
+        this.photoList = photos;
     }
 }
