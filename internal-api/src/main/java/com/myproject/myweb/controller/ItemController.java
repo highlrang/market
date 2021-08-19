@@ -4,12 +4,15 @@ import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.domain.Photo;
 import com.myproject.myweb.domain.Size;
 import com.myproject.myweb.dto.item.ItemRequestDto;
+import com.myproject.myweb.dto.item.ItemResponseDto;
+import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +31,7 @@ public class ItemController {
 
     @GetMapping("/save")
     public String saveForm(){
-        return "itemSaveForm";
+        return "item/save";
     }
 
 
@@ -38,7 +41,7 @@ public class ItemController {
                        @RequestParam(value="stock") int stock,
                        @RequestParam(value="file") List<MultipartFile> files){
 
-        List<Photo> namedPhotos = fileHandler.photoProcess(files);
+        List<PhotoDto> namedPhotos = fileHandler.photoProcess(files);
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .name(name)
@@ -49,7 +52,14 @@ public class ItemController {
 
         itemService.save(itemRequestDto);
 
-        return "redirect:/";
+        return "redirect:/item/list";
 
+    }
+
+    @GetMapping("/list")
+    public String list(Model model){
+        List<ItemResponseDto> items = itemService.findAll();
+        model.addAttribute("items", items);
+        return "item/list";
     }
 }

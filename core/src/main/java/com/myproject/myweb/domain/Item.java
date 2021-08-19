@@ -36,12 +36,10 @@ public class Item {
     private int stock;
 
     @Enumerated(EnumType.STRING)
-    private Color color;
-
-    @Enumerated(EnumType.STRING)
     private Size size;
 
-    @Embedded // list 가능?
+    // @Embedded
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Photo> photoList;
 
     @ColumnDefault("false")
@@ -49,13 +47,12 @@ public class Item {
 
     @Builder
     public Item(Category category, String name, int price, String description,
-                int stock, Color color, Size size, List<Photo> photoList){
+                int stock, Size size, List<Photo> photoList){
         this.category = category;
         this.name = name;
         this.price = price;
         this.description = description;
         this.stock = stock;
-        this.color = color;
         this.size = size;
         this.photoList = photoList;
         soldOut = false; // default;

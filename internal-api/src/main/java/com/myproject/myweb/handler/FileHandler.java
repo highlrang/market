@@ -1,6 +1,8 @@
 package com.myproject.myweb.handler;
 
 import com.myproject.myweb.domain.Photo;
+import com.myproject.myweb.dto.item.PhotoDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,12 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class FileHandler {
 
-    public List<Photo> photoProcess(List<MultipartFile> photos){
+    public List<PhotoDto> photoProcess(List<MultipartFile> photos){
 
-        List<Photo> namedPhotos = new ArrayList<>();
+        List<PhotoDto> namedPhotos = new ArrayList<>();
 
         photos.forEach(
             photo -> {
@@ -31,23 +34,22 @@ public class FileHandler {
 
                     String extension = extractedContentType(photo.getContentType());
 
-                    String name = path + "/" + System.nanoTime() + extension; // images/202010817/nanoTime.png
-                    namedPhotos.add(
-                            Photo.builder()
-                                    .originName(photo.getOriginalFilename())
-                                    .name(name)
-                                    .path(path)
-                                    .build()
+                    String name = path + "/" + System.nanoTime() + extension; // ../nanoTime.png
+
+                    namedPhotos.add(PhotoDto.builder()
+                            .originName(photo.getOriginalFilename())
+                            .name(name)
+                            .path(path)
+                            .build()
                     );
 
                     String absolutePath = new File("").getAbsolutePath() + "\\";
                     file = new File(absolutePath + name);
-
                     try {
                         photo.transferTo(file);
+
                     } catch (IOException e) {
-                        // log 처리
-                        // getCause getStacktrace getMessage
+                        log.info(e.getMessage());
                     }
                 }
             }

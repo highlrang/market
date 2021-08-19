@@ -3,6 +3,10 @@ server:
 
 # db 설정
 spring:
+  servlet:
+    multipart:
+      location: C:\Users\jhw12\IdeaProjects\market
+
   jpa:
     database: mysql
     # generate-ddl: true

@@ -6,24 +6,6 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
-    <script>
-        function addItem(){
-            var itemArea = $("#itemArea");
-            var item = $("#item");
-
-            var item2 = item.clone();
-            itemArea.append(item2);
-        }
-
-        function addPhoto(){
-            var photoArea = $("#photoArea");
-            var photo = $("#photo");
-
-            var photo2 = photo.clone();
-            photoArea.append(photo2);
-        }
-    </script>
-
     <form action="/item/save" method="post" enctype="multipart/form-data">
         <div>
             <input type="text" name="name" placeholder="상품명">

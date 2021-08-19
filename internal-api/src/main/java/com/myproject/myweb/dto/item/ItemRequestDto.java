@@ -23,10 +23,10 @@ public class ItemRequestDto {
     private int stock;
     private Size size;
     private Color color;
-    private List<Photo> photos;
+    private List<PhotoDto> photos;
 
     @Builder
-    public ItemRequestDto(String name, int stock, int price, List<Photo> photos){
+    public ItemRequestDto(String name, int stock, int price, List<PhotoDto> photos){
         this.name = name;
         this.stock = stock;
         this.price = price;
@@ -38,7 +38,6 @@ public class ItemRequestDto {
                 .name(name)
                 .stock(stock)
                 .price(price)
-                .photoList(photos)
                 .build();
 
     }

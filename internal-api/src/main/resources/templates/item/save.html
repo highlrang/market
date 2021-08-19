@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <form action="/item/save" method="post" enctype="multipart/form-data">
+        <div>
+            <input type="text" name="name" placeholder="상품명">
+        </div>
+        <div>
+            <input type="text" name="price" placeholder="가격">
+        </div>
+
+        <div>
+            <input type="text" name="stock" placeholder="수량">
+        </div>
+
+        <div>
+            <input multiple="multiple" type="file" name="file">
+        </div>
+
+        <div><input type="submit" value="save"></div>
+    </form>
+
+</body>
+</html>

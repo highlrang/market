@@ -2,25 +2,30 @@ package com.myproject.myweb.dto.item;
 
 import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
+import com.myproject.myweb.domain.Photo;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class ItemResponseDto {
 
-    private Category category;
+    private Long id;
     private String name;
     private int price;
-    private String description;
-
-    private List<ItemDetail> itemDetails;
+    private int stock;
+    private List<PhotoDto> photos;
 
     public ItemResponseDto(Item item){
-        category = item.getCategory();
+        id = item.getId();
         name = item.getName();
         price = item.getPrice();
-        description = item.getDescription();
-        itemDetails = item.getItemDetails();
+        stock = item.getStock();
+        photos = item.getPhotoList()
+                .stream()
+                .map(PhotoDto::new)
+                .collect(Collectors.toList());
+
     }
 }
