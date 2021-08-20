@@ -1,8 +1,5 @@
 package com.myproject.myweb.controller;
 
-import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.Photo;
-import com.myproject.myweb.domain.Size;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;

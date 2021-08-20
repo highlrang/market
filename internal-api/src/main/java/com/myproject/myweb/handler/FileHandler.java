@@ -28,7 +28,7 @@ public class FileHandler {
                 if(!photo.isEmpty()) {
 
                     String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                    String path = "images/" + now; // images/20210817
+                    String path = "upload/" + now; // upload/20210817
                     File file = new File(path);
                     if (!file.exists()) file.mkdirs();
 

@@ -19,7 +19,7 @@ public class Photo {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
-    private Item item; // 필요없는 연관관계??
+    private Item item;
 
     @Builder
     public Photo(String originName, String name, String path){
@@ -28,7 +28,7 @@ public class Photo {
         this.path = path;
     }
 
-    public void addItem(Item item){
+    public void setItem(Item item){
         this.item = item;
     }
 }

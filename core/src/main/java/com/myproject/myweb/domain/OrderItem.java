@@ -1,12 +1,15 @@
 package com.myproject.myweb.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id
     @GeneratedValue
@@ -25,9 +28,25 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
+    public void setOrder(Order order){
+        this.order = order;
+    }
 
+    public static OrderItem createOrderItem(Item item, int orderPrice, int count){
+        OrderItem orderItem = new OrderItem();
+        orderItem.item = item;
+        orderItem.orderPrice = orderPrice;
+        orderItem.count = count;
 
-    // 주문에 따라 재고 조절
-    // totalPrice = count * price
-    // Order OrderItem Item 참고하기
+        item.removeStrock(count);
+        return orderItem;
+    }
+
+    public void cancel(){
+        item.addStock(count);
+    }
+
+    public int getTotalPrice(){
+        return orderPrice * count;
+    }
 }

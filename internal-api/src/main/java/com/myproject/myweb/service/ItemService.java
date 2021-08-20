@@ -34,7 +34,7 @@ public class ItemService {
 
         List<Photo> photoList = getPhotoList(itemRequestDto, item);
         photoRepository.saveAll(photoList);
-        item.addPhotoList(photoList);
+        item.setPhotoList(photoList);
 
         return itemRepository.save(item).getId();
     }
@@ -44,7 +44,7 @@ public class ItemService {
                 .stream()
                 .map(photoDto -> {
                     Photo photo = photoDto.toEntity();
-                    photo.addItem(item);
+                    photo.setItem(item);
                     return photo;
                 })
                 .collect(Collectors.toList());

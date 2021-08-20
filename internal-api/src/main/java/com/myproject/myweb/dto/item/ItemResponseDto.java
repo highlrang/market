@@ -1,8 +1,6 @@
 package com.myproject.myweb.dto.item;
 
-import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.Photo;
 import lombok.Getter;
 
 import java.util.List;

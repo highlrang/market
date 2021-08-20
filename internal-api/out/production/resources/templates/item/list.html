@@ -12,7 +12,7 @@
         <div th:text="${item.stock}"></div>
 
         <div th:each="photo: ${item.photos}">
-            <img th:src="${photo.name}" th:alt="${photo.originName}" width="400">
+            <img th:src="|../${photo.name}|" th:alt="${photo.originName}" width="400">
         </div>
     </div>
 </body>

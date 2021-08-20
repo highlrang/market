@@ -21,45 +21,25 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
     private String name;
 
-    @NotNull
     private int price;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
 
     private int stock;
 
-    @Enumerated(EnumType.STRING)
-    private Size size;
-
-    // @Embedded
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Photo> photoList;
 
-    @ColumnDefault("false")
-    private Boolean soldOut;
-
     @Builder
-    public Item(Category category, String name, int price, String description,
-                int stock, Size size, List<Photo> photoList){
-        this.category = category;
+    public Item(String name, int price, int stock){
         this.name = name;
         this.price = price;
-        this.description = description;
         this.stock = stock;
-        this.size = size;
-        this.photoList = photoList;
-        soldOut = false; // default;
     }
 
-    public void soldout_complete(){ // stock 0 또는 사용자 지정
-        soldOut = true;
+    // item 등록 시 n개의 사진 이름 변경 후 추가
+    public void setPhotoList(List<Photo> photos){
+        this.photoList = photos;
     }
 
     public void addStock(int stockQuantity){
@@ -67,10 +47,10 @@ public class Item {
     }
 
     public void removeStrock(int stockQuantity){
-        stock -= stockQuantity;
-    }
-
-    public void addPhotoList(List<Photo> photos){
-        this.photoList = photos;
+        int nowStock = stock - stockQuantity;
+        if(nowStock < 0){
+            throw new IllegalStateException("stock zero");
+        }
+        stock = nowStock;
     }
 }

@@ -1,11 +1,10 @@
 server:
   port: 8081
 
-# db 설정
 spring:
   servlet:
     multipart:
-      location: C:\Users\jhw12\IdeaProjects\market
+      location: # C:\Users\jhw12\IdeaProjects\market\
 
   jpa:
     database: mysql
