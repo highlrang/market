@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class User {
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Order> orderList;
+    private List<Order> orderList = new ArrayList<>();
 
     @Builder
     public User(String name, String email, String password, Address address){ // 비번 암호화한 후 객체 생성

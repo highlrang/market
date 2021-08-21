@@ -10,7 +10,7 @@ spring:
     database: mysql
     # generate-ddl: true
     hibernate:
-      ddl-auto: update # create-drop none
+      ddl-auto: update # create-drop, none
 
     properties:
       hibernate:

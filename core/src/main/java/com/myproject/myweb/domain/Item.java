@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,7 +29,7 @@ public class Item {
     private int stock;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<Photo> photoList;
+    private List<Photo> photoList = new ArrayList<>();
 
     @Builder
     public Item(String name, int price, int stock){
