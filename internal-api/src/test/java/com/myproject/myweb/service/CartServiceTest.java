@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 class CartServiceTest {
 
     // @Mock ItemRepository itemRepository;
+    @Autowired UserRepository userRepository;
     @Autowired OrderRepository orderRepository;
     @Autowired CartItemRepository cartItemRepository;
     // @Mock OrderRepository orderRepository;
@@ -61,8 +62,8 @@ class CartServiceTest {
     @Test
     void toOrder() {
 
-        // Long[] ids = {3L, 4L};
-        List<CartItem> cartItems = cartItemRepository.findAllByUser_Id(1L);
+        User user = userRepository.findById(1L).get();
+        List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(user.getCart().getId());
         cartService.toOrder(1L, cartItems.stream().map(CartItem::getId).collect(Collectors.toList()));
 
         // then
