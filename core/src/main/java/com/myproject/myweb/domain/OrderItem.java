@@ -25,7 +25,7 @@ public class OrderItem {
     @JoinColumn(name="order_id")
     private Order order;
 
-    private int orderPrice;
+    private int price; // 주문 당시 금액
     private int count;
 
     public void setOrder(Order order){
@@ -35,7 +35,7 @@ public class OrderItem {
     public static OrderItem createOrderItem(Item item, int orderPrice, int count){
         OrderItem orderItem = new OrderItem();
         orderItem.item = item;
-        orderItem.orderPrice = orderPrice;
+        orderItem.price = orderPrice;
         orderItem.count = count;
 
         item.removeStrock(count);
@@ -47,6 +47,6 @@ public class OrderItem {
     }
 
     public int getTotalPrice(){
-        return orderPrice * count;
+        return price * count;
     }
 }

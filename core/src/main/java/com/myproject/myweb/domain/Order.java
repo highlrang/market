@@ -32,9 +32,10 @@ public class Order {
 
     private LocalDateTime orderDate;
 
+    private String tid;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
-
 
 
     public void setUser(User user){
@@ -59,7 +60,7 @@ public class Order {
         for(OrderItem orderItem: orderItems){
             order.addOrderItem(orderItem);
         }
-        order.orderStatus = OrderStatus.ORDER;
+        order.orderStatus = OrderStatus.READY;
         order.orderDate = LocalDateTime.now();
         return order;
     }
@@ -80,5 +81,13 @@ public class Order {
             totalPrice += orderItem.getTotalPrice();
         }
         return totalPrice;
+    }
+
+    public void setTid(String tid){
+        this.tid = tid;
+    }
+
+    public void setOrderStatus(OrderStatus status){
+        orderStatus = status;
     }
 }

@@ -27,6 +27,10 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
+    public Boolean orderImpossible(Long userId){
+        return orderRepository.findByUserAndStatusReady(userId, OrderStatus.READY).isPresent();
+    }
+
     @Transactional // 한 개 주문 시
     public Long order(Long userId, Long itemId, int count){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
@@ -45,6 +49,17 @@ public class OrderService {
         return orderRepository.save(order).getId();
     }
 
+    @Transactional
+    public void saveTid(Long orderId, String tid){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        order.setTid(tid);
+    }
+
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus status){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        order.setOrderStatus(status);
+    }
 
     @Transactional
     public void cancelOrder(Long orderId){
@@ -52,5 +67,15 @@ public class OrderService {
         order.cancel();
     }
 
+    public OrderResponseDto findOrderReady(Long userId){
+        Order order = orderRepository.findByUserAndStatusReady(userId, OrderStatus.READY).orElseThrow(() -> new IllegalArgumentException("OrderByUserNotFoundException"));
+        return new OrderResponseDto(order);
+    }
+
+    @Transactional
+    public void remove(Long orderId){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        orderRepository.delete(order);
+    }
 }
 

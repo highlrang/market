@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var msg = /*[[ ${orderFail} ]]*/;
+        /*]]*/
+
+        $(document).ready(function(){
+            if(msg != null){
+                alert(msg);
+            }
+        });
+    </script>
+
+    <form action="/order/payment/ready" method="post">
+    <div>
+        <div>
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.price}"></div>
+            <div th:each="photo: ${item.photos}">
+                <img th:src="|../../${photo.name}|" width="200" height="200">
+            </div>
+            <div>
+                <input type="hidden" name="item_id" th:value="${item.id}">
+                <input type="hidden" name="user_id" th:value="${session.user.id}">
+            </div>
+        </div>
+
+
+        <div><input type="text" name="count"></div>
+        <div><input type="submit" value="주문하기"></div>
+    </div>
+    </form>
+</body>
+</html>

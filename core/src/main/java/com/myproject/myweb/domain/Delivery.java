@@ -3,11 +3,13 @@ package com.myproject.myweb.domain;
 import com.myproject.myweb.domain.user.Address;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class Delivery {
 
     @Id

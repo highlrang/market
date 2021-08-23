@@ -59,4 +59,11 @@ public class ItemController {
         model.addAttribute("items", items);
         return "item/list";
     }
+
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable Long id, Model model){
+        ItemResponseDto item = itemService.findById(id);
+        model.addAttribute("item", item);
+        return "item/detail";
+    }
 }

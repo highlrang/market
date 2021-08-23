@@ -46,7 +46,7 @@ public class CartService {
     }
 
 
-    public void toOrder(Long userId, List<Long> cartItemIds){
+    public Long toOrder(Long userId, List<Long> cartItemIds){
         List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
@@ -58,12 +58,13 @@ public class CartService {
                 .collect(Collectors.toList());
 
         Order order = Order.createOrder(user, delivery, orderItems.toArray(OrderItem[]::new));
-        orderRepository.save(order); // 여러 상품들 >> 하나의 주문서 생성
+        orderRepository.save(order);// 여러 상품들 >> 하나의 주문서 생성
 
         // 장바구니 비우기 위의 cancel로 사용하기??
         Cart cart = cartRepository.findByUser_Id(userId).orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
         cart.removeCartItems(cartItems);
 
+        return order.getId();
     }
 
 }

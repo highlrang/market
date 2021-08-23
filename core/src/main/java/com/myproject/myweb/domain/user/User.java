@@ -44,4 +44,7 @@ public class User {
         this.cart = cart;
     }
 
+    public Boolean checkPassword(String password){
+        return this.password.equals(password);
+    }
 }
