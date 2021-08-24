@@ -1,12 +1,15 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Cart;
 import com.myproject.myweb.domain.Order;
+import com.myproject.myweb.domain.OrderItem;
 import com.myproject.myweb.domain.OrderStatus;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.dto.order.PaymentReadyDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
+import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +28,9 @@ import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -39,20 +40,17 @@ public class OrderController {
 
     private final WebClient webClient = WebClient.create();
     private final OrderService orderService;
+    private final CartService cartService;
     private final static String cid = "TC0ONETIME";
 
 
     // 익셉션 처리 + HttpStatus 200 이외의 경우 처리
-    // 단건 결제 >> 장바구니 복수건도 해보기
     @PostMapping("/payment/ready")
     public String readyPayment(HttpServletRequest request,
                                @RequestParam(value = "user_id") Long userId,
-                               @RequestParam(value = "item_id") Long itemId,
-                               @RequestParam(value = "count") int count){
-
-        // error 발생 시 orderService.remove(orderId);
-        orderService.remove(4L);
-        orderService.remove(5L);
+                               @RequestParam(value = "item_id") List<Long> itemIds,
+                               @RequestParam(value = "count", required = false) String count){
+        // count는 단건주문에만 필요, 장바구니는 코드로 가져오기
 
         Boolean orderImpossible = orderService.orderImpossible(userId);
         if(orderImpossible) {
@@ -60,7 +58,17 @@ public class OrderController {
             return "redirect:" + request.getHeader("Referer");
         }
 
-        Long orderId = orderService.order(userId, itemId, count);
+        log.info("count = " + count);
+        List<Integer> counts = new ArrayList<>();
+        if(count == null) {
+            counts = cartService.findItemCount(userId, itemIds);
+        }else{
+            counts.add(Integer.valueOf(count));
+        }
+        Long orderId = orderService.order(userId, itemIds, counts); // 여러 상품들 >> 하나의 주문서 생성
+
+        // error 발생 시 orderService.cancel(orderId);
+
         OrderResponseDto orderResponseDto = orderService.findById(orderId);
 
         String myHost = "http://127.0.0.1:8081/order";
@@ -73,8 +81,8 @@ public class OrderController {
         parameterMap.add("tax_free_amount", "0");
 
         parameterMap.add("approval_url", myHost + "/payment/approve");
-        parameterMap.add("cancel_url", myHost + "/cancel?id=" + itemId);
-        parameterMap.add("fail_url", myHost + "/fail?id=" + itemId);
+        parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
+        parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
 
         WebClient.ResponseSpec response = webClient
                 .mutate()
@@ -92,8 +100,6 @@ public class OrderController {
         ResponseEntity<PaymentReadyDto> responseEntity = response.toEntity(PaymentReadyDto.class).block();
         log.info(String.valueOf(responseEntity.getStatusCodeValue()));
         PaymentReadyDto paymentReadyDto = responseEntity.getBody();
-
-        log.info("url 전달 " + paymentReadyDto.getNext_redirect_pc_url());
         orderService.saveTid(orderId, paymentReadyDto.getTid());
 
         return "redirect:" + paymentReadyDto.getNext_redirect_pc_url();
@@ -110,22 +116,34 @@ public class OrderController {
     }
 
     @RequestMapping("/cancel")
-    public String orderCancel(@RequestParam(value = "id") Long id){
+    public String orderCancel(@RequestParam(value = "orderId") Long orderId){
+        orderService.cancel(orderId);
         orderRedirectAttributes("결제를 취소했습니다.");
-        return "redirect:/item/detail" + id;
+        return "redirect:/";
+        // 하나일 경우 상품 상세 페이지(itemId받아서) 여러 개일 경우 장바구니 페이지로
     }
 
     @RequestMapping("/fail")
-    public String orderFail(@RequestParam(value = "id") Long id){
+    public String orderFail(@RequestParam(value = "orderId") Long orderId){
+        orderService.cancel(orderId);
         orderRedirectAttributes("결제 실패했습니다.");
-        return "redirect:/item/detail" + id;
+        return "redirect:/";
     }
 
-    @RequestMapping("/payment/approve")
-    public String approvePayment(@RequestParam(value = "pg") String pg_token, HttpSession session){
+    @RequestMapping("/payment/approve") //GET
+    public String approvePayment(@RequestParam(value = "pg_token") String pg_token, HttpSession session){
 
         UserResponseDto user = (UserResponseDto) session.getAttribute("user");
         OrderResponseDto order = orderService.findOrderReady(user.getId());
+
+        Long cartId = 0L; List<Long> itemIds = new ArrayList<>();
+        try {
+            cartId = cartService.findByUser(user.getId()).getId();
+            itemIds = order.getOrderItems().stream()
+                    .map(OrderItemDto::getId)
+                    .collect(Collectors.toList());
+
+        } catch(IllegalArgumentException ignored){ }
 
         MultiValueMap<String, String> parameterMap = getParameterMap(user.getId(), order.getId());
         parameterMap.add("tid", order.getTid());
@@ -133,7 +151,7 @@ public class OrderController {
 
         String baseUrl = "https://kapi.kakao.com/v1/payment/approve";
 
-        Mono<ResponseEntity> response = webClient.mutate()
+        ResponseEntity<Object> response = webClient.mutate()
                 .baseUrl(baseUrl)
                 .defaultHeaders(httpHeaders -> {
                     httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -143,11 +161,13 @@ public class OrderController {
                 .post()
                 .body(BodyInserters.fromFormData(parameterMap))
                 .retrieve()
-                .bodyToMono(ResponseEntity.class);
+                .toEntity(Object.class)
+                .block();
 
-        ResponseEntity entity = response.block();
-        if(entity.getStatusCode().equals(HttpStatus.OK)) {
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP);
+            if(cartId != 0L) cartService.remove(cartId, itemIds);
+
         }else{
             // 장바구니에서는 장바구니로 돌아가기
             orderRedirectAttributes("결제 실패했습니다.");

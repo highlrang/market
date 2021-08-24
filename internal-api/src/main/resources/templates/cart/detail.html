@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+<script>
+    $(document).ready(function(){
+        $("#checkAll").click(function(){
+            if($("input:checkbox[id='checkAll']").prop("checked")){
+                $("input[type=checkbox]").prop("checked", true);
+            }else{
+                $("input[type=checkbox]").prop("checked", false);
+            }
+        });
+    });
+</script>
+
+<div th:if="${#lists.size(cart.cartItems)} == 0">
+
+    장바구니에 상품이 없습니다.
+
+</div>
+
+<form method="post">
+    <div><input type="hidden" name="user_id" th:value="${session.user.id}"></div>
+
+    <div th:each="item : ${cart.cartItems}">
+        <div><input type="checkbox" name="item_id" th:value="${item.itemId}"></div>
+
+        <div th:text="${item.itemName}"></div>
+        <div th:text="|${item.itemPrice}원|"></div>
+
+        <div th:text="|${item.itemCount}개|"></div>
+    </div>
+
+    <br>
+    <div th:text="|전체 금액 ${cart.totalPrice}원|"></div>
+    <br><br>
+    <div>
+        <label for="checkAll">전체 선택</label>
+        <input type="checkbox" id="checkAll">
+    </div>
+    <div>
+        <input type="submit" value="선택 삭제하기" formaction="/cart/remove">
+    </div>
+    <br><br>
+    <div>
+        <input type="submit" value="선택 주문하기" formaction="/order/payment/ready">
+    </div>
+
+</form>
+</body>
+</html>

@@ -10,9 +10,12 @@ public class UserResponseDto {
     private String name;
     private String email;
 
+    private Long cartId;
+
     public UserResponseDto(User entity){
         this.id = entity.getId();
         this.name = entity.getName();
         this.email = entity.getEmail();
+        this.cartId = entity.getCart().getId();
     }
 }

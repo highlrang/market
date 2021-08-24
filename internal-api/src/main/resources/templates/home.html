@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -7,5 +7,13 @@
 <body>
     홈 화면입니다.
     <a href="/item/save">상품 등록하기</a>
+
+    <div th:if="${session.user}">
+        <span th:text="|${session.user.name}님, 안녕하세요!|"></span>
+        <span th:if="${session.user.cartId} != null">
+            <a th:href="@{/cart/detail/{id}(id=${session.user.cartId})}">장바구니 이동</a>
+        </span>
+
+    </div>
 </body>
 </html>

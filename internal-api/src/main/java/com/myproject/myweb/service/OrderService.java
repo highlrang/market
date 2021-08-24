@@ -7,12 +7,15 @@ import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
 import com.myproject.myweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -31,20 +34,25 @@ public class OrderService {
         return orderRepository.findByUserAndStatusReady(userId, OrderStatus.READY).isPresent();
     }
 
-    @Transactional // 한 개 주문 시
-    public Long order(Long userId, Long itemId, int count){
+    @Transactional
+    public Long order(Long userId, List<Long> itemIds, List<Integer> counts){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
+        List<Item> items = itemRepository.findAllById(itemIds);
 
         // 배송 생성
         Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
 
         // 주문상품 생성
-        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
+        List<OrderItem> orderItems = new ArrayList<>();
+        for(int i=0; i<items.size(); i++) {
+            orderItems.add(
+                    OrderItem.createOrderItem(items.get(i), items.get(i).getPrice(), counts.get(i))
+            );
+        }
 
         // 배송, 주문상품 넣어서 >> 주문 생성
-        Order order = Order.createOrder(user, delivery, orderItem);
-        // orderItem 따로 save 안 해도 저장 되는 것??
+        Order order = Order.createOrder(user, delivery, orderItems.toArray(OrderItem[]::new));
+        // orderItem 따로 save 안 해도 저장됨(Cascade)
 
         return orderRepository.save(order).getId();
     }
@@ -62,7 +70,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void cancelOrder(Long orderId){
+    public void cancel(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         order.cancel();
     }

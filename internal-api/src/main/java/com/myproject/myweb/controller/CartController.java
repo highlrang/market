@@ -1,12 +1,12 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.dto.cart.CartResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -19,6 +19,13 @@ public class CartController {
 
     private final CartService cartService;
 
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable(value = "id") Long id, Model model){
+        CartResponseDto cart = cartService.findById(id);
+        model.addAttribute("cart", cart);
+        return "cart/detail";
+    }
+
     @PostMapping("/save")
     public String save(
                      @RequestParam(value = "user_id") Long userId, // session값 받기
@@ -29,13 +36,11 @@ public class CartController {
         return "redirect:" + request.getHeader("Referer");
     }
 
-    @PostMapping("/order")
-    public String order(@RequestParam(value = "item_id") List<Long> itemIds,
-                        @RequestParam(value = "user_id") Long userId){
-        Long orderId = cartService.toOrder(userId, itemIds);
-
-        // 복수건 결제 로직 만들기 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        return "order/detail";
+    @PostMapping("/remove") // 장바구니에서만 호출
+    public String remove(
+            @RequestParam("cart_id") Long cartId,
+            @RequestParam("item_id") List<Long> itemIds){
+        cartService.remove(cartId, itemIds);
+        return "redirect:/cart/detail/" + cartId;
     }
 }

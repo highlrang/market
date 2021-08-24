@@ -18,7 +18,7 @@
         });
     </script>
 
-    <form action="/order/payment/ready" method="post">
+    <form method="post">
     <div>
         <div>
             <div th:text="${item.name}"></div>
@@ -33,8 +33,11 @@
         </div>
 
 
-        <div><input type="text" name="count"></div>
-        <div><input type="submit" value="주문하기"></div>
+        <div><input type="text" name="count" value="1"></div>
+        <div>
+            <input type="submit" value="장바구니 담기" formaction="/cart/save">
+            <input type="submit" value="주문하기" formaction="/order/payment/ready">
+        </div>
     </div>
     </form>
 </body>
