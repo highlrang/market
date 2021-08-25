@@ -46,16 +46,15 @@ public class OrderController {
 
     // 익셉션 처리 + HttpStatus 200 이외의 경우 처리
     @PostMapping("/payment/ready")
-    public String readyPayment(HttpServletRequest request,
-                               @RequestParam(value = "user_id") Long userId,
+    public String readyPayment(@RequestParam(value = "user_id") Long userId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
                                @RequestParam(value = "count", required = false) String count){
         // count는 단건주문에만 필요, 장바구니는 코드로 가져오기
 
         Boolean orderImpossible = orderService.orderImpossible(userId);
         if(orderImpossible) {
-            orderRedirectAttributes("주문 중인 상품이 있습니다."); // template에 추가
-            return "redirect:" + request.getHeader("Referer");
+            orderRedirectAttributes("주문 중인 상품이 있어 진행이 불가능합니다."); // template에 추가
+            return "redirect:/";
         }
 
         log.info("count = " + count);
@@ -66,8 +65,7 @@ public class OrderController {
             counts.add(Integer.valueOf(count));
         }
         Long orderId = orderService.order(userId, itemIds, counts); // 여러 상품들 >> 하나의 주문서 생성
-
-        // error 발생 시 orderService.cancel(orderId);
+        // stock zero exception 대응하기
 
         OrderResponseDto orderResponseDto = orderService.findById(orderId);
 
@@ -84,25 +82,31 @@ public class OrderController {
         parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
         parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
 
-        WebClient.ResponseSpec response = webClient
-                .mutate()
-                .baseUrl(kakaopayUrl)
-                // "application/x-www-form-urlencoded;charset=utf-8"
-                .defaultHeaders(httpHeader -> {
-                    httpHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                    httpHeader.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
-                })
-                .build()
-                .post()
-                .body(BodyInserters.fromFormData(parameterMap))
-                .retrieve();
+        try {
+            Mono<PaymentReadyDto> response = webClient
+                    .mutate()
+                    .baseUrl(kakaopayUrl)
+                    // "application/x-www-form-urlencoded;charset=utf-8"
+                    .defaultHeaders(httpHeader -> {
+                        httpHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                        httpHeader.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
+                    })
+                    .build()
+                    .post()
+                    .body(BodyInserters.fromFormData(parameterMap))
+                    .retrieve()
+                    .bodyToMono(PaymentReadyDto.class);
 
-        ResponseEntity<PaymentReadyDto> responseEntity = response.toEntity(PaymentReadyDto.class).block();
-        log.info(String.valueOf(responseEntity.getStatusCodeValue()));
-        PaymentReadyDto paymentReadyDto = responseEntity.getBody();
-        orderService.saveTid(orderId, paymentReadyDto.getTid());
+            PaymentReadyDto paymentReadyDto = response.block();
+            orderService.saveTid(orderId, paymentReadyDto.getTid());
 
-        return "redirect:" + paymentReadyDto.getNext_redirect_pc_url();
+            return "redirect:" + paymentReadyDto.getNext_redirect_pc_url();
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            orderService.remove(orderId);
+            return "redirect:/"; // 수정
+        }
     }
 
 
@@ -180,7 +184,7 @@ public class OrderController {
 
     private void orderRedirectAttributes(String msg) {
         RedirectAttributes attributes = new RedirectAttributesModelMap();
-        attributes.addAttribute("orderFail", msg);
+        attributes.addAttribute("msg", msg);
     }
 
     @GetMapping("/detail/{id}")

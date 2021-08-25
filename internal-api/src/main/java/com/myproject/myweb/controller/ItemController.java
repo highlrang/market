@@ -8,6 +8,7 @@ import com.myproject.myweb.service.ItemService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.*;
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Controller
@@ -25,6 +27,7 @@ public class ItemController {
 
     private final ItemService itemService;
     private final FileHandler fileHandler;
+    private final MessageSource messageSource;
 
     @GetMapping("/save")
     public String saveForm(){
@@ -61,9 +64,12 @@ public class ItemController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id, Model model){
+    public String detail(@PathVariable Long id,
+                         @RequestParam(value = "msg", required = false) String msg,
+                         Model model){
         ItemResponseDto item = itemService.findById(id);
         model.addAttribute("item", item);
+        if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "item/detail";
     }
 }

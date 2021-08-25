@@ -83,6 +83,7 @@ public class OrderService {
     @Transactional
     public void remove(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        order.cancel(); // 재고 복귀
         orderRepository.delete(order);
     }
 }

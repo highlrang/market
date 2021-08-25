@@ -8,7 +8,7 @@
 <body>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var msg = /*[[ ${orderFail} ]]*/;
+        var msg = /*[[ ${msg} ]]*/;
         /*]]*/
 
         $(document).ready(function(){
@@ -18,27 +18,27 @@
         });
     </script>
 
-    <form method="post">
-    <div>
+    <form method="post" action="/order/payment/ready">
         <div>
-            <div th:text="${item.name}"></div>
-            <div th:text="${item.price}"></div>
-            <div th:each="photo: ${item.photos}">
-                <img th:src="|../../${photo.name}|" width="200" height="200">
-            </div>
             <div>
-                <input type="hidden" name="item_id" th:value="${item.id}">
-                <input type="hidden" name="user_id" th:value="${session.user.id}">
+                <div th:text="${item.name}"></div>
+                <div th:text="${item.price}"></div>
+                <div th:each="photo: ${item.photos}">
+                    <img th:src="|../../${photo.name}|" width="200" height="200">
+                </div>
+                <div>
+                    <input type="hidden" name="item_id" th:value="${item.id}">
+                    <input type="hidden" name="user_id" th:value="${session.user.id}">
+                </div>
+            </div>
+
+
+            <div><input type="text" name="count" value="1"></div>
+            <div>
+                <input type="submit" value="장바구니 담기" formaction="/cart/save">
+                <input type="submit" value="주문하기">
             </div>
         </div>
-
-
-        <div><input type="text" name="count" value="1"></div>
-        <div>
-            <input type="submit" value="장바구니 담기" formaction="/cart/save">
-            <input type="submit" value="주문하기" formaction="/order/payment/ready">
-        </div>
-    </div>
     </form>
 </body>
 </html>

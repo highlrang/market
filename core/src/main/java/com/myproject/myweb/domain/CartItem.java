@@ -26,22 +26,20 @@ public class CartItem {
     private Cart cart;
 
     private int count;
-    private int price;
 
     public void setCart(Cart cart) { // 이후에 Cart 엔티티 생성 또는 호출해서 등록 시 사용됨
         this.cart = cart;
     }
 
-    public static CartItem createCartItem(Item item, int price, int count){
+    public static CartItem createCartItem(Item item, int count){
         CartItem cartItem = new CartItem();
         cartItem.item = item;
-        cartItem.price = price;
         cartItem.count = count;
         return cartItem;
     }
 
     public int getTotalPrice(){
-        return count * price;
+        return count * item.getPrice();
     }
 
 

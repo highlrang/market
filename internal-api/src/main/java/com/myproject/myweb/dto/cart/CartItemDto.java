@@ -20,7 +20,7 @@ public class CartItemDto {
         this.itemId = entity.getItem().getId();
         this.itemName = entity.getItem().getName();
         this.itemCount = entity.getCount();
-        this.itemPrice = entity.getPrice();
+        this.itemPrice = entity.getItem().getPrice(); // 현재 상품 가격으로 장바구니
 
         this.userId = entity.getCart().getUser().getId();
         this.cartId = entity.getCart().getId();
