@@ -3,6 +3,7 @@ package com.myproject.myweb.service;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.order.OrderResponseDto;
+import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
 import com.myproject.myweb.repository.UserRepository;
@@ -24,6 +25,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final CouponRepository couponRepository;
 
     public OrderResponseDto findById(Long id){
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
@@ -42,24 +44,25 @@ public class OrderService {
     }
 
     @Transactional
-    public Long order(Long userId, List<Long> itemIds, List<Integer> counts){
+    public Long order(Long userId, Long itemId, int count, Long couponId){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
-        List<Item> items = itemRepository.findAllById(itemIds);
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         // 배송 생성
         Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
 
         // 주문상품 생성
-        List<OrderItem> orderItems = new ArrayList<>();
-        for(int i=0; i<items.size(); i++) {
-            orderItems.add(
-                    OrderItem.createOrderItem(items.get(i), items.get(i).getPrice(), counts.get(i))
-            );
+        int price = item.getPrice();
+        if(couponId != null){
+            Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
+            coupon.updateUsed();
+            price -= (price * (coupon.getDiscountPer() / 100)); // 할인가
         }
 
+        OrderItem orderItem = OrderItem.createOrderItem(item, price, count);
+
         // 배송, 주문상품 넣어서 >> 주문 생성
-        Order order = Order.createOrder(user, delivery, orderItems.toArray(OrderItem[]::new));
-        // orderItem 따로 save 안 해도 저장됨(Cascade)
+        Order order = Order.createOrder(user, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)
 
         return orderRepository.save(order).getId();
     }

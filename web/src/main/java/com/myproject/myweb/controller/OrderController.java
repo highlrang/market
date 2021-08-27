@@ -50,8 +50,9 @@ public class OrderController {
     @PostMapping("/payment/ready")
     public String readyPayment(@RequestParam(value = "user_id") Long userId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
-                               @RequestParam(value = "count", required = false) String count){
-        // count는 단건주문에만 필요, 장바구니는 코드로 가져오기
+                               @RequestParam(value = "count", required = false) String count,
+                               @RequestParam(value = "coupon", required = false) String couponId,
+                               @RequestParam(value = "cart_id", required = false) String cartId){
 
         Boolean orderImpossible = orderService.orderImpossible(userId);
         if(orderImpossible) {
@@ -59,15 +60,15 @@ public class OrderController {
             return "redirect:/";
         }
 
-        log.info("count = " + count);
-        List<Integer> counts = new ArrayList<>();
-        if(count == null) {
-            counts = cartService.findItemCount(userId, itemIds);
-        }else{
-            counts.add(Integer.valueOf(count));
+        Long orderId;
+        if(cartId != null){
+            // 장바구니에서 주문 (단건, 복수건)
+            orderId = cartService.order(userId, itemIds);
+        }else {
+            // 상품 단건 바로 주문
+            orderId = orderService.order(userId, itemIds.get(0), Integer.parseInt(count), Long.valueOf(couponId)); // 여러 상품들 >> 하나의 주문서 생성
+            // stock zero exception 대응하기
         }
-        Long orderId = orderService.order(userId, itemIds, counts); // 여러 상품들 >> 하나의 주문서 생성
-        // stock zero exception 대응하기
 
         OrderResponseDto orderResponseDto = orderService.findById(orderId);
 
@@ -130,7 +131,7 @@ public class OrderController {
 
     @RequestMapping("/fail")
     public String orderFail(@RequestParam(value = "orderId") Long orderId){
-        orderService.cancel(orderId);
+        orderService.cancel(orderId); // 취소가 아닌 실패 메서드 따로 만들기
         orderRedirectAttributes("결제 실패했습니다.");
         return "redirect:/";
     }
@@ -171,7 +172,9 @@ public class OrderController {
 
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP);
-            if(cartId != 0L) cartService.remove(cartId, itemIds);
+            if(cartId != 0L) {
+                cartService.remove(cartId, itemIds); // 쿠폰까지 삭제됨
+            }
 
         }else{
             // 장바구니에서는 장바구니로 돌아가기

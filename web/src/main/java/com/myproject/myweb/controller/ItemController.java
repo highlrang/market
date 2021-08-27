@@ -3,6 +3,7 @@ package com.myproject.myweb.controller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
+import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.io.File;
 import java.util.List;
@@ -66,9 +68,16 @@ public class ItemController {
     @GetMapping("/detail/{id}")
     public String detail(@PathVariable Long id,
                          @RequestParam(value = "msg", required = false) String msg,
+                         HttpSession session,
                          Model model){
         ItemResponseDto item = itemService.findById(id);
         model.addAttribute("item", item);
+
+        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
+        if(user != null){
+            model.addAttribute("coupons", user.getCoupons());
+        }
+
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "item/detail";
     }

@@ -1,6 +1,7 @@
 package com.myproject.myweb.domain.user;
 
 import com.myproject.myweb.domain.Cart;
+import com.myproject.myweb.domain.Coupon;
 import com.myproject.myweb.domain.Order;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orderList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    public List<Coupon> couponList = new ArrayList<>();
 
     @Builder
     public User(String name, String email, String password, Address address){ // 비번 암호화한 후 객체 생성

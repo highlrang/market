@@ -30,13 +30,21 @@
         <input type="hidden" name="user_id" th:value="${session.user.id}">
     </div>
 
-    <div th:each="item : ${cart.cartItems}">
-        <div><input type="checkbox" name="item_id" th:value="${item.itemId}"></div>
+    <div th:each="cartItem : ${cart.cartItems}">
+        <div><input type="hidden" name="cartItem_id" th:value="${cartItem.id}"></div>
+        <div><input type="checkbox" name="item_id" th:value="${cartItem.itemId}"></div>
 
-        <div th:text="${item.itemName}"></div>
-        <div th:text="|${item.itemPrice}원|"></div>
+        <div th:text="${cartItem.itemName}"></div>
+        <div th:text="|${cartItem.itemPrice}원|"></div>
 
-        <div th:text="|${item.itemCount}개|"></div>
+        <div><input type="text" th:value="${cartItem.itemCount}" name="count"></div>
+
+        <div th:text="${cartItem.coupon}"></div> 있으면 공개
+        <div> 있든 없든 변경 가능하게
+           <select name="coupon" th:each="coupon : ${coupons}">
+                <option th:value="${coupon.id}" th:text="${coupon.name} ${coupon.discountPer} ${coupon.expirationDate}"></option>
+            </select>
+        </div>
     </div>
 
     <br>
