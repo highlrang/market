@@ -30,6 +30,13 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
+    public List<OrderResponseDto> findByUserId(Long userId){
+        List<Order> orders = orderRepository.findAllByUser_Id(userId);
+        return orders.stream()
+                .map(OrderResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     public Boolean orderImpossible(Long userId){
         return orderRepository.findByUserAndStatusReady(userId, OrderStatus.READY).isPresent();
     }

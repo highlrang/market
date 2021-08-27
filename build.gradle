@@ -47,7 +47,7 @@ project(':batch'){
     }
 }
 
-project(':internal-api'){
+project(':web'){
     dependencies{
         compile project(':core')
     }

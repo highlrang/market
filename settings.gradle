@@ -1,6 +1,6 @@
 rootProject.name = 'market'
 include 'core'
 include 'batch'
+include 'web'
 include 'internal-api'
-include 'external-api'
 

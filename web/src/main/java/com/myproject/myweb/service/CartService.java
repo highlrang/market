@@ -65,11 +65,18 @@ public class CartService {
     }
 
     @Transactional
-    public void remove(Long cartId, List<Long> cartItemIds){
+    public void remove(Long cartId, List<Long> itemIds){
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
 
-        List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds); //
-        if(!cartItems.isEmpty()) cart.removeCartItems(cartItems);
+        List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(cartId) // 쿼리에서 일부분 꺼내와서 stream로직 처리!!!
+                .stream()
+                .filter(cartItem -> itemIds.contains(cartItem.getItem().getId()))
+                .collect(Collectors.toList());
+
+        if(!cartItems.isEmpty()) { // 연관관계
+            cart.removeCartItems(cartItems);
+            cartItemRepository.deleteAll(cartItems);
+        }
     }
 
 }

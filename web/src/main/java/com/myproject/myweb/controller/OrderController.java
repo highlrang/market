@@ -13,6 +13,7 @@ import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -41,6 +42,7 @@ public class OrderController {
     private final WebClient webClient = WebClient.create();
     private final OrderService orderService;
     private final CartService cartService;
+    private final MessageSource messageSource;
     private final static String cid = "TC0ONETIME";
 
 
@@ -110,7 +112,6 @@ public class OrderController {
     }
 
 
-
     private MultiValueMap<String, String> getParameterMap(@RequestParam("user_id") Long userId, Long orderId) {
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
         parameterMap.add("cid", cid);
@@ -144,7 +145,7 @@ public class OrderController {
         try {
             cartId = cartService.findByUser(user.getId()).getId();
             itemIds = order.getOrderItems().stream()
-                    .map(OrderItemDto::getId)
+                    .map(OrderItemDto::getItemId)
                     .collect(Collectors.toList());
 
         } catch(IllegalArgumentException ignored){ }
@@ -187,11 +188,60 @@ public class OrderController {
         attributes.addAttribute("msg", msg);
     }
 
+    @GetMapping("/list")
+    public String list(@RequestParam(value = "msg", required = false) String msg,
+                       HttpSession session, Model model){
+        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
+        List<OrderResponseDto> orders = orderService.findByUserId(user.getId());
+        model.addAttribute("orders", orders);
+        if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
+        return "order/list";
+    }
+
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id, Model model){
+    public String detail(@PathVariable Long id, Model model) {
         OrderResponseDto order = orderService.findById(id);
         model.addAttribute("order", order);
         return "order/detail";
+    }
+
+    @GetMapping("/payment/cancel/{orderId}")
+    public String paymentCancel(@PathVariable("orderId") Long orderId){
+
+        OrderResponseDto order = orderService.findById(orderId);
+        if(!order.getOrderStatus().equals("주문 완료")) throw new IllegalStateException("PaymentCancelFailed"); //
+
+        MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
+        parameterMap.add("cid", cid);
+        parameterMap.add("tid", order.getTid());
+        parameterMap.add("cancel_amount", String.valueOf(order.getTotalPrice()));
+        parameterMap.add("cancel_tax_free_amount", "0");
+
+        Mono<ResponseEntity<Object>> mono = webClient.mutate()
+                .baseUrl("https://kapi.kakao.com/v1/payment/cancel")
+                .defaultHeaders(
+                        httpHeaders -> {
+                            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                            httpHeaders.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
+                        }
+                )
+                .build()
+                .post()
+                .body(BodyInserters.fromFormData(parameterMap))
+                .retrieve()
+                .toEntity(Object.class);
+
+        try{
+            ResponseEntity<Object> response = mono.block();
+            if(response.getStatusCode().is2xxSuccessful()) orderService.cancel(orderId);
+
+        }catch(Exception e){
+            log.error("결제 취소가 실패했습니다. -> " + e.getMessage());
+            RedirectAttributes attributes = new RedirectAttributesModelMap();
+            attributes.addAttribute("msg", "paymentCancelFailed");
+        }
+
+        return "redirect:/order/list";
     }
 
 }

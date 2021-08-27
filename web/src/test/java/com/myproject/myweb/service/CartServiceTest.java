@@ -1,5 +1,6 @@
 package com.myproject.myweb.service;
 
+import com.myproject.myweb.domain.Cart;
 import com.myproject.myweb.domain.CartItem;
 import com.myproject.myweb.domain.Order;
 import com.myproject.myweb.domain.user.User;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +32,7 @@ class CartServiceTest {
     // @Mock ItemRepository itemRepository;
     @Autowired UserRepository userRepository;
     @Autowired OrderRepository orderRepository;
+    @Autowired CartRepository cartRepository;
     @Autowired CartItemRepository cartItemRepository;
     // @Mock OrderRepository orderRepository;
     // @InjectMocks
@@ -61,17 +64,6 @@ class CartServiceTest {
 
     @Test
     void toOrder() {
-
-        User user = userRepository.findById(1L).get();
-        List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(user.getCart().getId());
-        cartService.toOrder(1L, cartItems.stream().map(CartItem::getId).collect(Collectors.toList()));
-
-        // then
-        Order order = orderRepository.findAll().get(0);
-        System.out.println("사용자 이름 = " + order.getUser().getName());
-        order.getOrderItems()
-                .forEach(item -> System.out.println("주문한 상품 이름 " + item.getItem().getName() + " 주문한 상품 재고 = " + item.getItem().getStock()));
-
 
         // when(postService.findAll()).thenReturn(mockList);
         // doThrow().when().method();

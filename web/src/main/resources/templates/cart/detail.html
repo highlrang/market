@@ -25,7 +25,10 @@
 </div>
 
 <form method="post">
-    <div><input type="hidden" name="user_id" th:value="${session.user.id}"></div>
+    <div>
+        <input type="hidden" name="cart_id" th:value="${cart.id}">
+        <input type="hidden" name="user_id" th:value="${session.user.id}">
+    </div>
 
     <div th:each="item : ${cart.cartItems}">
         <div><input type="checkbox" name="item_id" th:value="${item.itemId}"></div>
