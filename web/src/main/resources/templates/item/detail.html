@@ -35,10 +35,12 @@
 
             <div><input type="text" name="count" value="1"></div>
 
-            <div th:if="coupons">
-               <select th:each="coupon : ${coupons}" name="coupon">
-                   <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.discountPer}% - ${coupon.expirationDate}까지|">
-                   </option>
+            <div>
+               <select name="coupon">
+                   <option value="null">선택안함</option>
+                   <span th:each="coupon: ${coupons}">
+                    <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.discountPer}% - ${coupon.expirationDate}까지|"></option>
+                   </span>
                </select>
             </div>
 

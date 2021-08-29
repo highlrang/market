@@ -15,51 +15,135 @@
                 $("input[type=checkbox]").prop("checked", false);
             }
         });
+
+        $("#order").click(function(){
+            var item_id_list = [];
+            $("input:checkbox[name='item_id']:checked").each(function(){
+                item_id_list.push($(this).val());
+            });
+
+            if(item_id_list.length == 0){
+                alert("상품을 선택해주세요.");
+                return false;
+            }
+
+            var data = {
+                user_id: $("#user_id").val(),
+                cart_id: $("#cart_id").val(),
+                item_id: item_id_list
+            };
+
+            var form = document.createElement('form');
+            form.setAttribute('method', 'post');
+            form.setAttribute('action', '/order/payment/ready');
+            document.charset = "utf-8";
+            for (var key in data) {
+                var hiddenField = document.createElement('input');
+                hiddenField.setAttribute('type', 'hidden');
+                hiddenField.setAttribute('name', key);
+                hiddenField.setAttribute('value', data[key]);
+                form.appendChild(hiddenField);
+            }
+            document.body.appendChild(form);
+            form.submit();
+
+            /*
+            $.ajax({
+                type: 'post',
+                url: '/order/payment/ready',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: data,
+                success: function(data) {
+                    alert(data);
+                },
+                error : function(request, status, error) {
+                    console.log(request, status, error);
+                }
+            });
+            */
+        });
+
+        $("#cart").click(function(){
+            var item_id_list = [];
+            $("input:checkbox[name='item_id']:checked").each(function(){
+                item_id_list.push($(this).val());
+            });
+
+            if(item_id_list.length == 0){
+                alert("상품을 선택해주세요.");
+                return false;
+            }
+
+            var data = {
+                cart_id: $("#cart_id").val(),
+                item_id: item_id_list
+            };
+
+            var form = document.createElement('form');
+            form.setAttribute('method', 'post');
+            form.setAttribute('action', '/cart/remove');
+            document.charset = "utf-8";
+            for (var key in data) {
+                var hiddenField = document.createElement('input');
+                hiddenField.setAttribute('type', 'hidden');
+                hiddenField.setAttribute('name', key);
+                hiddenField.setAttribute('value', data[key]);
+                form.appendChild(hiddenField);
+            }
+            document.body.appendChild(form);
+            form.submit();
+
+        });
     });
+
+
 </script>
 
-<div th:if="${#lists.size(cart.cartItems)} == 0">
+    <div th:if="${#lists.size(cart.cartItems)} == 0">
+        장바구니에 상품이 없습니다.
+    </div>
 
-    장바구니에 상품이 없습니다.
-
-</div>
-
-<form method="post">
     <div>
-        <input type="hidden" name="cart_id" th:value="${cart.id}">
-        <input type="hidden" name="user_id" th:value="${session.user.id}">
+        <input type="hidden" id="cart_id" th:value="${cart.id}">
+        <input type="hidden" id="user_id" th:value="${session.user.id}">
     </div>
 
     <div th:each="cartItem : ${cart.cartItems}">
-        <div><input type="hidden" name="cartItem_id" th:value="${cartItem.id}"></div>
-        <div><input type="checkbox" name="item_id" th:value="${cartItem.itemId}"></div>
+        <form method="post" action="/cart/update">
+            <div><input type="hidden" name="cartItem_id" th:value="${cartItem.id}"></div>
+            <div><input type="checkbox" name="item_id" th:value="${cartItem.itemId}"></div>
 
-        <div th:text="${cartItem.itemName}"></div>
-        <div th:text="|${cartItem.itemPrice}원|"></div>
+            <div th:text="${cartItem.itemName}"></div>
+            <div th:text="|${cartItem.itemPrice}원|"></div>
 
-        <div><input type="text" th:value="${cartItem.itemCount}" name="count"></div>
+            <div><input type="text" th:value="${cartItem.itemCount}" name="count"></div>
 
-        <div th:text="${cartItem.coupon}"></div> 있으면 공개
-        <div> 있든 없든 변경 가능하게
-           <select name="coupon" th:each="coupon : ${coupons}">
-                <option th:value="${coupon.id}" th:text="${coupon.name} ${coupon.discountPer} ${coupon.expirationDate}"></option>
-            </select>
-        </div>
+            <div th:if="${cartItem.coupon} != null">
+                <span th:text="${cartItem.coupon.name}"></span>
+            </div>
+            <div>
+                <select name="coupon">
+                    <option value="null">선택안함</option>
+                    <span th:each="coupon: ${coupons}">
+                        <option th:value="${coupon.id}" th:text="|${coupon.name} ${coupon.discountPer} ${coupon.expirationDate}|"></option>
+                    </span>
+                </select>
+            </div>
+
+            <div><input type="submit" value="수정"></div>
+        </form>
     </div>
 
     <br>
     <div th:text="|전체 금액 ${cart.totalPrice}원|"></div>
-    <br><br>
+    <br>
     <div>
         <label for="checkAll">전체 선택</label>
         <input type="checkbox" id="checkAll">
-    </div>
+    </div><br>
     <div>
-        <input type="submit" value="선택 삭제하기" formaction="/cart/remove">
-    </div>
-    <br><br>
-    <div>
-        <input type="submit" value="선택 주문하기" formaction="/order/payment/ready">
+        <input type="button" value="선택 삭제하기" id="cart">
+        <input type="button" value="선택 주문하기" id="order">
     </div>
 
 </form>

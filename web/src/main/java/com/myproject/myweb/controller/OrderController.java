@@ -51,7 +51,7 @@ public class OrderController {
     public String readyPayment(@RequestParam(value = "user_id") Long userId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
                                @RequestParam(value = "count", required = false) String count,
-                               @RequestParam(value = "coupon", required = false) String couponId,
+                               @RequestParam(value = "coupon") String couponId,
                                @RequestParam(value = "cart_id", required = false) String cartId){
 
         Boolean orderImpossible = orderService.orderImpossible(userId);
@@ -66,7 +66,7 @@ public class OrderController {
             orderId = cartService.order(userId, itemIds);
         }else {
             // 상품 단건 바로 주문
-            orderId = orderService.order(userId, itemIds.get(0), Integer.parseInt(count), Long.valueOf(couponId)); // 여러 상품들 >> 하나의 주문서 생성
+            orderId = orderService.order(userId, itemIds.get(0), Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
             // stock zero exception 대응하기
         }
 

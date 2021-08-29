@@ -7,6 +7,7 @@ import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.CouponService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/cart")
@@ -46,18 +48,18 @@ public class CartController {
                      @RequestParam(value = "coupon", required = false) String couponId,
                      RedirectAttributes attributes){
 
-        cartService.put(userId, itemId, count, Long.valueOf(couponId));
+        cartService.put(userId, itemId, count, couponId);
         attributes.addAttribute("msg", "CartSave");
         return "redirect:/item/detail/" + itemId;
     }
 
     @PostMapping("/update")
     public String update(
-            @RequestParam(value = "cart_id") Long cartId,
             @RequestParam(value = "cartItem_id") Long cartItemId,
             @RequestParam(value = "count") int count,
             @RequestParam(value = "coupon", required = false) String couponId){
         cartService.update(cartItemId, count, couponId);
+        Long cartId = cartService.findCartIdByCartItemId(cartItemId);
         return "redirect:/cart/detail/" + cartId;
     }
 

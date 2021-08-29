@@ -44,7 +44,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Long order(Long userId, Long itemId, int count, Long couponId){
+    public Long order(Long userId, Long itemId, int count, String couponId){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
@@ -52,14 +52,12 @@ public class OrderService {
         Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
 
         // 주문상품 생성
-        int price = item.getPrice();
-        if(couponId != null){
-            Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
-            coupon.updateUsed();
-            price -= (price * (coupon.getDiscountPer() / 100)); // 할인가
+        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
+        if(!couponId.equals("null")){
+            Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
+            // coupon.updateUsed(); // orderItem에서 cascade로 삭제안 될때만 필요
+            orderItem.setCoupon(coupon);
         }
-
-        OrderItem orderItem = OrderItem.createOrderItem(item, price, count);
 
         // 배송, 주문상품 넣어서 >> 주문 생성
         Order order = Order.createOrder(user, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)

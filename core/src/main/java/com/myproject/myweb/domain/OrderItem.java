@@ -28,6 +28,9 @@ public class OrderItem {
     private int price; // 주문 당시 금액
     private int count;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Coupon coupon;
+
     public void setOrder(Order order){
         this.order = order;
     }
@@ -42,11 +45,17 @@ public class OrderItem {
         return orderItem;
     }
 
+    public void setCoupon(Coupon coupon){
+        this.coupon = coupon;
+    }
+
     public void cancel(){
         item.addStock(count);
     }
 
     public int getTotalPrice(){
-        return price * count;
+        if(coupon != null) return price * count;
+        int finalPrice = price - (price * (coupon.getDiscountPer() / 100)); // 할인가
+        return finalPrice * count;
     }
 }

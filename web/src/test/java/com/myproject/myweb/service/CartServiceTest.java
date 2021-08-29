@@ -2,6 +2,7 @@ package com.myproject.myweb.service;
 
 import com.myproject.myweb.domain.Cart;
 import com.myproject.myweb.domain.CartItem;
+import com.myproject.myweb.domain.Coupon;
 import com.myproject.myweb.domain.Order;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.repository.*;
@@ -16,6 +17,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,7 @@ class CartServiceTest {
     @Autowired OrderRepository orderRepository;
     @Autowired CartRepository cartRepository;
     @Autowired CartItemRepository cartItemRepository;
+    @Autowired CouponRepository couponRepository;
     // @Mock OrderRepository orderRepository;
     // @InjectMocks
     @Autowired CartService cartService;
@@ -48,8 +51,7 @@ class CartServiceTest {
 
     @Test @Commit
     void put() {
-        cartService.put(1L, 3L, 1);
-        cartService.put(1L, 4L, 1);
+        // cartService.put(1L, 3L, 1);
 
         List<CartItem> cartItems = cartItemRepository.findAll();
 
@@ -60,6 +62,30 @@ class CartServiceTest {
 
     @Test
     void cancel() {
+        User user = userRepository.findById(1L).get();
+
+        LocalDateTime fiveMonthAfter = LocalDateTime.now().plusMonths(5L);
+        Coupon coupon1 = Coupon.builder()
+                .name("5% 할인 쿠폰")
+                .descountPer(5)
+                .expirationDate(fiveMonthAfter)
+                .user(user)
+                .build();
+        Coupon coupon2 = Coupon.builder()
+                .name("10% 할인 쿠폰")
+                .descountPer(10)
+                .expirationDate(fiveMonthAfter)
+                .user(user)
+                .build();
+
+        couponRepository.save(coupon1);
+        // user.getCouponList().add(coupon1);
+
+        couponRepository.save(coupon2);
+        // user.getCouponList().add(coupon2); // 연관관계 매핑 안해도 들어가는 이유는 cascade 때문??
+
+        user.getCouponList().forEach(coupon -> System.out.println(coupon.getId()));
+
     }
 
     @Test

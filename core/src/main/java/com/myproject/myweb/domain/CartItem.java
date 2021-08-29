@@ -37,12 +37,15 @@ public class CartItem {
         this.cart = cart;
     }
 
-    public static CartItem createCartItem(Item item, int count, Coupon coupon){
+    public static CartItem createCartItem(Item item, int count){
         CartItem cartItem = new CartItem();
         cartItem.item = item;
         cartItem.count = count;
-        cartItem.coupon = coupon;
         return cartItem;
+    }
+
+    public void setCoupon(Coupon coupon){
+        this.coupon = coupon;
     }
 
     public void update(int count, Coupon coupon){
@@ -51,7 +54,11 @@ public class CartItem {
     }
 
     public int getTotalPrice(){
-        return (item.getPrice() - (item.getPrice() * coupon.getDiscountPer()/100)) * count;
+        int totalPrice = item.getPrice() * count;
+        if(coupon != null){
+            totalPrice = (item.getPrice() - (item.getPrice() * coupon.getDiscountPer()/100)) * count;
+        }
+        return totalPrice;
     }
 
 

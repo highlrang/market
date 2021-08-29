@@ -42,23 +42,30 @@ public class CartService {
         return cartItemRepository.findCountByUser_IdAndItem_Id(userId, itemIds);
     }
 
+    public Long findCartIdByCartItemId(Long cartItemId){
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(() -> new IllegalArgumentException("CartItemNotFoundException"));
+        return cartItem.getCart().getId();
+    }
+
     @Transactional
-    public void put(Long userId, Long itemId, int count, Long couponId){
+    public void put(Long userId, Long itemId, int count, String couponId){
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
-        Coupon coupon = couponRespository.findById(couponId).orElseThrow(() -> new IllegalArgumentException("CouponNowFoundException"));
-        CartItem cartItem = CartItem.createCartItem(item, count, coupon);
+        CartItem cartItem = CartItem.createCartItem(item, count);
+        if(couponId != null) {
+            Coupon coupon = couponRespository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNowFoundException"));
+            cartItem.setCoupon(coupon);
+        }
+
         try {
             Cart userCart = cartRepository.findById(user.getCart().getId())
                     .orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
 
-            boolean anyMatch = userCart.getCartItems().stream()
-                    .anyMatch(existing -> existing.getItem().equals(item));
-            if(!anyMatch) {
-                userCart.addCartItem(cartItem); // 연관관계 먼저 !
-                cartItemRepository.save(cartItem);
-            }
+            // boolean anyMatch = userCart.getCartItems().stream().anyMatch(existing -> existing.getItem().equals(item));
+            userCart.addCartItem(cartItem); // cascade 설정 안 했기에 연관관계 먼저 넣기
+            cartItemRepository.save(cartItem);
+
 
         }catch (IllegalArgumentException e){
             Cart cart = Cart.createCart(user, cartItem);
@@ -94,7 +101,7 @@ public class CartService {
     @Transactional
     public void update(Long cartItemId, int count, String couponId){
         CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(() -> new IllegalArgumentException("CartItemNotFoundException"));
-        if(couponId != null) {
+        if(!couponId.equals("null")) {
             Coupon coupon = couponRespository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotExistException"));
             cartItem.update(count, coupon);
         }else{
