@@ -29,3 +29,6 @@ logging:
         SQL: debug
         type: trace
 
+gmail:
+  username: "developoffi@gmail.com"
+  password: "gkdtksgkdtla9921"

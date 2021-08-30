@@ -6,9 +6,9 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
-    <script>
+    <script th:inline="javascript">
         /*<![CDATA[*/
-        var msg = /*[[ ${msg} ]]*/;
+        var msg = [[ ${msg} ]];
         /*]]*/
 
         $(document).ready(function(){

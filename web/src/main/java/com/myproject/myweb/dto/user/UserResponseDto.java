@@ -17,14 +17,17 @@ public class UserResponseDto {
     private Long cartId;
     private List<CouponDto> coupons;
 
+    private Boolean certified;
+
     public UserResponseDto(User entity){
         this.id = entity.getId();
         this.name = entity.getName();
         this.email = entity.getEmail();
-        this.cartId = entity.getCart().getId();
+        if(entity.getCart() != null) this.cartId = entity.getCart().getId();
         this.coupons = entity.getCouponList()
                 .stream()
                 .map(CouponDto::new)
                 .collect(Collectors.toList());
+        this.certified = entity.getCertified();
     }
 }

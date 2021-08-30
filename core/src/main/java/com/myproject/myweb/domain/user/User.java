@@ -6,6 +6,7 @@ import com.myproject.myweb.domain.Order;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,6 +28,10 @@ public class User {
     @Embedded
     private Address address;
 
+    private String certificationToken;
+    @ColumnDefault("false")
+    private Boolean certified;
+
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Cart cart;
 
@@ -42,6 +47,14 @@ public class User {
         this.password = password;
         this.name = name;
         this.address = address;
+        certified = false;
+    }
+
+    public void setCertificationToken(String token){
+        certificationToken = token;
+    }
+    public void setCertified(Boolean isCertified){
+        certified = isCertified;
     }
 
     public void setCart(Cart cart){

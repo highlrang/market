@@ -20,7 +20,7 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // N:1에서 N이 주인 >> Coupon Table 생기는지 확인
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -31,10 +31,10 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
     private Boolean isUsed;
 
     @Builder
-    public Coupon(String name, User user, int descountPer, LocalDateTime expirationDate){
+    public Coupon(String name, User user, int discountPer, LocalDateTime expirationDate){
         this.name = name;
         this.user = user;
-        this.discountPer = descountPer;
+        this.discountPer = discountPer;
         this.expirationDate = expirationDate;
         isUsed = false;
     }
