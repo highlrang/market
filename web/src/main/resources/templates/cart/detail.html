@@ -6,8 +6,20 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+        var msg = [[ ${msg} ]];
+    /*]]*/
+
+    $(document).ready(function(){
+        if(msg != null){
+            alert(msg);
+        }
+    });
+</script>
 <script>
     $(document).ready(function(){
+
         $("#checkAll").click(function(){
             if($("input:checkbox[id='checkAll']").prop("checked")){
                 $("input[type=checkbox]").prop("checked", true);

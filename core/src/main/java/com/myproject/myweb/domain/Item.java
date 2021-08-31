@@ -50,7 +50,7 @@ public class Item {
     public void removeStrock(int stockQuantity){
         int nowStock = stock - stockQuantity;
         if(nowStock < 0){
-            throw new IllegalStateException("stock zero");
+            throw new IllegalStateException("StockZeroException");
         }
         stock = nowStock;
     }

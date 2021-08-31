@@ -11,8 +11,10 @@ import com.myproject.myweb.dto.order.PaymentReadyDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.OrderService;
+import com.myproject.myweb.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -39,14 +41,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/order")
 public class OrderController {
 
-    private final WebClient webClient = WebClient.create();
     private final OrderService orderService;
     private final CartService cartService;
+    private final PaymentService paymentService;
     private final MessageSource messageSource;
-    private final static String cid = "TC0ONETIME";
 
 
-    // 익셉션 처리 + HttpStatus 200 이외의 경우 처리
     @PostMapping("/payment/ready")
     public String readyPayment(@RequestParam(value = "user_id") Long userId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
@@ -56,8 +56,10 @@ public class OrderController {
 
         Boolean orderImpossible = orderService.orderImpossible(userId);
         if(orderImpossible) {
-            orderRedirectAttributes("주문 중인 상품이 있어 진행이 불가능합니다."); // template에 추가
-            return "redirect:/";
+            orderRedirectAttributes("OrderAlreadyInProgress");
+            if(cartId == null) return "redirect:/item/detail/" + itemIds.get(0);
+            return "redirect:/cart/detail/" + cartId;
+            // 주문 페이지 따로 생기기 전까지는 item detail 또는 cart detail 페이지로
         }
 
         Long orderId;
@@ -70,70 +72,31 @@ public class OrderController {
             // stock zero exception 대응하기
         }
 
-        OrderResponseDto orderResponseDto = orderService.findById(orderId);
+        String url = paymentService.ready(userId, orderId);
+        if(url != null) return "redirect:" + url;
 
-        String myHost = "http://127.0.0.1:8081/order";
-        String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
-
-        MultiValueMap<String, String> parameterMap = getParameterMap(userId, orderId);
-        parameterMap.add("item_name", orderResponseDto.getOrderItemsName());
-        parameterMap.add("quantity", String.valueOf(orderResponseDto.getTotalCount()));
-        parameterMap.add("total_amount", String.valueOf(orderResponseDto.getTotalPrice()));
-        parameterMap.add("tax_free_amount", "0");
-
-        parameterMap.add("approval_url", myHost + "/payment/approve");
-        parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
-        parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
-
-        try {
-            Mono<PaymentReadyDto> response = webClient
-                    .mutate()
-                    .baseUrl(kakaopayUrl)
-                    // "application/x-www-form-urlencoded;charset=utf-8"
-                    .defaultHeaders(httpHeader -> {
-                        httpHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                        httpHeader.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
-                    })
-                    .build()
-                    .post()
-                    .body(BodyInserters.fromFormData(parameterMap))
-                    .retrieve()
-                    .bodyToMono(PaymentReadyDto.class);
-
-            PaymentReadyDto paymentReadyDto = response.block();
-            orderService.saveTid(orderId, paymentReadyDto.getTid());
-
-            return "redirect:" + paymentReadyDto.getNext_redirect_pc_url();
-
-        }catch (Exception e){
-            log.error(e.getMessage());
-            orderService.remove(orderId);
-            return "redirect:/"; // 수정
-        }
+        if(cartId == null) return "redirect:/item/detail" + itemIds.get(0);
+        return "redirect:/cart/detail" + cartId;
     }
 
-
-    private MultiValueMap<String, String> getParameterMap(@RequestParam("user_id") Long userId, Long orderId) {
-        MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
-        parameterMap.add("cid", cid);
-        parameterMap.add("partner_order_id", String.valueOf(orderId));
-        parameterMap.add("partner_user_id", String.valueOf(userId));
-        return parameterMap;
+    @RequestMapping("/payment/cancel")
+    public String paymentCancel(@RequestParam(value = "orderId") Long orderId){
+        // status QUIT_PAYMENT 확인하기
+        String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
+        orderService.remove(orderId);
+        orderRedirectAttributes("PaymentCancel");
+        return "redirect:/" + url;
+        // 일단 item 하나일 경우 상품 상세 페이지, 여러 개일 경우 장바구니 페이지로
     }
 
-    @RequestMapping("/cancel")
-    public String orderCancel(@RequestParam(value = "orderId") Long orderId){
-        orderService.cancel(orderId);
-        orderRedirectAttributes("결제를 취소했습니다.");
-        return "redirect:/";
-        // 하나일 경우 상품 상세 페이지(itemId받아서) 여러 개일 경우 장바구니 페이지로
-    }
-
-    @RequestMapping("/fail")
+    @RequestMapping("/payment/fail")
     public String orderFail(@RequestParam(value = "orderId") Long orderId){
-        orderService.cancel(orderId); // 취소가 아닌 실패 메서드 따로 만들기
-        orderRedirectAttributes("결제 실패했습니다.");
-        return "redirect:/";
+        // status QUIT_PAYMENT 확인하기
+        String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
+        orderService.remove(orderId);
+        orderRedirectAttributes("PaymentFailed");
+        return "redirect:/" + url;
+        // 일단 item 하나일 경우 상품 상세 페이지, 여러 개일 경우 장바구니 페이지로
     }
 
     @RequestMapping("/payment/approve") //GET
@@ -142,48 +105,36 @@ public class OrderController {
         UserResponseDto user = (UserResponseDto) session.getAttribute("user");
         OrderResponseDto order = orderService.findOrderReady(user.getId());
 
-        Long cartId = 0L; List<Long> itemIds = new ArrayList<>();
+        List<Long> itemIds = order.getOrderItems().stream()
+                .map(OrderItemDto::getItemId)
+                .collect(Collectors.toList());
+
+        Long cartId = 0L;
         try {
             cartId = cartService.findByUser(user.getId()).getId();
-            itemIds = order.getOrderItems().stream()
-                    .map(OrderItemDto::getItemId)
-                    .collect(Collectors.toList());
-
         } catch(IllegalArgumentException ignored){ }
 
-        MultiValueMap<String, String> parameterMap = getParameterMap(user.getId(), order.getId());
-        parameterMap.add("tid", order.getTid());
-        parameterMap.add("pg_token", pg_token);
-
-        String baseUrl = "https://kapi.kakao.com/v1/payment/approve";
-
-        ResponseEntity<Object> response = webClient.mutate()
-                .baseUrl(baseUrl)
-                .defaultHeaders(httpHeaders -> {
-                    httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                    httpHeaders.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
-                })
-                .build()
-                .post()
-                .body(BodyInserters.fromFormData(parameterMap))
-                .retrieve()
-                .toEntity(Object.class)
-                .block();
-
-        if(response.getStatusCode().equals(HttpStatus.OK)) {
+        Boolean success = paymentService.approve(user.getId(), order.getId(), pg_token);
+        if(success) {
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP);
-            if(cartId != 0L) {
+            if (cartId != 0L) {
                 cartService.remove(cartId, itemIds); // 쿠폰까지 삭제됨
             }
-
-        }else{
-            // 장바구니에서는 장바구니로 돌아가기
-            orderRedirectAttributes("결제 실패했습니다.");
-            return "redirect:/item/detail/" + order.getOrderItems().get(0).getId();
-            // 보통은 결제 전 페이지, 나는 일단 상품 디테일 페이지
+            return "redirect:/order/detail/" + order.getId();
         }
 
-        return "redirect:/order/detail/" + order.getId();
+        // 400 Bad Request Error etc...
+        orderRedirectAttributes("PaymentFailed");
+        if(cartId != 0L) return "redirect:/cart/detail/" + cartId;
+        return "redirect:/item/detail/" + order.getOrderItems().get(0).getId();
+
+    }
+
+    @RequestMapping("/cancel/{orderId}")
+    public String orderCancel(@RequestParam(value = "orderId") Long orderId){
+        String msg = paymentService.cancel(orderId);// orderService.cancel() 까지 호출
+        orderRedirectAttributes(msg);
+        return "redirect:/order/list";
     }
 
     private void orderRedirectAttributes(String msg) {
@@ -206,45 +157,6 @@ public class OrderController {
         OrderResponseDto order = orderService.findById(id);
         model.addAttribute("order", order);
         return "order/detail";
-    }
-
-    @GetMapping("/payment/cancel/{orderId}")
-    public String paymentCancel(@PathVariable("orderId") Long orderId){
-
-        OrderResponseDto order = orderService.findById(orderId);
-        if(!order.getOrderStatus().equals("주문 완료")) throw new IllegalStateException("PaymentCancelFailed"); //
-
-        MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
-        parameterMap.add("cid", cid);
-        parameterMap.add("tid", order.getTid());
-        parameterMap.add("cancel_amount", String.valueOf(order.getTotalPrice()));
-        parameterMap.add("cancel_tax_free_amount", "0");
-
-        Mono<ResponseEntity<Object>> mono = webClient.mutate()
-                .baseUrl("https://kapi.kakao.com/v1/payment/cancel")
-                .defaultHeaders(
-                        httpHeaders -> {
-                            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                            httpHeaders.set("Authorization", "KakaoAK 39e0b2a37b36d82e2289cee9827048e2");
-                        }
-                )
-                .build()
-                .post()
-                .body(BodyInserters.fromFormData(parameterMap))
-                .retrieve()
-                .toEntity(Object.class);
-
-        try{
-            ResponseEntity<Object> response = mono.block();
-            if(response.getStatusCode().is2xxSuccessful()) orderService.cancel(orderId);
-
-        }catch(Exception e){
-            log.error("결제 취소가 실패했습니다. -> " + e.getMessage());
-            RedirectAttributes attributes = new RedirectAttributesModelMap();
-            attributes.addAttribute("msg", "paymentCancelFailed");
-        }
-
-        return "redirect:/order/list";
     }
 
 }

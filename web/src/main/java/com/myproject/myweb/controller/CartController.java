@@ -28,15 +28,19 @@ public class CartController {
 
     private final CartService cartService;
     private final CouponService couponService;
+    private final MessageSource messageSource;
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable(value = "id") Long id, HttpSession session, Model model){
+    public String detail(@PathVariable(value = "id") Long id, HttpSession session,
+                         @RequestParam(value = "msg", required = false) String msg,
+                         Model model){
         CartResponseDto cart = cartService.findById(id);
         model.addAttribute("cart", cart);
 
-        // cartItem에 사용되지 않은 쿠폰만 보내기
         UserResponseDto user = (UserResponseDto) session.getAttribute("user");
         model.addAttribute("coupons", couponService.findByUserAndCanUse(user.getId()));
+
+        if(msg != null) model.addAttribute("msg", messageSource.getMessage("msg", null, Locale.getDefault()));
         return "cart/detail";
     }
 

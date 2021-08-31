@@ -30,7 +30,7 @@ public class CartItem {
     // @NotNull
     private int count;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // coupon 삭제되는지 확인
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // coupon까지 삭제되게
     private Coupon coupon;
 
     public void setCart(Cart cart) { // 이후에 Cart 엔티티 생성 또는 호출해서 등록 시 사용됨

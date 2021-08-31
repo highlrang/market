@@ -25,7 +25,7 @@
         <div th:text="${order.orderDate}"></div>
         <div th:text="${order.orderStatus}"></div>
         <div th:if="${order.orderStatus} == '주문 완료'">
-            <a th:href="@{/order/payment/cancel/{orderId}(orderId=${order.id})}">주문 취소</a>
+            <a th:href="@{/order/cancel/{orderId}(orderId=${order.id})}">주문 취소</a>
         </div>
         <br>
     </div>

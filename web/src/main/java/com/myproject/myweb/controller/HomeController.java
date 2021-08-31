@@ -98,8 +98,8 @@ public class HomeController {
                 userService.certify(user.getId());
                 attributes.addAttribute("msg", "UserJoinEmailCertificationRetry");
                 return "redirect:/";
+                // 인증 안된채로는 기능 사용 못하게 xx
             }
-            // 인증이 필요합니다 + 메일 다시 보내는 페이지로 | 인증 안된채로는 기능 사용 못하게 xx
             session.setAttribute("user", user);
 
         }catch (IllegalArgumentException | IllegalStateException | MessagingException error){

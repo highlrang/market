@@ -2,15 +2,29 @@ package com.myproject.myweb.service;
 
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.User;
+import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
+import com.myproject.myweb.dto.order.PaymentReadyDto;
 import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
 import com.myproject.myweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +69,7 @@ public class OrderService {
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
         if(!couponId.equals("null")){
             Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
-            // coupon.updateUsed(); // orderItem에서 cascade로 삭제안 될때만 필요
+            // coupon.updateUsed(); // orderItem에서 cascade로 쿠폰 삭제돼서 필요없음
             orderItem.setCoupon(coupon);
         }
 
@@ -66,15 +80,17 @@ public class OrderService {
     }
 
     @Transactional
-    public void saveTid(Long orderId, String tid){
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
-        order.setTid(tid);
-    }
-
-    @Transactional
     public void updateOrderStatus(Long orderId, OrderStatus status){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         order.setOrderStatus(status);
+    }
+
+    public String getRedirectUrlByItemOneOrMany(Long orderId){
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        if(order.getOrderItems().size() == 1){
+            return "item/detail/" + order.getOrderItems().get(0).getId();
+        }
+        return "cart/detail" + order.getUser().getCart().getId();
     }
 
     @Transactional

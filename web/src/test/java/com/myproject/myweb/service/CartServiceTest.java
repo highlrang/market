@@ -67,13 +67,13 @@ class CartServiceTest {
         LocalDateTime fiveMonthAfter = LocalDateTime.now().plusMonths(5L);
         Coupon coupon1 = Coupon.builder()
                 .name("5% 할인 쿠폰")
-                .descountPer(5)
+                .discountPer(5)
                 .expirationDate(fiveMonthAfter)
                 .user(user)
                 .build();
         Coupon coupon2 = Coupon.builder()
                 .name("10% 할인 쿠폰")
-                .descountPer(10)
+                .discountPer(10)
                 .expirationDate(fiveMonthAfter)
                 .user(user)
                 .build();
