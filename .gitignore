@@ -4,5 +4,16 @@
 
 /gradle/
 
+/core/build/
+/core/out/
+
+/web/build/
+/web/out/
+
 /upload/
+
+/core/src/main/resources/*.yml
+
+/web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
+/web/src/main/resources/*.yml
 
