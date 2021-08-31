@@ -32,3 +32,6 @@ logging:
 gmail:
   username: "developoffi@gmail.com"
   password: "gkdtksgkdtla9921"
+
+kakaopay:
+  cid: "TC0ONETIME"
