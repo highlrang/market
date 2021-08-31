@@ -12,6 +12,8 @@
 
 /upload/
 
-EchoHandler
-*.yml
+/web/src/main/resources/*.yml
+/core/src/main/resources/*.yml
+
+/web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
 
