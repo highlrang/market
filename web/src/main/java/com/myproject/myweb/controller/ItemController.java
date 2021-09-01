@@ -14,10 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,7 +47,15 @@ public class ItemController {
                        @RequestParam(value="stock") int stock,
                        @RequestParam(value="file") List<MultipartFile> files){
 
-        List<PhotoDto> namedPhotos = fileHandler.photoProcess(files);
+        List<PhotoDto> namedPhotos;
+        try {
+            namedPhotos = fileHandler.photoProcess(files);
+
+        }catch(IOException e){
+            RedirectAttributes attributes = new RedirectAttributesModelMap();
+            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
+            return "redirect:/save";
+        }
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .name(name)

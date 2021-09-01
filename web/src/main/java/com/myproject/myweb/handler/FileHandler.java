@@ -19,42 +19,41 @@ import java.util.Map;
 @Component
 public class FileHandler {
 
-    public List<PhotoDto> photoProcess(List<MultipartFile> photos){
+    public List<PhotoDto> photoProcess(List<MultipartFile> photos) throws IOException {
 
         List<PhotoDto> namedPhotos = new ArrayList<>();
 
-        photos.forEach(
-            photo -> {
-                if(!photo.isEmpty()) {
+        for (MultipartFile photo : photos) {
+            if (!photo.isEmpty()) {
 
-                    String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                    String path = "upload/" + now; // upload/20210817
-                    File file = new File(path);
-                    if (!file.exists()) file.mkdirs();
+                String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String path = "upload/" + now; // upload/20210817
+                File file = new File(path);
+                if (!file.exists()) file.mkdirs();
 
-                    String extension = extractedContentType(photo.getContentType());
+                String extension = extractedContentType(photo.getContentType());
+                String name = path + "/" + System.nanoTime() + extension; // ../nanoTime.png
 
-                    String name = path + "/" + System.nanoTime() + extension; // ../nanoTime.png
+                namedPhotos.add(PhotoDto.builder()
+                        .originName(photo.getOriginalFilename())
+                        .name(name)
+                        .path(path)
+                        .build()
+                );
 
-                    namedPhotos.add(PhotoDto.builder()
-                            .originName(photo.getOriginalFilename())
-                            .name(name)
-                            .path(path)
-                            .build()
-                    );
+                String absolutePath = new File("").getAbsolutePath() + "\\";
+                file = new File(absolutePath + name);
+                try {
+                    photo.transferTo(file);
 
-                    String absolutePath = new File("").getAbsolutePath() + "\\";
-                    file = new File(absolutePath + name);
-                    try {
-                        photo.transferTo(file);
-
-                    } catch (IOException e) {
-                        log.info(e.getMessage());
-                    }
+                } catch (IOException e) {
+                    log.error("사진 파일 저장 실패");
+                    // namedPhotos.clear();
+                    throw new IOException("PhotoSaveFailedException");
+                    // break;
                 }
             }
-        );
-
+        }
         return namedPhotos;
 
     }

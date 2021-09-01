@@ -6,7 +6,6 @@ import com.myproject.myweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -103,10 +102,13 @@ public class HomeController {
             session.setAttribute("user", user);
 
         }catch (IllegalArgumentException | IllegalStateException | MessagingException error){
+
             if(error.getMessage().equals("UserNotFoundException")){
                 bindingResult.rejectValue("email", "EmailError", "email을 가진 사용자를 찾을 수 없습니다.");
+
             }else if(error.getMessage().equals("UserNotMatchedException")){
                 bindingResult.rejectValue("password", "PasswordError", "비밀번호 불일치입니다.");
+
             }else{
                 bindingResult.reject("EmailError", "이메일 인증을 위한 이메일 전송이 실패했습니다.");
             }

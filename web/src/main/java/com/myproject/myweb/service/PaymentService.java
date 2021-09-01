@@ -128,7 +128,6 @@ public class PaymentService {
     @Transactional
     public String cancel(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
-        if(!order.getOrderStatus().equals("주문 완료")) throw new IllegalStateException("OrderAlreadyCompleteException");
 
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
         parameterMap.add("cid", cid);

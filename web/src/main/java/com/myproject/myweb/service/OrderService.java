@@ -69,7 +69,7 @@ public class OrderService {
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
         if(!couponId.equals("null")){
             Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
-            // coupon.updateUsed(); // orderItem에서 cascade로 쿠폰 삭제돼서 필요없음
+            coupon.updateUsed(); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
             orderItem.setCoupon(coupon);
         }
 

@@ -24,7 +24,7 @@ public class UserResponseDto {
         this.name = entity.getName();
         this.email = entity.getEmail();
         if(entity.getCart() != null) this.cartId = entity.getCart().getId();
-        this.coupons = entity.getCouponList()
+        this.coupons = entity.getCouponList() // list니까 null이어도 에러 안남
                 .stream()
                 .map(CouponDto::new)
                 .collect(Collectors.toList());

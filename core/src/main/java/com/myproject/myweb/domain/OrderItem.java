@@ -20,7 +20,7 @@ public class OrderItem {
     @JoinColumn(name="item_id")
     private Item item;
 
-    @JsonIgnore
+    @JsonIgnore // 중복이니 ignore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="order_id")
     private Order order;
@@ -28,7 +28,7 @@ public class OrderItem {
     private int price; // 주문 당시 금액
     private int count;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private Coupon coupon;
 
     public void setOrder(Order order){

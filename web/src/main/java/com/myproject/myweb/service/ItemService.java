@@ -29,18 +29,9 @@ public class ItemService {
     }
 
     public Long save(ItemRequestDto itemRequestDto){
-
         Item item = itemRequestDto.toEntity();
 
-        List<Photo> photoList = getPhotoList(itemRequestDto, item);
-        photoRepository.saveAll(photoList);
-        item.setPhotoList(photoList);
-
-        return itemRepository.save(item).getId();
-    }
-
-    private List<Photo> getPhotoList(ItemRequestDto itemRequestDto, Item item) {
-        return itemRequestDto.getPhotos()
+        List<Photo> photoList = itemRequestDto.getPhotos()
                 .stream()
                 .map(photoDto -> {
                     Photo photo = photoDto.toEntity();
@@ -48,6 +39,11 @@ public class ItemService {
                     return photo;
                 })
                 .collect(Collectors.toList());
+
+        item.setPhotoList(photoList);
+
+        // cascade로 photo 까지 save ..
+        return itemRepository.save(item).getId();
     }
 
     public List<ItemResponseDto> findAll(){

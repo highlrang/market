@@ -20,7 +20,7 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

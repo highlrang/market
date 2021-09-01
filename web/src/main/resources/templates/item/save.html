@@ -6,6 +6,18 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var msg = [[ ${msg} ]];
+        /*]]*/
+
+        $(document).ready(function(){
+            if(msg != null){
+                alert(msg);
+            }
+        });
+    </script>
+
     <form action="/item/save" method="post" enctype="multipart/form-data">
         <div>
             <input type="text" name="name" placeholder="상품명">

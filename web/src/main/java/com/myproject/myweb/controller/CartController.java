@@ -52,8 +52,16 @@ public class CartController {
                      @RequestParam(value = "coupon", required = false) String couponId,
                      RedirectAttributes attributes){
 
-        cartService.put(userId, itemId, count, couponId);
-        attributes.addAttribute("msg", "CartSave");
+        String msg;
+        try {
+            cartService.put(userId, itemId, count, couponId);
+            msg = "CartSave";
+
+        }catch(IllegalArgumentException e){
+            msg = e.getMessage();
+        }
+
+        attributes.addAttribute("msg", msg);
         return "redirect:/item/detail/" + itemId;
     }
 
@@ -61,9 +69,18 @@ public class CartController {
     public String update(
             @RequestParam(value = "cartItem_id") Long cartItemId,
             @RequestParam(value = "count") int count,
-            @RequestParam(value = "coupon", required = false) String couponId){
-        cartService.update(cartItemId, count, couponId);
+            @RequestParam(value = "coupon", required = false) String couponId,
+            RedirectAttributes attributes){
+        try {
+            cartService.update(cartItemId, count, couponId);
+
+        }catch (IllegalArgumentException e){
+            attributes.addAttribute("msg", e.getMessage());
+        }
+
         Long cartId = cartService.findCartIdByCartItemId(cartItemId);
+        // 이건 에러 나면 common exception handler가 해결
+
         return "redirect:/cart/detail/" + cartId;
     }
 
@@ -71,8 +88,15 @@ public class CartController {
     @PostMapping("/remove") // 장바구니에서만 호출
     public String remove(
             @RequestParam("cart_id") Long cartId,
-            @RequestParam("item_id") List<Long> itemIds){
-        cartService.remove(cartId, itemIds);
+            @RequestParam("item_id") List<Long> itemIds,
+            RedirectAttributes attributes){
+        try {
+            cartService.remove(cartId, itemIds);
+
+        }catch (IllegalArgumentException e){
+            attributes.addAttribute("msg", e.getMessage());
+        }
+
         return "redirect:/cart/detail/" + cartId;
     }
 }

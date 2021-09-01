@@ -17,7 +17,7 @@ public class Photo {
     private String name; // 저장 파일명
     private String path; // 저장 경로
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
@@ -28,7 +28,8 @@ public class Photo {
         this.path = path;
     }
 
-    public void setItem(Item item){
+    public void setItem(Item item){ // 연관관계 매핑
         this.item = item;
+        // item.getPhotoList().add(this); // cascade로 들어가서 필요없는 것 같은데
     }
 }

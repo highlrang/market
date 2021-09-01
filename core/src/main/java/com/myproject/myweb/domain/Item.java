@@ -39,8 +39,8 @@ public class Item {
     }
 
     // item 등록 시 n개의 사진 이름 변경 후 추가
-    public void setPhotoList(List<Photo> photos){
-        this.photoList = photos;
+    public void setPhotoList(List<Photo> photoList){
+        this.photoList = photoList;
     }
 
     public void addStock(int stockQuantity){

@@ -44,9 +44,8 @@ public class UserService {
     }
 
     @Transactional
-    public Long join(UserRequestDto userRequestDto){
+    public Long join(UserRequestDto userRequestDto) throws IllegalStateException{
         Boolean alreadyExist = userRepository.findByEmail(userRequestDto.getEmail()).isPresent();
-
         if(alreadyExist) throw new IllegalStateException("UserAlreadyExistException");
 
         User user = userRepository.save(userRequestDto.toEntity());

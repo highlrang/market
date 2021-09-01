@@ -32,13 +32,13 @@ public class User {
     @ColumnDefault("false")
     private Boolean certified;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orderList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) // 사용자 삭제될 때 쿠폰 같이 삭제
     public List<Coupon> couponList = new ArrayList<>();
 
     @Builder
