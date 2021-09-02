@@ -5,6 +5,7 @@ import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.dto.order.PaymentReadyDto;
+import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
@@ -58,7 +59,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Long order(Long userId, Long itemId, int count, String couponId){
+    public Long order(Long userId, Long itemId, int count, String couponId) throws IllegalArgumentException, ItemStockException {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 

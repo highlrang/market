@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public String ready(Long userId, Long orderId) {
+    public String ready(Long userId, Long orderId) throws WebClientResponseException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
@@ -56,8 +57,7 @@ public class PaymentService {
         parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
         parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
 
-        try {
-            Mono<ResponseEntity<PaymentReadyDto>> mono = webClient
+        Mono<ResponseEntity<PaymentReadyDto>> mono = webClient
                     .mutate()
                     .baseUrl(kakaopayUrl)
                     // "application/x-www-form-urlencoded;charset=utf-8"
@@ -69,23 +69,25 @@ public class PaymentService {
                     .post()
                     .body(BodyInserters.fromFormData(parameterMap))
                     .retrieve()
+                    /*
+                    .bodyToMono()
+                    .onErrorResume(throwable -> {
+                        return Mono.error(new RuntimeException(throwable));
+                    });
+                    */
+                    /*
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                              clientResponse -> clientResponse.toEntity(String.class)
+                                                            .map(body -> new RuntimeException(body))
+                    )
+                     */
                     .toEntity(PaymentReadyDto.class);
 
-            ResponseEntity<PaymentReadyDto> responseEntity = mono.block();
-            if(responseEntity.getStatusCode().is2xxSuccessful()) {
-                PaymentReadyDto dto = responseEntity.getBody();
-                this.saveTid(orderId, dto.getTid());
-                return dto.getNext_redirect_pc_url();
-            }
-            log.error(responseEntity.getStatusCodeValue() + " 결제 요청 실패");
-            orderService.remove(orderId);
-            return null;
-
-        }catch (Exception e){
-            log.error(e.getMessage());
-            orderService.remove(orderId);
-            return null;
-        }
+        ResponseEntity<PaymentReadyDto> responseEntity = mono.block();
+        // if(responseEntity.getStatusCode().is2xxSuccessful()) {}
+        PaymentReadyDto dto = responseEntity.getBody();
+        this.saveTid(orderId, dto.getTid());
+        return dto.getNext_redirect_pc_url();
     }
 
     @Transactional
@@ -94,7 +96,7 @@ public class PaymentService {
         order.setTid(tid);
     }
 
-    public Boolean approve(Long userId, Long orderId, String pg_token){
+    public void approve(Long userId, Long orderId, String pg_token) throws WebClientResponseException{
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
 
         MultiValueMap<String, String> parameterMap = getParameterMap(userId, orderId);
@@ -103,8 +105,7 @@ public class PaymentService {
 
         String baseUrl = "https://kapi.kakao.com/v1/payment/approve";
 
-        try {
-            ResponseEntity<Object> response = webClient.mutate()
+        ResponseEntity<Object> response = webClient.mutate()
                     .baseUrl(baseUrl)
                     .defaultHeaders(httpHeaders -> {
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -116,17 +117,10 @@ public class PaymentService {
                     .retrieve()
                     .toEntity(Object.class)
                     .block();
-
-            return response.getStatusCode().is2xxSuccessful();
-
-        }catch(Exception e){
-            log.error(e.getMessage());
-            return false;
-        }
     }
 
     @Transactional
-    public String cancel(Long orderId){
+    public String cancel(Long orderId) throws IllegalStateException, WebClientResponseException{
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
 
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
@@ -136,8 +130,7 @@ public class PaymentService {
         parameterMap.add("cancel_tax_free_amount", "0");
 
         String msg;
-        try{
-            Mono<ResponseEntity<Object>> mono = webClient.mutate()
+        Mono<ResponseEntity<Object>> mono = webClient.mutate()
                 .baseUrl("https://kapi.kakao.com/v1/payment/cancel")
                 .defaultHeaders(
                         httpHeaders -> {
@@ -151,20 +144,16 @@ public class PaymentService {
                 .retrieve()
                 .toEntity(Object.class);
 
-            ResponseEntity<Object> response = mono.block();
+        ResponseEntity<Object> response = mono.block();
 
-            if(response.getStatusCode().is2xxSuccessful()) {
-                orderService.cancel(orderId);
-                msg = "OrderCancelComplete";
-            }else{
-                log.error("HttpStatus = " + response.getStatusCodeValue() + " 결제 취소 실패");
-                msg = "PaymentCancelFailed";
-            }
-
-        }catch(Exception e){
-            log.error("결제 취소가 실패했습니다. 익셉션 발생 -> " + e.getMessage());
+        if(response.getStatusCode().is2xxSuccessful()) {
+            orderService.cancel(orderId); // throws IllegalStateException
+            msg = "OrderCancelComplete";
+        }else{
+            log.error("HttpStatus = " + response.getStatusCodeValue() + " 결제 취소 실패");
             msg = "PaymentCancelFailed";
         }
+
 
         return msg;
     }

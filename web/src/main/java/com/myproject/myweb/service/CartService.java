@@ -3,6 +3,7 @@ package com.myproject.myweb.service;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.cart.CartResponseDto;
+import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class CartService {
         return new CartResponseDto(cart);
     }
 
-    public CartResponseDto findByUser(Long userId) {
+    public CartResponseDto findByUser(Long userId) throws IllegalArgumentException{
         Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("CartByUserNotFoundException"));
         return new CartResponseDto(cart);
@@ -75,7 +76,7 @@ public class CartService {
     }
 
     @Transactional
-    public Long order(Long userId, List<Long> itemIds){
+    public Long order(Long userId, List<Long> itemIds) throws ItemStockException {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
 
@@ -113,8 +114,6 @@ public class CartService {
 
     @Transactional
     public void remove(Long cartId, List<Long> itemIds) throws IllegalArgumentException{
-        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
-
         List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(cartId) // 쿼리에서 일부분 꺼내와서 stream로직 처리!!!
                 .stream()
                 .filter(cartItem -> itemIds.contains(cartItem.getItem().getId()))

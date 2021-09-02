@@ -1,5 +1,6 @@
 package com.myproject.myweb.domain;
 
+import com.myproject.myweb.exception.ItemStockException;
 import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class Item {
     public void removeStrock(int stockQuantity){
         int nowStock = stock - stockQuantity;
         if(nowStock < 0){
-            throw new IllegalStateException("StockZeroException");
+            throw new ItemStockException("StockZeroException", String.valueOf(id), name);
         }
         stock = nowStock;
     }

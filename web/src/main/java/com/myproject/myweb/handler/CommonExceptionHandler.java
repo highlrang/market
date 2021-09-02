@@ -18,7 +18,7 @@ public class CommonExceptionHandler {
 
     private final MessageSource messageSource;
 
-    @ExceptionHandler(value = {IllegalArgumentException.class}) // request redirect session
+    @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class}) // request redirect session
     public String argORstatusException(HttpServletRequest request,
                                        IllegalArgumentException exception,
                                        Model model){

@@ -58,7 +58,7 @@ public class HomeController {
             msg = "UserJoinEmailCertification";
 
         }catch(MessagingException e){
-            log.error(e.getMessage());
+            log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
             userService.expirateToken(userId);
             msg = "UserJoinCertificationFailed";
         }
