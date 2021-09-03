@@ -1,11 +1,15 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
+import com.myproject.myweb.dto.user.CustomerResponseDto;
+import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
+import com.myproject.myweb.service.user.SellerService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,7 @@ import java.util.Locale;
 public class ItemController {
 
     private final ItemService itemService;
+    private final SellerService sellerService;
     private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
@@ -42,7 +47,8 @@ public class ItemController {
 
 
     @PostMapping("/save")
-    public String save(@RequestParam(value="name") String name,
+    public String save(@RequestParam(value="seller_id") Long sellerId, // form으로 생성해도 됨
+                       @RequestParam(value="name") String name,
                        @RequestParam(value="price") int price,
                        @RequestParam(value="stock") int stock,
                        @RequestParam(value="file") List<MultipartFile> files){
@@ -58,6 +64,7 @@ public class ItemController {
         }
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+                .sellerId(sellerId)
                 .name(name)
                 .price(price)
                 .stock(stock)
@@ -70,7 +77,7 @@ public class ItemController {
 
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list") // 판매자 상관없이 전체 상품 목록(나중에 카테고리별로 나누기)
     public String list(Model model){
         List<ItemResponseDto> items = itemService.findAll();
         model.addAttribute("items", items);
@@ -85,9 +92,9 @@ public class ItemController {
         ItemResponseDto item = itemService.findById(id);
         model.addAttribute("item", item);
 
-        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
-        if(user != null){
-            model.addAttribute("coupons", user.getCoupons());
+        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
+        if(customer != null){
+            model.addAttribute("coupons", customer.getCoupons());
         }
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));

@@ -1,33 +1,19 @@
 package com.myproject.myweb.service;
 
 import com.myproject.myweb.domain.*;
+import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
-import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
-import com.myproject.myweb.dto.order.PaymentReadyDto;
 import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.repository.CouponRepository;
+import com.myproject.myweb.repository.CustomerRepository;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
-import com.myproject.myweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +24,7 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final ItemRepository itemRepository;
     private final CouponRepository couponRepository;
 
@@ -47,24 +33,24 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
-    public List<OrderResponseDto> findByUserId(Long userId){
-        List<Order> orders = orderRepository.findAllByUser_Id(userId);
+    public List<OrderResponseDto> findByCustomerId(Long customerId){
+        List<Order> orders = orderRepository.findAllByCustomer_Id(customerId);
         return orders.stream()
                 .map(OrderResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    public Boolean orderImpossible(Long userId){
-        return orderRepository.findByUserAndStatusReady(userId, OrderStatus.READY).isPresent();
+    public Boolean orderImpossible(Long customerId){
+        return orderRepository.findByUserAndStatusReady(customerId, OrderStatus.READY).isPresent();
     }
 
     @Transactional
     public Long order(Long userId, Long itemId, int count, String couponId) throws IllegalArgumentException, ItemStockException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        Customer customer = customerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         // 배송 생성
-        Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
+        Delivery delivery = new Delivery(customer.getAddress(), DeliveryStatus.READY);
 
         // 주문상품 생성
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
@@ -75,7 +61,7 @@ public class OrderService {
         }
 
         // 배송, 주문상품 넣어서 >> 주문 생성
-        Order order = Order.createOrder(user, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)
+        Order order = Order.createOrder(customer, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)
 
         return orderRepository.save(order).getId();
     }
@@ -91,7 +77,7 @@ public class OrderService {
         if(order.getOrderItems().size() == 1){
             return "item/detail/" + order.getOrderItems().get(0).getId();
         }
-        return "cart/detail" + order.getUser().getCart().getId();
+        return "cart/detail" + order.getCustomer().getCart().getId();
     }
 
     @Transactional

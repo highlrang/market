@@ -1,6 +1,8 @@
 package com.myproject.myweb.dto.user;
 
 import com.myproject.myweb.domain.user.Address;
+import com.myproject.myweb.domain.user.Customer;
+import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.domain.user.User;
 import com.sun.istack.NotNull;
 import lombok.Getter;
@@ -20,13 +22,21 @@ public class UserRequestDto {
     private String password;
     private String name;
 
-    private Address address; // 나중에
+    // private Address address;
 
-    public User toEntity(){
-        return User.builder()
+    public Customer toCustomer(){
+        return (Customer) Customer.builder()
                 .email(email)
                 .password(password)
                 .name(name)
+                .build();
+    }
+
+    public Seller toSeller(){
+        return (Seller) Seller.builder()
+                .email(email)
+                .name(name)
+                .password(password)
                 .build();
     }
 }

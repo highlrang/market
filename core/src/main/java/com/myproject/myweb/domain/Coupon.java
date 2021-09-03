@@ -1,5 +1,6 @@
 package com.myproject.myweb.domain;
 
+import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,8 +22,8 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     private int discountPer;
 
@@ -31,9 +32,9 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
     private Boolean isUsed;
 
     @Builder
-    public Coupon(String name, User user, int discountPer, LocalDateTime expirationDate){
+    public Coupon(String name, Customer customer, int discountPer, LocalDateTime expirationDate){
         this.name = name;
-        this.user = user;
+        this.customer = customer;
         this.discountPer = discountPer;
         this.expirationDate = expirationDate;
         isUsed = false;

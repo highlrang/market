@@ -1,6 +1,7 @@
 package com.myproject.myweb.service;
 
 import com.myproject.myweb.domain.*;
+import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.cart.CartResponseDto;
 import com.myproject.myweb.exception.ItemStockException;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CartService {
 
-    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final ItemRepository itemRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -33,14 +34,10 @@ public class CartService {
         return new CartResponseDto(cart);
     }
 
-    public CartResponseDto findByUser(Long userId) throws IllegalArgumentException{
-        Cart cart = cartRepository.findByUser_Id(userId)
+    public CartResponseDto findByCustomer(Long customerId) throws IllegalArgumentException{
+        Cart cart = cartRepository.findByCustomer_Id(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("CartByUserNotFoundException"));
         return new CartResponseDto(cart);
-    }
-
-    public List<Integer> findItemCount(Long userId, List<Long> itemIds){
-        return cartItemRepository.findCountByUser_IdAndItem_Id(userId, itemIds);
     }
 
     public Long findCartIdByCartItemId(Long cartItemId){
@@ -49,8 +46,8 @@ public class CartService {
     }
 
     @Transactional
-    public void put(Long userId, Long itemId, int count, String couponId) throws IllegalArgumentException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public void put(Long customerId, Long itemId, int count, String couponId) throws IllegalArgumentException{
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         CartItem cartItem = CartItem.createCartItem(item, count);
@@ -60,7 +57,7 @@ public class CartService {
         }
 
         try {
-            Cart userCart = cartRepository.findById(user.getCart().getId())
+            Cart userCart = cartRepository.findById(customer.getCart().getId())
                     .orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
 
             // boolean anyMatch = userCart.getCartItems().stream().anyMatch(existing -> existing.getItem().equals(item));
@@ -69,19 +66,19 @@ public class CartService {
 
 
         }catch (IllegalArgumentException e){
-            Cart cart = Cart.createCart(user, cartItem);
+            Cart cart = Cart.createCart(customer, cartItem);
             cartRepository.save(cart);
         }
 
     }
 
     @Transactional
-    public Long order(Long userId, List<Long> itemIds) throws ItemStockException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
-        Delivery delivery = new Delivery(user.getAddress(), DeliveryStatus.READY);
+    public Long order(Long customerId, List<Long> itemIds) throws ItemStockException {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        Delivery delivery = new Delivery(customer.getAddress(), DeliveryStatus.READY);
 
         List<Item> items = itemRepository.findAllById(itemIds);
-        List<CartItem> cartItems = user.getCart().getCartItems().stream()
+        List<CartItem> cartItems = customer.getCart().getCartItems().stream()
                 .filter(cartItem -> items.contains(cartItem.getItem()))
                 .collect(Collectors.toList());
 
@@ -96,7 +93,7 @@ public class CartService {
                 })
                 .collect(Collectors.toList());
 
-        Order order = Order.createOrder(user, delivery, orderItems.toArray(OrderItem[]::new));
+        Order order = Order.createOrder(customer, delivery, orderItems.toArray(OrderItem[]::new));
 
         return orderRepository.save(order).getId();
     }

@@ -3,9 +3,11 @@ package com.myproject.myweb.controller;
 import com.myproject.myweb.domain.OrderStatus;
 import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
+import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.service.CartService;
+import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.OrderService;
 import com.myproject.myweb.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +33,18 @@ public class OrderController {
     private final OrderService orderService;
     private final CartService cartService;
     private final PaymentService paymentService;
+    private final ItemService itemService;
     private final MessageSource messageSource;
 
 
     @PostMapping("/payment/ready")
-    public String readyPayment(@RequestParam(value = "user_id") Long userId,
+    public String readyPayment(@RequestParam(value = "customer_id") Long customerId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
                                @RequestParam(value = "count", required = false) String count,
                                @RequestParam(value = "coupon") String couponId,
                                @RequestParam(value = "cart_id", required = false) String cartId){
 
-        Boolean orderImpossible = orderService.orderImpossible(userId);
+        Boolean orderImpossible = orderService.orderImpossible(customerId);
         String url;
         if(cartId == null) {
             url = "redirect:/item/detail/" + itemIds.get(0);
@@ -59,20 +62,20 @@ public class OrderController {
         try {
             if (cartId != null) {
                 // 장바구니에서 주문 (단건, 복수건) >> user exception >> common handler home redirect
-                orderId = cartService.order(userId, itemIds);
+                orderId = cartService.order(customerId, itemIds);
             } else {
                 // 상품 단건 바로 주문 >> user or item exception >> common handler home redirect
-                orderId = orderService.order(userId, itemIds.get(0), Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
+                orderId = orderService.order(customerId, itemIds.get(0), Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
             }
         }catch (ItemStockException e){
             String msg = messageSource.getMessage(e.getMessage(), e.getArgs(), Locale.getDefault());
-            log.error("item id = " + e.getArgs()[0] + " " + msg);
+            itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
             orderRedirectAttributes(msg);
             return url;
         }
 
         try {
-            String finalUrl = paymentService.ready(userId, orderId);
+            String finalUrl = paymentService.ready(customerId, orderId);
             if (finalUrl != null) return "redirect:" + finalUrl;
 
         }catch (WebClientResponseException e){
@@ -106,8 +109,8 @@ public class OrderController {
     @RequestMapping("/payment/approve") //GET
     public String approvePayment(@RequestParam(value = "pg_token") String pg_token, HttpSession session){
 
-        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
-        OrderResponseDto order = orderService.findOrderReady(user.getId());
+        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
+        OrderResponseDto order = orderService.findOrderReady(customer.getId());
 
         List<Long> itemIds = order.getOrderItems().stream()
                 .map(OrderItemDto::getItemId)
@@ -115,11 +118,11 @@ public class OrderController {
 
         Long cartId = 0L;
         try {
-            cartId = cartService.findByUser(user.getId()).getId();
+            cartId = cartService.findByCustomer(customer.getId()).getId();
         } catch(IllegalArgumentException ignored){ }
 
         try {
-            paymentService.approve(user.getId(), order.getId(), pg_token);
+            paymentService.approve(customer.getId(), order.getId(), pg_token);
 
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 없을 가능성이 높아 common handler로만 처리
             if (cartId != 0L) {
@@ -161,8 +164,8 @@ public class OrderController {
     @GetMapping("/list")
     public String list(@RequestParam(value = "msg", required = false) String msg,
                        HttpSession session, Model model){
-        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
-        List<OrderResponseDto> orders = orderService.findByUserId(user.getId());
+        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
+        List<OrderResponseDto> orders = orderService.findByCustomerId(customer.getId());
         model.addAttribute("orders", orders);
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "order/list";

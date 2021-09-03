@@ -12,9 +12,9 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@NoArgsConstructor
 @Getter
+@MappedSuperclass
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -32,14 +32,6 @@ public class User {
     @ColumnDefault("false")
     private Boolean certified;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Cart cart;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Order> orderList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) // 사용자 삭제될 때 쿠폰 같이 삭제
-    public List<Coupon> couponList = new ArrayList<>();
 
     @Builder
     public User(String name, String email, String password, Address address){ // 비번 암호화한 후 객체 생성
@@ -55,10 +47,6 @@ public class User {
     }
     public void setCertified(Boolean isCertified){
         certified = isCertified;
-    }
-
-    public void setCart(Cart cart){
-        this.cart = cart;
     }
 
     public Boolean checkPassword(String password){

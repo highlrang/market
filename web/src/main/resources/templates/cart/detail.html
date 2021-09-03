@@ -40,7 +40,7 @@
             }
 
             var data = {
-                user_id: $("#user_id").val(),
+                customer_id: $("#customer_id").val(),
                 cart_id: $("#cart_id").val(),
                 item_id: item_id_list
             };
@@ -117,7 +117,7 @@
 
     <div>
         <input type="hidden" id="cart_id" th:value="${cart.id}">
-        <input type="hidden" id="user_id" th:value="${session.user.id}">
+        <input type="hidden" id="customer_id" th:value="${session.customer.id}">
     </div>
 
     <div th:each="cartItem : ${cart.cartItems}">

@@ -1,6 +1,7 @@
 package com.myproject.myweb.dto.cart;
 
 import com.myproject.myweb.domain.Cart;
+import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import lombok.Getter;
 
@@ -12,8 +13,6 @@ public class CartResponseDto {
 
     private Long id;
 
-    private UserResponseDto user; // no need
-
     private List<CartItemDto> cartItems;
 
     private int totalPrice;
@@ -24,7 +23,6 @@ public class CartResponseDto {
                 .stream()
                 .map(CartItemDto::new)
                 .collect(Collectors.toList());
-        this.user = new UserResponseDto(entity.getUser());
         this.totalPrice = entity.getTotalPrice();
     }
 }

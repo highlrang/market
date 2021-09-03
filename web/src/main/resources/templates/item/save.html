@@ -20,6 +20,9 @@
 
     <form action="/item/save" method="post" enctype="multipart/form-data">
         <div>
+            <input type="hidden" name="seller_id" th:value="${session.seller.id}">
+        </div>
+        <div>
             <input type="text" name="name" placeholder="상품명">
         </div>
         <div>

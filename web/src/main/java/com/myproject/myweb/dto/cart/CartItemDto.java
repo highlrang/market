@@ -26,7 +26,7 @@ public class CartItemDto {
         this.itemPrice = entity.getItem().getPrice(); // 현재 상품 가격으로 장바구니
         if(entity.getCoupon() != null) this.coupon = new CouponDto(entity.getCoupon());
 
-        this.userId = entity.getCart().getUser().getId();
+        this.userId = entity.getCart().getCustomer().getId();
         this.cartId = entity.getCart().getId();
 
     }

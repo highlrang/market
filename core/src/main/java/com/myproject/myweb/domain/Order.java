@@ -1,5 +1,6 @@
 package com.myproject.myweb.domain;
 
+import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +21,8 @@ public class Order {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
@@ -38,9 +39,9 @@ public class Order {
     private List<OrderItem> orderItems = new ArrayList<>();
 
 
-    public void setUser(User user){
-        this.user = user;
-        user.getOrderList().add(this);
+    public void setCustomer(Customer customer){
+        this.customer = customer;
+        customer.getOrderList().add(this);
     }
 
     public void addOrderItem(OrderItem orderItem){
@@ -53,9 +54,9 @@ public class Order {
         delivery.setOrder(this);
     }
 
-    public static Order createOrder(User user, Delivery delivery, OrderItem... orderItems){
+    public static Order createOrder(Customer customer, Delivery delivery, OrderItem... orderItems){
         Order order = new Order();
-        order.setUser(user);
+        order.setCustomer(customer);
         order.setDelivery(delivery);
         for(OrderItem orderItem: orderItems){
             order.addOrderItem(orderItem);

@@ -1,5 +1,7 @@
 package com.myproject.myweb.domain;
 
+import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.exception.ItemStockException;
 import com.sun.istack.NotNull;
 import lombok.Builder;
@@ -23,6 +25,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
+
     private String name;
 
     private int price;
@@ -32,11 +38,18 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Photo> photoList = new ArrayList<>();
 
-    @Builder
-    public Item(String name, int price, int stock){
-        this.name = name;
-        this.price = price;
-        this.stock = stock;
+    public static Item createItem(Seller seller, String name, int price, int stock){
+        Item item = new Item();
+        item.setSeller(seller);
+        item.name = name;
+        item.price = price;
+        item.stock = stock;
+        return item;
+    }
+
+    public void setSeller(Seller seller){
+        this.seller = seller;
+        seller.getItemList().add(this);
     }
 
     // item 등록 시 n개의 사진 이름 변경 후 추가

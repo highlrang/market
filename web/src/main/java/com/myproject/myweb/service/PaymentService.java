@@ -28,18 +28,18 @@ public class PaymentService {
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
     @Value("${kakaopay.cid}")
-    private final String cid;
+    private static String cid; // final
 
-    private MultiValueMap<String, String> getParameterMap(@RequestParam("user_id") Long userId, Long orderId) {
+    private MultiValueMap<String, String> getParameterMap(@RequestParam("customer_id") Long customerId, Long orderId) {
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
         parameterMap.add("cid", cid);
         parameterMap.add("partner_order_id", String.valueOf(orderId));
-        parameterMap.add("partner_user_id", String.valueOf(userId));
+        parameterMap.add("partner_user_id", String.valueOf(customerId));
         return parameterMap;
     }
 
     @Transactional
-    public String ready(Long userId, Long orderId) throws WebClientResponseException {
+    public String ready(Long customerId, Long orderId) throws WebClientResponseException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
@@ -47,7 +47,7 @@ public class PaymentService {
         String myHost = "http://127.0.0.1:8081/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
-        MultiValueMap<String, String> parameterMap = getParameterMap(userId, orderId);
+        MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
         parameterMap.add("item_name", orderResponseDto.getOrderItemsName());
         parameterMap.add("quantity", String.valueOf(orderResponseDto.getTotalCount()));
         parameterMap.add("total_amount", String.valueOf(orderResponseDto.getTotalPrice()));
@@ -96,10 +96,10 @@ public class PaymentService {
         order.setTid(tid);
     }
 
-    public void approve(Long userId, Long orderId, String pg_token) throws WebClientResponseException{
+    public void approve(Long customerId, Long orderId, String pg_token) throws WebClientResponseException{
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
 
-        MultiValueMap<String, String> parameterMap = getParameterMap(userId, orderId);
+        MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
         parameterMap.add("tid", order.getTid());
         parameterMap.add("pg_token", pg_token);
 

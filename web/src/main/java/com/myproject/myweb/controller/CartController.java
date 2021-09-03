@@ -31,8 +31,9 @@ public class CartController {
     private final MessageSource messageSource;
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable(value = "id") Long id, HttpSession session,
+    public String detail(@PathVariable(value = "id") Long id,
                          @RequestParam(value = "msg", required = false) String msg,
+                         HttpSession session,
                          Model model){
         CartResponseDto cart = cartService.findById(id);
         model.addAttribute("cart", cart);
@@ -46,7 +47,7 @@ public class CartController {
 
     @PostMapping("/save")
     public String save(
-                     @RequestParam(value = "user_id") Long userId,
+                     @RequestParam(value = "customer_id") Long customerId,
                      @RequestParam(value = "item_id") Long itemId,
                      @RequestParam(value = "count") int count,
                      @RequestParam(value = "coupon", required = false) String couponId,
@@ -54,7 +55,7 @@ public class CartController {
 
         String msg;
         try {
-            cartService.put(userId, itemId, count, couponId);
+            cartService.put(customerId, itemId, count, couponId);
             msg = "CartSave";
 
         }catch(IllegalArgumentException e){
