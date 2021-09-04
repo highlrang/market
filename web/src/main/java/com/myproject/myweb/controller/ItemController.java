@@ -1,6 +1,7 @@
 package com.myproject.myweb.controller;
 
 import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.dto.coupon.CouponDto;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
@@ -8,6 +9,7 @@ import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.handler.FileHandler;
+import com.myproject.myweb.service.CouponService;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.user.SellerService;
 import lombok.Data;
@@ -36,7 +38,7 @@ import java.util.Locale;
 public class ItemController {
 
     private final ItemService itemService;
-    private final SellerService sellerService;
+    private final CouponService couponService;
     private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
@@ -94,7 +96,8 @@ public class ItemController {
 
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
         if(customer != null){
-            model.addAttribute("coupons", customer.getCoupons());
+            List<CouponDto> coupons = couponService.findByCustomerAndCanUse(customer.getId());
+            model.addAttribute("coupons", coupons);
         }
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));

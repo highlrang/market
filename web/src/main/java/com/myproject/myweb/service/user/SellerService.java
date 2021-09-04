@@ -1,12 +1,8 @@
 package com.myproject.myweb.service.user;
 
-import com.myproject.myweb.domain.Coupon;
-import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
-import com.myproject.myweb.dto.user.UserResponseDto;
-import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,8 +50,8 @@ public class SellerService implements UserService{
 
     @Override
     @Transactional
-    public void certify(Long userId) throws MessagingException {
-        Seller seller = sellerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public void certify(Long sellerId) throws MessagingException {
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(createToken());
 
         String name = "";
@@ -82,15 +78,15 @@ public class SellerService implements UserService{
 
     @Override
     @Transactional
-    public void expirateToken(Long userId){
-        Seller seller = sellerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public void expirateToken(Long sellerId){
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(null);
     }
 
     @Override
     @Transactional
-    public Boolean confirmToken(Long userId, String token){
-        Seller seller = sellerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public Boolean confirmToken(Long sellerId, String token){
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         if(seller.getCertificationToken().equals(token)) seller.setCertified(true);
         return seller.getCertified();
     }

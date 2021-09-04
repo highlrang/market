@@ -1,10 +1,5 @@
 package com.myproject.myweb.controller;
 
-import com.myproject.myweb.dto.user.CustomerResponseDto;
-import com.myproject.myweb.dto.user.UserRequestDto;
-import com.myproject.myweb.dto.user.UserResponseDto;
-import com.myproject.myweb.service.user.CustomerService;
-import com.myproject.myweb.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;

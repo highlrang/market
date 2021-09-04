@@ -1,8 +1,5 @@
 package com.myproject.myweb.dto.item;
 
-import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.user.Seller;
-import com.myproject.myweb.dto.user.SellerResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

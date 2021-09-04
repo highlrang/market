@@ -93,15 +93,15 @@ public class CustomerService implements UserService{
 
     @Override
     @Transactional
-    public void expirateToken(Long userId){
-        Customer customer = customerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public void expirateToken(Long customerId){
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         customer.setCertificationToken(null);
     }
 
     @Override
     @Transactional
-    public Boolean confirmToken(Long userId, String token){
-        Customer customer = customerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public Boolean confirmToken(Long customerId, String token){
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         if(customer.getCertificationToken().equals(token)) customer.setCertified(true);
         return customer.getCertified();
     }

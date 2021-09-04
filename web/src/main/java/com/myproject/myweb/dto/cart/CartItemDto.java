@@ -15,7 +15,7 @@ public class CartItemDto {
     private int itemPrice;
     private CouponDto coupon;
 
-    private Long userId;
+    private Long customerId;
     private Long cartId;
 
     public CartItemDto(CartItem entity){
@@ -26,7 +26,7 @@ public class CartItemDto {
         this.itemPrice = entity.getItem().getPrice(); // 현재 상품 가격으로 장바구니
         if(entity.getCoupon() != null) this.coupon = new CouponDto(entity.getCoupon());
 
-        this.userId = entity.getCart().getCustomer().getId();
+        this.customerId = entity.getCart().getCustomer().getId();
         this.cartId = entity.getCart().getId();
 
     }

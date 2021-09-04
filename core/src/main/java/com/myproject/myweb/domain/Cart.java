@@ -1,7 +1,6 @@
 package com.myproject.myweb.domain;
 
 import com.myproject.myweb.domain.user.Customer;
-import com.myproject.myweb.domain.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +18,7 @@ public class Cart {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id") // user id or customer id??
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)

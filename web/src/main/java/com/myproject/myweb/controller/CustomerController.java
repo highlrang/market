@@ -41,21 +41,21 @@ public class CustomerController {
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "user/join";
 
-        Long userId = null;
+        Long customerId = null;
         try {
-            userId = customerService.join(userRequestDto);
+            customerId = customerService.join(userRequestDto);
         }catch (IllegalStateException e){
             bindingResult.rejectValue("email", e.getMessage());
         }
 
         String msg;
         try {
-            customerService.certify(userId);
+            customerService.certify(customerId);
             msg = "UserJoinEmailCertification";
 
         }catch(MessagingException e){
             log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
-            customerService.expirateToken(userId);
+            customerService.expirateToken(customerId);
             msg = "UserJoinCertificationFailed";
         }
         attributes.addAttribute("msg", msg);
@@ -63,14 +63,14 @@ public class CustomerController {
     }
 
     @GetMapping("/certified")
-    public String certified(@RequestParam(name = "user") Long userId,
+    public String certified(@RequestParam(name = "user") Long customerId,
                             @RequestParam(name = "token") String token,
                             RedirectAttributes attributes){
         String msg = "UserJoinComplete";
-        if(!customerService.confirmToken(userId, token)) {
+        if(!customerService.confirmToken(customerId, token)) {
             msg = "UserJoinCertificationFailed";
         }
-        customerService.expirateToken(userId);
+        customerService.expirateToken(customerId);
         attributes.addAttribute("msg", msg);
         return "redirect:/";
     }

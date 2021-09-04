@@ -1,5 +1,6 @@
 package com.myproject.myweb.service;
 
+import com.myproject.myweb.domain.CartItem;
 import com.myproject.myweb.domain.Coupon;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,14 +33,25 @@ public class CouponService {
                 .collect(Collectors.toList());
     }
 
-    public List<CouponDto> findByUserAndCanUse(Long userId){
-        Customer customer = customerRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+    public List<CouponDto> findByCustomerAndCanUse(Long customerId){
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         List<Coupon> coupons = customer.getCouponList();
 
-        customer.getCart().getCartItems()
-                .forEach(cartItem -> coupons.remove(cartItem.getCoupon()));
+        /*
+        1. cartItem에 사용되지 않은
+        2. 기간이 만료되지 않은
+        3. 결제에 사용되지 않은(isUsed=false) 쿠폰만 보내기
+        */
+
+        List<Coupon> selectedCoupons = customer.getCart().getCartItems()
+                .stream()
+                .map(CartItem::getCoupon)
+                .collect(Collectors.toList());
 
         return coupons.stream()
+                .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
+                .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
+                .filter(coupon -> !selectedCoupons.contains(coupon))
                 .map(CouponDto::new)
                 .collect(Collectors.toList());
     }

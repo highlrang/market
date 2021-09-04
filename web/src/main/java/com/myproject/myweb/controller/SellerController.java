@@ -45,21 +45,21 @@ public class SellerController {
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "user/join";
 
-        Long userId = null;
+        Long sellerId = null;
         try {
-            userId = sellerService.join(userRequestDto);
+            sellerId = sellerService.join(userRequestDto);
         }catch (IllegalStateException e){
             bindingResult.rejectValue("email", e.getMessage());
         }
 
         String msg;
         try {
-            sellerService.certify(userId);
+            sellerService.certify(sellerId);
             msg = "UserJoinEmailCertification";
 
         }catch(MessagingException e){
             log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
-            sellerService.expirateToken(userId);
+            sellerService.expirateToken(sellerId);
             msg = "UserJoinCertificationFailed";
         }
         attributes.addAttribute("msg", msg);
@@ -67,14 +67,14 @@ public class SellerController {
     }
 
     @GetMapping("/certified")
-    public String certified(@RequestParam(name = "user") Long userId,
+    public String certified(@RequestParam(name = "user") Long sellerId,
                             @RequestParam(name = "token") String token,
                             RedirectAttributes attributes){
         String msg = "UserJoinComplete";
-        if(!sellerService.confirmToken(userId, token)) {
+        if(!sellerService.confirmToken(sellerId, token)) {
             msg = "UserJoinCertificationFailed";
         }
-        sellerService.expirateToken(userId);
+        sellerService.expirateToken(sellerId);
         attributes.addAttribute("msg", msg);
         return "redirect:/";
     }

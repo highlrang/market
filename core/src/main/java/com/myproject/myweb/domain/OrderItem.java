@@ -51,6 +51,7 @@ public class OrderItem {
 
     public void cancel(){
         item.addStock(count);
+        coupon.updateUsed();
     }
 
     public int getTotalPrice(){
