@@ -52,12 +52,7 @@ public class CustomerService implements UserService{
 
         Customer customer = customerRepository.save(userRequestDto.toCustomer());
 
-        Coupon coupon = Coupon.builder()
-                .name("신규 회원 10% 할인 쿠폰")
-                .expirationDate(LocalDateTime.now().plusMonths(5L))
-                .discountPer(5)
-                .customer(customer)
-                .build();
+        Coupon coupon = Coupon.createCoupon("신규 회원 10% 할인 쿠폰", customer, 10, LocalDateTime.now().plusMonths(5L));
         couponRepository.save(coupon);
 
         return customer.getId();

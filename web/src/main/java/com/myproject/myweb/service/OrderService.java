@@ -41,7 +41,7 @@ public class OrderService {
     }
 
     public Boolean orderImpossible(Long customerId){
-        return orderRepository.findByCustomerAndStatusReady(customerId, OrderStatus.READY).isPresent();
+        return orderRepository.findByCustomer_IdAndOrderStatus(customerId, OrderStatus.READY).isPresent();
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class OrderService {
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
         if(!couponId.equals("null")){
             Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
-            coupon.updateUsed(); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
+            coupon.setIsUsed(true); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
             orderItem.setCoupon(coupon);
         }
 
@@ -83,18 +83,18 @@ public class OrderService {
     @Transactional
     public void cancel(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
-        order.cancel();
+        order.cancel(); // 재고 & 쿠폰 복구
     }
 
     public OrderResponseDto findOrderReady(Long customerId){
-        Order order = orderRepository.findByCustomerAndStatusReady(customerId, OrderStatus.READY).orElseThrow(() -> new IllegalArgumentException("OrderByUserNotFoundException"));
+        Order order = orderRepository.findByCustomer_IdAndOrderStatus(customerId, OrderStatus.READY).orElseThrow(() -> new IllegalArgumentException("OrderByUserNotFoundException"));
         return new OrderResponseDto(order);
     }
 
     @Transactional
     public void remove(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
-        order.cancel(); // 재고 & 쿠폰 복귀
+        order.cancel(); // 재고 & 쿠폰 복구
         orderRepository.delete(order);
     }
 }

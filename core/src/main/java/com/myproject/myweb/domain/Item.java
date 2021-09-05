@@ -25,21 +25,25 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(value = EnumType.STRING)
+    private Category category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private Seller seller;
 
     private String name;
 
-    private int price;
+    private int price; // origin이랑 now랑 나눠서
 
     private int stock;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Photo> photoList = new ArrayList<>();
 
-    public static Item createItem(Seller seller, String name, int price, int stock){
+    public static Item createItem(Category category, Seller seller, String name, int price, int stock){
         Item item = new Item();
+        item.category = category;
         item.setSeller(seller);
         item.name = name;
         item.price = price;
@@ -50,11 +54,6 @@ public class Item {
     public void setSeller(Seller seller){
         this.seller = seller;
         seller.getItemList().add(this);
-    }
-
-    // item 등록 시 n개의 사진 이름 변경 후 추가
-    public void setPhotoList(List<Photo> photoList){
-        this.photoList = photoList;
     }
 
     public void addStock(int stockQuantity){

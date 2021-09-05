@@ -21,7 +21,7 @@ public class ExpiredCouponRemoveScheduler {
     @Scheduled(cron = "0 0 1 * * *") // 매월 1일
     public void couponRemove(){
         List<Coupon> coupons = couponRepository.findAllByExpirationDateBefore(LocalDateTime.now());
-        couponRepository.deleteAll(coupons); // in query로 해야하는지 확인
+        couponRepository.deleteAllInBatch(coupons); // in query로 해야하는지 확인
         log.info("스케줄러 실행 완료!");
     }
 }

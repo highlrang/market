@@ -142,16 +142,20 @@ public class OrderController {
     public String orderCancel(@RequestParam(value = "orderId") Long orderId){
         String msg = "";
         try{
-            msg = paymentService.cancel(orderId); // orderService.cancel() 까지 호출, exception은 common으로 해결
+            paymentService.cancel(orderId); // orderService.cancel() 까지 호출, exception은 common으로 해결
+            msg = "OrderCancelComplete";
+
         }catch (IllegalStateException e){
             if(e.getMessage().equals("DeliveryAlreadyCompletedException")) { // 배달완료 exception 처리
                 msg = e.getMessage();
             }
             log.error(e.getMessage());
+
         }catch (WebClientResponseException e){
             log.error("status code = " + e.getRawStatusCode() + " " + e.getMessage() + " 결제 취소 실패");
             msg = "PaymentCancelFailed";
         }
+
         orderRedirectAttributes(msg);
         return "redirect:/order/list";
     }

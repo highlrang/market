@@ -30,6 +30,6 @@ public class Photo {
 
     public void setItem(Item item){ // 연관관계 매핑
         this.item = item;
-        // item.getPhotoList().add(this); // cascade로 들어가서 필요없는 것 같은데
+        item.getPhotoList().add(this);
     }
 }

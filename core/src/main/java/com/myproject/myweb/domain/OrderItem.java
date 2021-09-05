@@ -33,11 +33,15 @@ public class OrderItem {
 
     public void setOrder(Order order){
         this.order = order;
-    }
+    }  // 연관관계 매핑에 사용됨
+
+    public void setCoupon(Coupon coupon){
+        this.coupon = coupon;
+    }  // 단방향
 
     public static OrderItem createOrderItem(Item item, int orderPrice, int count){
         OrderItem orderItem = new OrderItem();
-        orderItem.item = item;
+        orderItem.item = item; // 단방향
         orderItem.price = orderPrice;
         orderItem.count = count;
 
@@ -45,13 +49,9 @@ public class OrderItem {
         return orderItem;
     }
 
-    public void setCoupon(Coupon coupon){
-        this.coupon = coupon;
-    }
-
     public void cancel(){
         item.addStock(count);
-        coupon.updateUsed();
+        coupon.setIsUsed(false);
     }
 
     public int getTotalPrice(){

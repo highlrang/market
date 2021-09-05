@@ -120,7 +120,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public String cancel(Long orderId) throws IllegalStateException, WebClientResponseException{
+    public void cancel(Long orderId) throws IllegalStateException, WebClientResponseException{
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
 
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
@@ -146,16 +146,8 @@ public class PaymentService {
 
         ResponseEntity<Object> response = mono.block();
 
-        if(response.getStatusCode().is2xxSuccessful()) {
-            orderService.cancel(orderId); // throws IllegalStateException
-            msg = "OrderCancelComplete";
-        }else{
-            log.error("HttpStatus = " + response.getStatusCodeValue() + " 결제 취소 실패");
-            msg = "PaymentCancelFailed";
-        }
-
-
-        return msg;
+        // if(response.getStatusCode().is2xxSuccessful()) {
+        orderService.cancel(orderId);
     }
 
 }

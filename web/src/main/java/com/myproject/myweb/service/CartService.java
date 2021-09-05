@@ -86,7 +86,7 @@ public class CartService {
                 .map(cartItem -> {
                     OrderItem orderItem = OrderItem.createOrderItem(cartItem.getItem(), cartItem.getItem().getPrice(), cartItem.getCount());
                     if(cartItem.getCoupon() != null) {
-                        cartItem.getCoupon().updateUsed(); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
+                        cartItem.getCoupon().setIsUsed(true); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
                         orderItem.setCoupon(cartItem.getCoupon());
                     }
                     return orderItem;

@@ -1,5 +1,6 @@
 package com.myproject.myweb.service;
 
+import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.domain.Photo;
 import com.myproject.myweb.domain.user.Seller;
@@ -10,6 +11,8 @@ import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +26,6 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final SellerRepository sellerRepository;
-    private final PhotoRepository photoRepository;
 
     public ItemResponseDto findById(Long id){
 
@@ -38,7 +40,8 @@ public class ItemService {
         Seller seller = sellerRepository.findById(itemRequestDto.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
 
-        Item item = Item.createItem(seller, itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock());
+        Item item = Item.createItem(itemRequestDto.getCategory(), seller,
+                itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock());
 
         List<Photo> photoList = itemRequestDto.getPhotos()
                 .stream()
@@ -49,15 +52,16 @@ public class ItemService {
                 })
                 .collect(Collectors.toList());
 
-        item.setPhotoList(photoList);
-
         // cascade로 photo 까지 save ..
         return itemRepository.save(item).getId();
     }
 
-    public List<ItemResponseDto> findAll(){
-        List<Item> items = itemRepository.findAll();
-        return items.stream()
+    public List<ItemResponseDto> findAllByCategory(Category category, int page, int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
+        items.getTotalPages();
+        return items.getContent().stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList());
     }

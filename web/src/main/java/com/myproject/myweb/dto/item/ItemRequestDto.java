@@ -1,5 +1,6 @@
 package com.myproject.myweb.dto.item;
 
+import com.myproject.myweb.domain.Category;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 public class ItemRequestDto { // template에 전달 안 함
+    private Category category;
     private Long sellerId;
     private String name;
     private int price;
@@ -17,7 +19,8 @@ public class ItemRequestDto { // template에 전달 안 함
     private List<PhotoDto> photos;
 
     @Builder
-    public ItemRequestDto(Long sellerId, String name, int stock, int price, List<PhotoDto> photos){
+    public ItemRequestDto(Category category, Long sellerId, String name, int stock, int price, List<PhotoDto> photos){
+        this.category = category;
         this.sellerId = sellerId;
         this.name = name;
         this.stock = stock;

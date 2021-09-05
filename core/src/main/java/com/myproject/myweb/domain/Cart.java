@@ -43,7 +43,7 @@ public class Cart {
     }
 
     public void removeCartItems(List<CartItem> cartItems){
-        cartItems.forEach(cartItem -> this.cartItems.remove(cartItem));
+        this.cartItems.removeAll(cartItems);
     }
 
     public int getTotalPrice(){

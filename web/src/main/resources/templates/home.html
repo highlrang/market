@@ -22,7 +22,12 @@
     <div th:if="${session.customer}">
         <span th:text="|${session.customer.name}님, 안녕하세요!|"></span>
         <span>
-            <a href="/item/list">상품 목록 보기</a>
+            상품 목록 보기
+            <select>
+                <span th:each="cate : ${categories}">
+                    <option th:value="${cate.getKey()}" th:text="${cate.getValue()}"></option>
+                </span>
+            </select>
         </span>
         <span th:if="${session.customer.cartId} != null">
             <a th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니 이동</a>

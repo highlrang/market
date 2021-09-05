@@ -6,20 +6,17 @@ import com.myproject.myweb.domain.Order;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Getter @Setter
 @MappedSuperclass
 @NoArgsConstructor
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public abstract class User {
 
     private String name;
     private String email;
@@ -31,23 +28,6 @@ public class User {
     private String certificationToken;
     @ColumnDefault("false")
     private Boolean certified;
-
-
-    @Builder
-    public User(String name, String email, String password, Address address){ // 비번 암호화한 후 객체 생성
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.address = address;
-        certified = false;
-    }
-
-    public void setCertificationToken(String token){
-        certificationToken = token;
-    }
-    public void setCertified(Boolean isCertified){
-        certified = isCertified;
-    }
 
     public Boolean checkPassword(String password){
         return this.password.equals(password);

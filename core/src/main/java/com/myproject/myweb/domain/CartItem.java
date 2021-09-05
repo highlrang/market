@@ -27,13 +27,12 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    // @NotNull
     private int count;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Coupon coupon;
 
-    public void setCart(Cart cart) { // 이후에 Cart 엔티티 생성 또는 호출해서 등록 시 사용됨
+    public void setCart(Cart cart) { // 연관관계 매핑용
         this.cart = cart;
     }
 
@@ -44,6 +43,7 @@ public class CartItem {
         return cartItem;
     }
 
+    // 쿠폰 없을 수 있으니까 setter로 빼놓아야함
     public void setCoupon(Coupon coupon){
         this.coupon = coupon;
     }
@@ -54,11 +54,8 @@ public class CartItem {
     }
 
     public int getTotalPrice(){
-        int totalPrice = item.getPrice() * count;
-        if(coupon != null){
-            totalPrice = (item.getPrice() - (item.getPrice() * coupon.getDiscountPer()/100)) * count;
-        }
-        return totalPrice;
+        if(coupon == null) return item.getPrice() * count;
+        return (item.getPrice() - (item.getPrice() * coupon.getDiscountPer()/100)) * count;
     }
 
 

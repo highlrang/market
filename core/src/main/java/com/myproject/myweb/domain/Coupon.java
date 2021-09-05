@@ -30,16 +30,22 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
 
     private Boolean isUsed;
 
-    @Builder
-    public Coupon(String name, Customer customer, int discountPer, LocalDateTime expirationDate){
-        this.name = name;
+    public void setCustomer(Customer customer){
         this.customer = customer;
-        this.discountPer = discountPer;
-        this.expirationDate = expirationDate;
-        isUsed = false;
+        customer.getCouponList().add(this);
     }
 
-    public void updateUsed(){
-        isUsed = !isUsed;
+    public static Coupon createCoupon(String name, Customer customer, int discountPer, LocalDateTime expirationDate){
+        Coupon coupon = new Coupon();
+        coupon.name = name;
+        coupon.setCustomer(customer);
+        coupon.discountPer = discountPer;
+        coupon.expirationDate = expirationDate;
+        coupon.isUsed = false;
+        return coupon;
+    }
+
+    public void setIsUsed(Boolean isUsed){
+        this.isUsed = isUsed;
     }
 }

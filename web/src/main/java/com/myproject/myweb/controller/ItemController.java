@@ -1,5 +1,6 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.coupon.CouponDto;
 import com.myproject.myweb.dto.item.ItemRequestDto;
@@ -43,13 +44,15 @@ public class ItemController {
     private final MessageSource messageSource;
 
     @GetMapping("/save")
-    public String saveForm(){
+    public String saveForm(Model model){
+        model.addAttribute("categories", Category.values());
         return "item/save";
     }
 
 
     @PostMapping("/save")
-    public String save(@RequestParam(value="seller_id") Long sellerId, // form으로 생성해도 됨
+    public String save(@RequestParam(value="category") String category,
+                       @RequestParam(value="seller_id") Long sellerId, // form으로 생성하기
                        @RequestParam(value="name") String name,
                        @RequestParam(value="price") int price,
                        @RequestParam(value="stock") int stock,
@@ -66,6 +69,7 @@ public class ItemController {
         }
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+                .category(Category.valueOf(category))
                 .sellerId(sellerId)
                 .name(name)
                 .price(price)
@@ -79,9 +83,12 @@ public class ItemController {
 
     }
 
-    @GetMapping("/list") // 판매자 상관없이 전체 상품 목록(나중에 카테고리별로 나누기)
-    public String list(Model model){
-        List<ItemResponseDto> items = itemService.findAll();
+    @GetMapping("/list") // 판매자 상관없이 카테고리별 상품 목록
+    public String list(@RequestParam(name = "category") String category,
+                        @RequestParam(name = "page") int page,
+                        @RequestParam(name = "size") int size,
+                        Model model){
+        List<ItemResponseDto> items = itemService.findAllByCategory(Category.valueOf(category), page, size);
         model.addAttribute("items", items);
         return "item/list";
     }

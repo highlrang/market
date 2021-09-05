@@ -1,5 +1,6 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -24,6 +25,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(@RequestParam(value = "msg", required = false) String msg,
                        Model model){
+        model.addAttribute("categories", Category.values());
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "home";
     }

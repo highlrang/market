@@ -11,8 +11,7 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("select o from Order o join fetch o.customer c where c.id =:customerId and o.orderStatus =:status")
-    Optional<Order> findByCustomerAndStatusReady(@Param(value = "customerId") Long customerId, @Param(value = "status") OrderStatus orderStatus);
+    Optional<Order> findByCustomer_IdAndOrderStatus(Long customerId, OrderStatus status);
 
     List<Order> findAllByCustomer_Id(Long customerId);
 }

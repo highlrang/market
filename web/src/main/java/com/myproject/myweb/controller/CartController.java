@@ -3,6 +3,7 @@ package com.myproject.myweb.controller;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.cart.CartResponseDto;
 import com.myproject.myweb.dto.coupon.CouponDto;
+import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.CouponService;
@@ -38,7 +39,7 @@ public class CartController {
         CartResponseDto cart = cartService.findById(id);
         model.addAttribute("cart", cart);
 
-        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
+        CustomerResponseDto user = (CustomerResponseDto) session.getAttribute("customer");
         model.addAttribute("coupons", couponService.findByCustomerAndCanUse(user.getId()));
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage("msg", null, Locale.getDefault()));

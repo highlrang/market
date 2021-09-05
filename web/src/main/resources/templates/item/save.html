@@ -19,6 +19,15 @@
     </script>
 
     <form action="/item/save" method="post" enctype="multipart/form-data">
+
+        <div>
+        <select name="category">
+            <div th:each="cate : ${categories}">
+                <option th:value="${cate.getKey()}" th:text="${cate.getValue()}"></option>
+            </div>
+        </select>
+        </div>
+
         <div>
             <input type="hidden" name="seller_id" th:value="${session.seller.id}">
         </div>

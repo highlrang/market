@@ -44,8 +44,9 @@ public class Order {
         customer.getOrderList().add(this);
     }
 
+    // orderItem 다 생성해놓고 >> 후에 order 생성할 때 그 때 양쪽 연관관계 매핑!!☆☆
     public void addOrderItem(OrderItem orderItem){
-        orderItems.add(orderItem); // 연관관계 매핑
+        orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
 
@@ -77,11 +78,9 @@ public class Order {
     }
 
     public int getTotalPrice(){
-        int totalPrice = 0;
-        for(OrderItem orderItem: orderItems){
-            totalPrice += orderItem.getTotalPrice();
-        }
-        return totalPrice;
+        return orderItems.stream()
+                .mapToInt(OrderItem::getTotalPrice)
+                .sum();
     }
 
     public void setTid(String tid){
