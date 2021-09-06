@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -80,17 +81,42 @@ public class ItemController {
         itemService.save(itemRequestDto);
 
         return "redirect:/item/list";
-
     }
 
-    @GetMapping("/list") // 판매자 상관없이 카테고리별 상품 목록
-    public String list(@RequestParam(name = "category") String category,
-                        @RequestParam(name = "page") int page,
-                        @RequestParam(name = "size") int size,
-                        Model model){
-        List<ItemResponseDto> items = itemService.findAllByCategory(Category.valueOf(category), page, size);
-        model.addAttribute("items", items);
+    @GetMapping("/list/{category}") // 판매자 상관없이 카테고리별 상품 목록
+    public String list(@PathVariable String category, Model model){
+        ItemService.ListByPaging<ItemResponseDto> itemList =
+                itemService.findAllByCategoryAndPaging(Category.valueOf(category), 0, 3);
+
+        model.addAttribute("items", itemList.getList());
+        model.addAttribute("totalPage", itemList.getTotalPage());
+
+        model.addAttribute("nowPage", "0");
+        model.addAttribute("nowSize", "3");
+        model.addAttribute("category", category);
+
         return "item/list";
+    }
+
+    @GetMapping("/list/api")
+    @ResponseBody
+    public ItemService.ListByPaging<ItemResponseDto> listApi(
+            @RequestParam(name = "category") String category,
+            Pageable pageable // ?page=n&size=n 으로 전달하기
+    ){
+
+        ItemService.ListByPaging<ItemResponseDto> listDto =
+                itemService.findAllByCategoryAndPaging(
+                        Category.valueOf(category),
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
+                );
+
+        listDto.setCategory(category);
+        listDto.setNowPage(pageable.getPageNumber());
+        listDto.setNowSize(pageable.getPageSize());
+
+        return listDto;
     }
 
     @GetMapping("/detail/{id}")

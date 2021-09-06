@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 <body>
     <script th:inline="javascript">
@@ -21,13 +22,9 @@
 
     <div th:if="${session.customer}">
         <span th:text="|${session.customer.name}님, 안녕하세요!|"></span>
-        <span>
-            상품 목록 보기
-            <select>
-                <span th:each="cate : ${categories}">
-                    <option th:value="${cate.getKey()}" th:text="${cate.getValue()}"></option>
-                </span>
-            </select>
+        page랑 size는 안 넣고 보내보기
+        <span th:each="cate : ${categories}">
+             <a th:href="@{ /item/list/{category}(category = ${cate.getKey()}) }" th:text="${cate.getValue()}"></a>
         </span>
         <span th:if="${session.customer.cartId} != null">
             <a th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니 이동</a>

@@ -10,13 +10,19 @@ import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerRepository;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,14 +62,28 @@ public class ItemService {
         return itemRepository.save(item).getId();
     }
 
-    public List<ItemResponseDto> findAllByCategory(Category category, int page, int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
+    public ListByPaging<ItemResponseDto> findAllByCategoryAndPaging(Category category, int page, int size){
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
         Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
-        items.getTotalPages();
-        return items.getContent().stream()
+
+        return new ListByPaging<>(items.getTotalPages(), items.getContent().stream()
                 .map(ItemResponseDto::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+    }
+
+    @Getter @Setter
+    public static class ListByPaging<T>{
+        private String category;
+        private int nowSize;
+        private int nowPage;
+        private int totalPage;
+        private List<T> list;
+
+        public ListByPaging(int totalPage, List<T> list) {
+            this.totalPage = totalPage;
+            this.list = list;
+        }
     }
 
     public List<ItemResponseDto> findBySeller(Long sellerId){

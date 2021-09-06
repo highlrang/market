@@ -3,6 +3,7 @@ package com.myproject.myweb.domain.user;
 import com.myproject.myweb.domain.Item;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Seller extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

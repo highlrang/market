@@ -5,6 +5,7 @@ import com.myproject.myweb.domain.Coupon;
 import com.myproject.myweb.domain.Order;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class Customer extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
