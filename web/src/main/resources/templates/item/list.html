@@ -7,163 +7,156 @@
 </head>
 <body>
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        var msg = [[ ${msg} ]]; // 그냥 [[ ${msg} ]]만으로 되는지 확인하기
-        /*]]*/
-
-        $(document).ready(function(){
-            var now_page = $("#nowPage").val();
-            var now_page_by_ten = parseInt(now_page / 10) * 10;
-
+        function pagination(first_page, size, total_page){ // 현재 페이지는 쿼리 페이지+1로 넘어옴
             var pages = "";
-            var start = now_page_by_ten;
-            if(start != 0) {
+            if(first_page > 1){
                 pages += "<input type='button' name='previous' value='이전'>";
-            }else{
-                start = 1; // 일의 자리의 페이지라면 시작은 1
             }
 
-            var total_page = $("#totalPage").val();
-            total_page = parseInt(total_page) + 1;
-            var end = parseInt(start + 10);
+            total_page = parseInt(total_page) + 1; // 마지막 페이지 포함이기에 +1
+            var end = parseInt(first_page + 10);
             if(end > total_page) {
                 end = total_page;
             }
 
-            for(var i=start; i<end; i++){
-                console.log(i);
-                pages += "<input type='button' name='page' value='" + i + "'>";
+            for(var i=first_page; i<end; i++){
+                pages += "<input type='button' name='page' value='" + i + "'";
+                if(i == now_page){
+                    pages += " class='btn btn-black'";
+                }
+                pages += ">";
             }
 
             if(end != total_page) {
                 pages += "<input type='button' name='next' value='다음'>";
             }
 
-            $("#pagination").replaceWith(pages);
-        });
+            $("#pagination").empty();
+            $("#pagination").append(pages);
+        }
 
         $(document).ready(function(){
-            var now_page = $("#nowPage").val();
-            var now_size = $("#nowSize").val(); // null인지 확인하기
+            // 처음에는 nowPage 항상 1
+            pagination([[ ${nowPage} ]], [[ ${nowSize} ]], [[ ${totalPage} ]]);
 
-            $("input[name='page']").val(now_page).attr('class', 'btn btn-black'); // 다른 버튼 눌렀을 때 없어지는지 확인
-            $("#size").val(now_size).prop("selected", true);
+            $("#size").val([[ ${nowSize} ]]).prop("selected", true);
         });
 
+        $(function(){
+            $("#size").change(function(){
+                var data = {
+                    category: $("#category").val(),
+                    page: "1", // 이후에 $("#nowPage").val()
+                    size: $(this).val()
+                };
 
-        $("#size").change(function(){
-            var data = {
-                category: $("#category").val(),
-                page: this.val(),
-                size: $("#nowSize").val()
-            };
+                $.ajax({
+                    type: 'get',
+                    url: '/item/list/api',
+                    data: data,
+                    success: function(data) {
+                        console.log(data);
 
-            $.ajax({
-                type: 'get',
-                url: '/item/list',
-                data: data,
-                success: function(data) {
-                    $.each(Object.keys(data), function(index, key){
-                        $("#data[key]").val(data[key]);
-                    });
+                        var itemList = "";
+                        $.each(data["list"], function(index, item){
+                            itemList += "<div>"
+                                     + "<div>" + item.name + "</div>"
+                                     + "<div>" + item.price + "</div>"
+                                     + "<div>" + item.stock + "</div>"
+                                     + "<div>";
+                            $.each(item.photos, function(index, photo){
+                                itemList += "<img src='../" + photo.name
+                                         + "' alt='" + photo.originName
+                                         + "' width='200' height='200'>";
+                            });
+                            itemList += "</div></div>";
+                        });
 
-                    $("#itemList").replaceWith(data[items]);
-                },
-                error : function(request, status, error) {
-                    console.log(request, status, error);
-                }
+                        $("#itemList").empty();
+                        $("#itemList").append(itemList);
+
+                        pagination(data["nowPage"], data["nowSize"], data["totalPage"]);
+                    },
+                    error : function(request, status, error) {
+                        console.log(request, status, error);
+                    }
+                });
+
+            });
+        });
+
+        $(function(){
+            $("input[name='page']").click(function(){
+                $("input[name='page']").attr('class', '');
+                $(this).attr('class', 'btn btn-black');
+
+                var data = {
+                    category: $("#category").val(),
+                    page: $(this).val(),
+                    size: $("#size").val()
+                };
+
+                $.ajax({
+                    type: 'get',
+                    url: '/item/list/api',
+                    data: data,
+                    success: function(data) {
+                        console.log(data);
+                        $("#now_page").val(data["nowPage"]);
+
+                        var itemList = "";
+                        $.each(data["list"], function(index, item){
+                            itemList += "<div>"
+                                     + "<div>" + item.name + "</div>"
+                                     + "<div>" + item.price + "</div>"
+                                     + "<div>" + item.stock + "</div>"
+                                     + "<div>";
+                            $.each(item.photos, function(index, photo){
+                                itemList += "<img src='../" + photo.name
+                                         + "' alt='" + photo.originName
+                                         + "' width='200' height='200'>";
+                            });
+                            itemList += "</div></div>";
+                        });
+
+                        $("#itemList").empty();
+                        $("#itemList").append(itemList);
+                    },
+                    error : function(request, status, error) {
+                        console.log(request, status, error);
+                    }
+                });
+
+            });
+        });
+
+        $(function(){
+            $("input[name='previous']").click(function(){
+                var now_page = parseInt($("input[name='page']:first").val()) - 10;
+                console.log(now_page);
+                pagination(now_page, $("size").val(), $("total_page").val());
+
+                // $("input[name='page']:last").click();
             });
 
-        });
+            $("input[name='next']").click(function(){
+                var now_page = parseInt($("input[name='page']:last").val()) + 1;
+                console.log(now_page);
+                pagination(now_page, $("#size").val(), $("#total_page").val());
 
-        $("input[name='page']").click(function(){
-            var data = {
-                category: $("#category").val(),
-                page: this.val(),
-                size: $("#nowSize").val()
-            };
-
-            $.ajax({
-                type: 'get',
-                url: '/item/list',
-                data: data,
-                success: function(data) {
-                    $.each(Object.keys(data), function(index, key){
-                        $("#data[key]").val(data[key]);
-                    });
-
-                    $("#itemList").replaceWith(data[items]);
-                },
-                error : function(request, status, error) {
-                    console.log(request, status, error);
-                }
+                // $("input[name='page']:first").click();
             });
-
         });
-
-        $("input[name='previous']").click(function(){
-            var first_page = $("input[name='page']:first").val();
-
-            var start = parseInt(first_page - 10);
-            var pages = "";
-            if(start != 1) {
-                pages += "<input type='button' name='previous' value='이전'>";
-            }
-
-            var total_page = $("#totalPage").val();
-            total_page = parseInt(total_page) + 1;
-            var end = parseInt(start + 10);
-            if(end > total_page) {
-                end = total_page;
-            }
-
-            for(var i=start; i<end; i++){ // 이거 반복이니까 함수로 빼기
-                pages += "<input type='button' name='page' value='" + i + "'>";
-            }
-
-            if(end != totalPage) {
-                pages += "<input type='button' name='next' value='다음'>";
-            }
-
-            $("#pagination").replaceWith(pages);
-        });
-
-        $("input[name='next']").click(function(){
-            var last_page = $("input[name='page']:last").val();
-
-            var pages = "";
-            var start = parseInt(last_page + 1);
-            if(start != 1) {
-                pages += "<input type='button' name='previous' value='이전'>";
-            }
-
-            var total_page = $("#totalPage").val();
-            total_page = parseInt(total_page) + 1;
-            var end = parseInt(start + 10);
-            if(end > total_page) {
-                end = total_page;
-            }
-
-            for(var i=start; i<end; i++){
-                pages += "<input type='button' name='page' value='" + i + "'>";
-            }
-
-            if(end != totalPage) {
-                pages += "<input type='button' name='next' value='다음'>";
-            }
-
-            $("#pagination").replaceWith(pages);
-        });
-
     </script>
 
     <div>
         <select id="size">
             <option value="1">1개(10개)</option>
-            <option value="3" selected>3개(20개)</option>
+            <option value="3">3개(20개)</option>
         </select>
     </div>
 
+    <div id="itemList">
     <div th:each="item: ${items}">
 
         <div th:text="${item.name}"></div>
@@ -174,13 +167,11 @@
             <img th:src="|../${photo.name}|" th:alt="${photo.originName}" width="200" height="200">
         </div>
     </div>
-
-    <div id="itemList"></div>
+    </div>
 
     <div>
-        <input type="hidden" id="nowSize" th:value="${nowSize}">
-        <input type="hidden" id="nowPage" th:value="${nowPage}">
-        <input type="hidden" id="totalPage" th:value="${totalPage}">
+        <input type="hidden" id="now_page" th:value="${nowPage}">
+        <input type="hidden" id="total_page" th:value="${totalPage}">
         <input type="hidden" id="category" th:value="${category}">
     </div>
 

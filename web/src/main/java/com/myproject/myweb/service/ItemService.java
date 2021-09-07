@@ -14,8 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -62,9 +65,9 @@ public class ItemService {
         return itemRepository.save(item).getId();
     }
 
-    public ListByPaging<ItemResponseDto> findAllByCategoryAndPaging(Category category, int page, int size){
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-
+    public ListByPaging<ItemResponseDto> findAllByCategoryAndPaging(Category category, Pageable pageable){
+        PageRequest pageRequest =
+                PageRequest.of(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
 
         return new ListByPaging<>(items.getTotalPages(), items.getContent().stream()
@@ -74,7 +77,6 @@ public class ItemService {
 
     @Getter @Setter
     public static class ListByPaging<T>{
-        private String category;
         private int nowSize;
         private int nowPage;
         private int totalPage;

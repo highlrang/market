@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,15 +84,16 @@ public class ItemController {
         return "redirect:/item/list";
     }
 
-    @GetMapping("/list/{category}") // 판매자 상관없이 카테고리별 상품 목록
+    // 판매자 상관없이 카테고리별 상품 목록
+    @GetMapping("/list/{category}")
     public String list(@PathVariable String category, Model model){
         ItemService.ListByPaging<ItemResponseDto> itemList =
-                itemService.findAllByCategoryAndPaging(Category.valueOf(category), 0, 3);
+                itemService.findAllByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(3));
 
         model.addAttribute("items", itemList.getList());
         model.addAttribute("totalPage", itemList.getTotalPage());
 
-        model.addAttribute("nowPage", "0");
+        model.addAttribute("nowPage", "1");
         model.addAttribute("nowSize", "3");
         model.addAttribute("category", category);
 
@@ -108,11 +110,9 @@ public class ItemController {
         ItemService.ListByPaging<ItemResponseDto> listDto =
                 itemService.findAllByCategoryAndPaging(
                         Category.valueOf(category),
-                        pageable.getPageNumber(),
-                        pageable.getPageSize()
+                        pageable
                 );
 
-        listDto.setCategory(category);
         listDto.setNowPage(pageable.getPageNumber());
         listDto.setNowSize(pageable.getPageSize());
 
