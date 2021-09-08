@@ -52,6 +52,18 @@ public class ItemService {
         Item item = Item.createItem(itemRequestDto.getCategory(), seller,
                 itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock());
 
+        itemRequestDto.getPhotos()
+                .forEach(photoDto -> {
+                    Photo photo = photoDto.toEntity();
+                    photo.setItem(item);
+                });
+        // cascade로 photo 까지 save ..
+        return itemRepository.save(item).getId();
+    }
+
+    @Transactional
+    public void update(Long id, ItemRequestDto itemRequestDto){
+        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
         List<Photo> photoList = itemRequestDto.getPhotos()
                 .stream()
                 .map(photoDto -> {
@@ -61,8 +73,7 @@ public class ItemService {
                 })
                 .collect(Collectors.toList());
 
-        // cascade로 photo 까지 save ..
-        return itemRepository.save(item).getId();
+        item.update(itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock(), photoList);
     }
 
     public ListByPaging<ItemResponseDto> findAllByCategoryAndPaging(Category category, Pageable pageable){

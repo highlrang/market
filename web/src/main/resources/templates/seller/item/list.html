@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+
+<div th:each="item: ${items}">
+
+    <div>
+        <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
+    </div>
+    <div th:text="|${item.price}원|"></div>
+    <div th:text="|${item.stock}개|"></div>
+    <br>
+</div>
+
+</body>
+</html>

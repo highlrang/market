@@ -15,7 +15,10 @@
       <input type="password" placeholder="password" th:field="*{password}">
       <span th:if="${#fields.hasErrors('password')}" th:errors="#{password}"></span>
   </div>
-  <div><input type="submit" value="로그인"></div>
+  <div>
+      <input type="submit" value="고객 로그인">
+      <input type="submit" value="판매자 로그인" formaction="/seller/login">
+  </div>
 </form>
 </body>
 </html>

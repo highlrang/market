@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class ItemRequestDto { // template에 전달 안 함
     private Category category;

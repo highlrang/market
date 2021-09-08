@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+  <script th:inline="javascript">
+    $(function(){
+      var msg = [[ ${msg} ]];
+      if(msg != null){
+        alert(msg);
+      }
+    });
+
+    $(form).on("submit", function(){
+    });
+  </script>
+
+  <form th:action="@{/seller/item/update/{id}(id=${item.id})}" method="post" enctype="multipart/form-data">
+    <div>
+      <input type="text" th:value="${item.category.getValue()}" readonly>
+    </div>
+
+    <div>
+      <input type="text" th:value="${item.name}" name="name">
+    </div>
+    <div>
+      <input type="text" th:value="${item.price}" name="price">
+    </div>
+    <div>
+      <input type="text" th:value="${item.stock}" name="stock">
+    </div>
+
+    <div th:each="photo : ${item.photos}">
+      <input type="hidden" name="photo" value="${photo}">
+      <img th:src="|../../../${photo.name}|" th:alt="${photo.originName}" width="200" height="200" onclick="if(confirm('삭제하시겠습니까?')){$(this).siblings().remove(); $(this).remove();}">
+    </div>
+
+    <div>
+      <input type="file" name="file" multiple>
+    </div>
+
+    <div>
+      <input type="submit" value="저장">
+    </div>
+  </form>
+
+</body>
+</html>

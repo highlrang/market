@@ -67,4 +67,12 @@ public class Item {
         }
         stock = nowStock;
     }
+
+    public void update(String name, int price, int stock, List<Photo> photoList){
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.photoList.clear(); // 이게 최선?
+        this.photoList = photoList;
+    }
 }

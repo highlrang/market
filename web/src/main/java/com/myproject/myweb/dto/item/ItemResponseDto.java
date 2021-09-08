@@ -1,5 +1,6 @@
 package com.myproject.myweb.dto.item;
 
+import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 public class ItemResponseDto {
 
     private Long id;
+    private Category category;
     private String name;
     private int price;
     private int stock;
@@ -17,6 +19,7 @@ public class ItemResponseDto {
 
     public ItemResponseDto(Item item){
         id = item.getId();
+        category = item.getCategory();
         name = item.getName();
         price = item.getPrice();
         stock = item.getStock();

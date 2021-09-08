@@ -1,9 +1,13 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Item;
+import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
+import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
+import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.user.CustomerService;
 import com.myproject.myweb.service.user.SellerService;
@@ -14,11 +18,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +37,7 @@ public class SellerController {
 
     private final SellerService sellerService;
     private final ItemService itemService;
+    private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
     @GetMapping("/join")
@@ -79,11 +87,6 @@ public class SellerController {
         return "redirect:/";
     }
 
-    @GetMapping("/login")
-    public String loginForm(@ModelAttribute UserRequestDto userRequestDto){
-        return "user/login";
-    }
-
     @PostMapping("/login")
     public String login(@Valid UserRequestDto userRequestDto,
                         BindingResult bindingResult,
@@ -129,6 +132,55 @@ public class SellerController {
         SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
         List<ItemResponseDto> itemList = itemService.findBySeller(seller.getId());
         model.addAttribute("items", itemList);
-        return "item/list";
+        return "seller/item/list";
     }
+
+    @GetMapping("/item/detail/{id}")
+    public String detail(@PathVariable Long id, Model model){
+        ItemResponseDto item = itemService.findById(id);
+        model.addAttribute("item", item);
+        return "seller/item/detail";
+    }
+
+    @GetMapping("/item/update/{id}")
+    public String updateForm(@PathVariable Long id, Model model,
+                             @RequestParam(name = "msg", required = false) String msg){
+        ItemResponseDto item = itemService.findById(id);
+        model.addAttribute("item", item);
+        if(msg != null) model.addAttribute("msg", msg);
+        return "seller/item/update";
+    }
+
+    @PostMapping("/item/update/{id}")
+    public String update(@PathVariable Long id,
+                         @RequestParam(value="name") String name,
+                         @RequestParam(value="price") int price,
+                         @RequestParam(value="stock") int stock,
+                         @RequestParam(value="file") List<MultipartFile> files,
+                         @RequestParam(value="photo") List<PhotoDto> photos){
+
+        log.info(String.valueOf(photos.isEmpty()));
+
+        List<PhotoDto> namedPhotos;
+        try {
+            namedPhotos = fileHandler.photoProcess(files);
+
+        }catch(IOException e){
+            RedirectAttributes attributes = new RedirectAttributesModelMap();
+            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
+            return "redirect:/seller/item/update/" + id;
+        }
+
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+                .name(name)
+                .price(price)
+                .stock(stock)
+                .photos(namedPhotos)
+                .build();
+
+        itemService.update(id, itemRequestDto);
+        return "redirect:/seller/item/detail/" + id;
+    }
+
+
 }
