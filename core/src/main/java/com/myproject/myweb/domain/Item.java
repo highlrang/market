@@ -72,7 +72,6 @@ public class Item {
         this.name = name;
         this.price = price;
         this.stock = stock;
-        this.photoList.clear(); // 이게 최선?
-        this.photoList = photoList;
+        this.photoList.addAll(photoList);
     }
 }

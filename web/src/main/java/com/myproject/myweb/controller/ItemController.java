@@ -88,7 +88,7 @@ public class ItemController {
     @GetMapping("/list/{category}")
     public String list(@PathVariable String category, Model model){
         ItemService.ListByPaging<ItemResponseDto> itemList =
-                itemService.findAllByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(3));
+                itemService.findByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(3));
 
         model.addAttribute("items", itemList.getList());
         model.addAttribute("totalPage", itemList.getTotalPage());
@@ -107,16 +107,10 @@ public class ItemController {
             Pageable pageable // ?page=n&size=n 으로 전달하기
     ){
 
-        ItemService.ListByPaging<ItemResponseDto> listDto =
-                itemService.findAllByCategoryAndPaging(
+        return itemService.findByCategoryAndPaging(
                         Category.valueOf(category),
                         pageable
                 );
-
-        listDto.setNowPage(pageable.getPageNumber());
-        listDto.setNowSize(pageable.getPageSize());
-
-        return listDto;
     }
 
     @GetMapping("/detail/{id}")

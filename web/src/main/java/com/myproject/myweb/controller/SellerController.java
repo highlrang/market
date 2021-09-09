@@ -1,5 +1,6 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
@@ -14,6 +15,8 @@ import com.myproject.myweb.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -127,13 +130,40 @@ public class SellerController {
         return "redirect:/";
     }
 
-    @GetMapping("/item/list") // 판매자의 상품 리스트
-    public String list(HttpSession session, Model model){
+    @GetMapping("/item/index") // 판매자의 상품 리스트
+    public String categoryList(Model model){
+        model.addAttribute("categories", Category.values());
+        return "seller/item/index";
+    }
+
+    @GetMapping("/item/list/{category}") // 첫 리스트 요청
+    public String listByCategory(@PathVariable("category") String category,
+                                 HttpSession session, Model model){
+
         SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
-        List<ItemResponseDto> itemList = itemService.findBySeller(seller.getId());
-        model.addAttribute("items", itemList);
+        ItemService.ListByPaging<ItemResponseDto> itemList =
+                itemService.findBySellerAndCategory(seller.getId(), Category.valueOf(category), Pageable.ofSize(5));
+
+        model.addAttribute("totalPage", itemList.getTotalPage());
+        model.addAttribute("items", itemList.getList());
+
+        model.addAttribute("nowPage", 1);
+        model.addAttribute("nowSize", 5);
+        model.addAttribute("category", category);
+
         return "seller/item/list";
     }
+
+    @GetMapping("/item/list/api") // 이후 리스트 요청(페이지 넘겨서)
+    @ResponseBody
+    public ItemService.ListByPaging<ItemResponseDto> listByCategoryApi(
+            @RequestParam("seller_id") Long sellerId, // 이렇게 session이 아닌 값으로 하는 게 날지
+            @RequestParam("category") String category,
+            Pageable pageable
+    ){
+        return itemService.findBySellerAndCategory(sellerId, Category.valueOf(category), pageable);
+    }
+
 
     @GetMapping("/item/detail/{id}")
     public String detail(@PathVariable Long id, Model model){
@@ -157,9 +187,7 @@ public class SellerController {
                          @RequestParam(value="price") int price,
                          @RequestParam(value="stock") int stock,
                          @RequestParam(value="file") List<MultipartFile> files,
-                         @RequestParam(value="photo") List<PhotoDto> photos){
-
-        log.info(String.valueOf(photos.isEmpty()));
+                         @RequestParam(value="photo") List<Long> photoIds){
 
         List<PhotoDto> namedPhotos;
         try {
@@ -178,7 +206,7 @@ public class SellerController {
                 .photos(namedPhotos)
                 .build();
 
-        itemService.update(id, itemRequestDto);
+        itemService.update(id, photoIds, itemRequestDto);
         return "redirect:/seller/item/detail/" + id;
     }
 

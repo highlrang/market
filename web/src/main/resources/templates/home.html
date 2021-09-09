@@ -34,7 +34,7 @@
     <div th:if="${session.seller}">
         <div th:text="|${session.seller.name}님, 안녕하세요!|"></div>
         <div><a href="/item/save">상품 등록하기</a></div>
-        <div><a href="/seller/item/list">등록한 상품 목록</a></div>
+        <div><a href="/seller/item/index">등록한 상품 목록</a></div>
     </div>
 
     <div th:if="${session.customer} == null and ${session.seller} == null">

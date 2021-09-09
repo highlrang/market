@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long>{
 
-    List<Item> findAllBySeller_Id(Long sellerId);
+    Page<Item> findAllBySeller_IdAndCategory(Long sellerId, Category category, Pageable pageable);
 
     Page<Item> findAllByCategory(Category category, Pageable pageable);
 }

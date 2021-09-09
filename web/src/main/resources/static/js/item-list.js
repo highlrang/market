@@ -33,13 +33,7 @@ function itemListChange(data){
                  + "<div><a href='/item/detail/" + item.id + "'>"  + item.name + "</a></div>"
                  + "<div>" + item.price + "</div>"
                  + "<div>" + item.stock + "</div>"
-                 + "<div>";
-        $.each(item.photos, function(index, photo){
-            itemList += "<img src='../" + photo.name
-                     + "' alt='" + photo.originName
-                     + "' width='200' height='200'>";
-        });
-        itemList += "</div></div><br>";
+                 + "</div><br>";
     });
 
     $("#itemList").empty();
@@ -48,10 +42,11 @@ function itemListChange(data){
 
 $(function(){
     $("#size").change(function(){
+        var size = $(this).val();
         var data = {
             category: $("#category").val(),
             page: "1",
-            size: $(this).val()
+            size: size
         };
 
         $.ajax({
@@ -60,12 +55,12 @@ $(function(){
             data: data,
             success: function(data) {
                 console.log(data);
-                $("#now_page").val(data["nowPage"]);
+                $("#now_page").val("1");
                 $("#total_page").val(data["totalPage"]);
 
                 itemListChange(data);
 
-                pagination(data["nowPage"], data["nowSize"], data["totalPage"]);
+                pagination("1", size, data["totalPage"]);
             },
             error : function(request, status, error) {
                 console.log(request, status, error);
@@ -80,9 +75,10 @@ $(function(){
         $("input[name='page']").attr('class', '');
         $(this).attr('class', 'btn btn-black');
 
+        var page = $(this).val();
         var data = {
             category: $("#category").val(),
-            page: $(this).val(),
+            page: page,
             size: $("#size").val()
         };
 
@@ -92,7 +88,7 @@ $(function(){
             data: data,
             success: function(data) {
                 console.log(data);
-                $("#now_page").val(data["nowPage"]);
+                $("#now_page").val(page);
 
                 itemListChange(data);
             },

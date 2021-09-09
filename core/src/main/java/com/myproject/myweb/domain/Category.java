@@ -20,13 +20,4 @@ public enum Category {
         return name();
     }
 
-    public static String[] getAllValues(){
-        return new String[]{
-                CLOTHES.value, HOUSEHOLD_GOODS.value, LEISURE_GOODS.value,
-                ANIMAL_GOODS.value, CLEANING_SUPPLIES.value, KITCHEN_UTENSILS.value,
-                BATHROOM_SUPPLIES.value, ELECTRONICS.value, INTERIOR_GOODS.value,
-                FURNITURE.value, STATIONERY.value, COSMETICS.value, FOOD.value, BOOKS.value
-        };
-    }
-
 }

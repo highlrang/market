@@ -4,11 +4,25 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="/js/item-list.js"></script>
 </head>
 <body>
+<script>
+    $(function(){
+        // 처음에는 nowPage 1
+        pagination([[ ${nowPage} ]], [[ ${nowSize} ]], [[ ${totalPage} ]]);
+        $("#size").val([[ ${nowSize} ]]).prop("selected", true);
+    });
+</script>
+<div>
+    <select id="size">
+        <option value="5">5개</option>
+        <option value="10">10개</option>
+    </select>
+</div>
 
+<div id="itemList">
 <div th:each="item: ${items}">
-
     <div>
         <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
     </div>
@@ -16,6 +30,15 @@
     <div th:text="|${item.stock}개|"></div>
     <br>
 </div>
+</div>
+
+<div>
+    <input type="hidden" id="now_page" th:value="${nowPage}">
+    <input type="hidden" id="total_page" th:value="${totalPage}">
+    <input type="hidden" id="category" th:value="${category}">
+</div>
+
+<div id="pagination"></div>
 
 </body>
 </html>

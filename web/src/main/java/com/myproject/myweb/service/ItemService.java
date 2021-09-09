@@ -35,6 +35,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final SellerRepository sellerRepository;
+    private final PhotoRepository photoRepository;
 
     public ItemResponseDto findById(Long id){
 
@@ -62,8 +63,18 @@ public class ItemService {
     }
 
     @Transactional
-    public void update(Long id, ItemRequestDto itemRequestDto){
+    public void update(Long id, List<Long> photoIds, ItemRequestDto itemRequestDto){
         Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
+
+        // 사진 삭제 처리 >> item의 photoList까지 연결
+        photoRepository.deleteAllInBatch(
+                item.getPhotoList()
+                        .stream()
+                        .filter(photo -> !photoIds.contains(photo.getId()))
+                        .collect(Collectors.toList())
+        );
+
+        // 사진 추가
         List<Photo> photoList = itemRequestDto.getPhotos()
                 .stream()
                 .map(photoDto -> {
@@ -76,7 +87,7 @@ public class ItemService {
         item.update(itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock(), photoList);
     }
 
-    public ListByPaging<ItemResponseDto> findAllByCategoryAndPaging(Category category, Pageable pageable){
+    public ListByPaging<ItemResponseDto> findByCategoryAndPaging(Category category, Pageable pageable){
         PageRequest pageRequest =
                 PageRequest.of(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
@@ -86,10 +97,20 @@ public class ItemService {
                 .collect(Collectors.toList()));
     }
 
+    public ListByPaging<ItemResponseDto> findBySellerAndCategory(Long id, Category category, Pageable pageable){
+        PageRequest pageRequest =
+                PageRequest.of(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        Page<Item> items = itemRepository.findAllBySeller_IdAndCategory(id, category, pageRequest);
+        return new ListByPaging<>(
+                items.getTotalPages(),
+                items.getContent().stream()
+                    .map(ItemResponseDto::new)
+                    .collect(Collectors.toList())
+        );
+    }
+
     @Getter @Setter
     public static class ListByPaging<T>{
-        private int nowSize;
-        private int nowPage;
         private int totalPage;
         private List<T> list;
 
@@ -97,13 +118,6 @@ public class ItemService {
             this.totalPage = totalPage;
             this.list = list;
         }
-    }
-
-    public List<ItemResponseDto> findBySeller(Long sellerId){
-        return itemRepository.findAllBySeller_Id(sellerId)
-                .stream()
-                .map(ItemResponseDto::new)
-                .collect(Collectors.toList());
     }
 
     public void stockNotice(Long itemId){
