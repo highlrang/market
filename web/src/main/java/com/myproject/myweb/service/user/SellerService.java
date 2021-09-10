@@ -7,6 +7,9 @@ import com.myproject.myweb.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +28,16 @@ public class SellerService implements UserService{
 
     private final SellerRepository sellerRepository;
     private final JavaMailSender emailSender;
+    private final BCryptPasswordEncoder passwordEncoder;
 
+    @Override // login 역할
+    public SellerResponseDto loadUserByUsername(String email) {
+        Seller seller = sellerRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        return new SellerResponseDto(seller);
+    }
+
+    /*
     @Override
     public SellerResponseDto login(UserRequestDto userRequestDto) throws IllegalArgumentException, IllegalStateException {
         Seller seller = sellerRepository.findByEmail(userRequestDto.getEmail())
@@ -38,6 +50,7 @@ public class SellerService implements UserService{
 
         return new SellerResponseDto(seller);
     }
+    */
 
     @Override
     @Transactional
@@ -45,6 +58,7 @@ public class SellerService implements UserService{
         Boolean alreadyExist = sellerRepository.findByEmail(userRequestDto.getEmail()).isPresent();
         if(alreadyExist) throw new IllegalStateException("UserAlreadyExistException");
 
+        userRequestDto.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         return sellerRepository.save(userRequestDto.toSeller()).getId();
     }
 
@@ -78,7 +92,7 @@ public class SellerService implements UserService{
 
     @Override
     @Transactional
-    public void expirateToken(Long sellerId){
+    public void expireToken(Long sellerId){
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(null);
     }
@@ -95,5 +109,4 @@ public class SellerService implements UserService{
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         return new SellerResponseDto(seller);
     }
-
 }

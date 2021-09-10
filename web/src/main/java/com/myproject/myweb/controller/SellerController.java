@@ -1,21 +1,17 @@
 package com.myproject.myweb.controller;
 
 import com.myproject.myweb.domain.Category;
-import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
-import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
-import com.myproject.myweb.service.user.CustomerService;
 import com.myproject.myweb.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -70,7 +66,7 @@ public class SellerController {
 
         }catch(MessagingException e){
             log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
-            sellerService.expirateToken(sellerId);
+            sellerService.expireToken(sellerId);
             msg = "UserJoinCertificationFailed";
         }
         attributes.addAttribute("msg", msg);
@@ -85,42 +81,8 @@ public class SellerController {
         if(!sellerService.confirmToken(sellerId, token)) {
             msg = "UserJoinCertificationFailed";
         }
-        sellerService.expirateToken(sellerId);
+        sellerService.expireToken(sellerId);
         attributes.addAttribute("msg", msg);
-        return "redirect:/";
-    }
-
-    @PostMapping("/login")
-    public String login(@Valid UserRequestDto userRequestDto,
-                        BindingResult bindingResult,
-                        HttpSession session,
-                        RedirectAttributes attributes){
-        if(bindingResult.hasErrors()) return "redirect:/login";
-
-        try{
-            SellerResponseDto seller = sellerService.login(userRequestDto);
-            if(!seller.getCertified()) {
-                sellerService.certify(seller.getId());
-                attributes.addAttribute("msg", "UserJoinEmailCertificationRetry");
-                return "redirect:/";
-                // 인증 안된채로는 기능 사용 못하게 xx
-            }
-            session.setAttribute("seller", seller);
-
-        }catch (IllegalArgumentException | IllegalStateException | MessagingException error){
-
-            if(error.getMessage().equals("UserNotFoundException")){
-                bindingResult.rejectValue("email", "EmailError", "email을 가진 사용자를 찾을 수 없습니다.");
-
-            }else if(error.getMessage().equals("UserNotMatchedException")){
-                bindingResult.rejectValue("password", "PasswordError", "비밀번호 불일치입니다.");
-
-            }else{
-                bindingResult.reject("EmailError", "이메일 인증을 위한 이메일 전송이 실패했습니다.");
-            }
-            return "redirect:/login";
-        }
-
         return "redirect:/";
     }
 

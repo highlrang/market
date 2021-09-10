@@ -11,6 +11,9 @@ import com.myproject.myweb.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +33,16 @@ public class CustomerService implements UserService{
     private final CustomerRepository customerRepository;
     private final CouponRepository couponRepository;
     private final JavaMailSender emailSender; // Impl
+    private final BCryptPasswordEncoder passwordEncoder;
 
+    @Override
+    public CustomerResponseDto loadUserByUsername(String email) { // login에 사용됨
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundByException"));
+        return new CustomerResponseDto(customer);
+    }
+
+    /*
     @Override
     public CustomerResponseDto login(UserRequestDto userRequestDto) throws IllegalArgumentException, IllegalStateException {
         Customer customer = customerRepository.findByEmail(userRequestDto.getEmail())
@@ -43,6 +55,7 @@ public class CustomerService implements UserService{
 
         return new CustomerResponseDto(customer);
     }
+    */
 
     @Override
     @Transactional
@@ -50,6 +63,7 @@ public class CustomerService implements UserService{
         Boolean alreadyExist = customerRepository.findByEmail(userRequestDto.getEmail()).isPresent();
         if(alreadyExist) throw new IllegalStateException("UserAlreadyExistException");
 
+        userRequestDto.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         Customer customer = customerRepository.save(userRequestDto.toCustomer());
 
         Coupon coupon = Coupon.createCoupon("신규 회원 10% 할인 쿠폰", customer, 10, LocalDateTime.now().plusMonths(5L));
@@ -88,7 +102,7 @@ public class CustomerService implements UserService{
 
     @Override
     @Transactional
-    public void expirateToken(Long customerId){
+    public void expireToken(Long customerId){
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         customer.setCertificationToken(null);
     }
@@ -100,5 +114,4 @@ public class CustomerService implements UserService{
         if(customer.getCertificationToken().equals(token)) customer.setCertified(true);
         return customer.getCertified();
     }
-
 }

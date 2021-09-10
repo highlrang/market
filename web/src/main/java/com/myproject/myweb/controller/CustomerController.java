@@ -55,7 +55,7 @@ public class CustomerController {
 
         }catch(MessagingException e){
             log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
-            customerService.expirateToken(customerId);
+            customerService.expireToken(customerId);
             msg = "UserJoinCertificationFailed";
         }
         attributes.addAttribute("msg", msg);
@@ -70,7 +70,7 @@ public class CustomerController {
         if(!customerService.confirmToken(customerId, token)) {
             msg = "UserJoinCertificationFailed";
         }
-        customerService.expirateToken(customerId);
+        customerService.expireToken(customerId);
         attributes.addAttribute("msg", msg);
         return "redirect:/";
     }
@@ -80,6 +80,7 @@ public class CustomerController {
         return "user/login";
     }
 
+    /*
     @PostMapping("/login")
     public String login(@Valid UserRequestDto userRequestDto,
                         BindingResult bindingResult,
@@ -113,8 +114,9 @@ public class CustomerController {
 
         return "redirect:/";
     }
+     */
 
-    @GetMapping("/logout")
+    @GetMapping("/logout") // security 들리나 안 들리나?
     public String logout(HttpSession session){
         session.invalidate();
         return "redirect:/";

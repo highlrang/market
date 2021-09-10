@@ -4,10 +4,11 @@ import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @NoArgsConstructor
-public class UserResponseDto{ // abstract ?
+public abstract class UserResponseDto implements UserDetails { // abstract ?
 
     protected Long id;
     protected String name;
