@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'de.codecentric:spring-boot-admin-starter-client:2.5.1'
+    implementation 'de.codecentric:spring-boot-admin-starter-server:2.5.1'
+
 }
 
 test {

@@ -13,6 +13,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'org.springframework.batch:spring-batch-test'
     // quartz는 나중에
+
+    implementation 'de.codecentric:spring-boot-admin-starter-client:2.5.1'
 }
 
 test {
