@@ -39,12 +39,24 @@ public class SellerController {
     private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
+    @GetMapping("/login")
+    public String loginForm(){
+        return "seller/login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session){
+        session.invalidate();
+        log.info("logout controller 거침"); // security 들리나 안 들리나?
+        return "redirect:/";
+    }
+
     @GetMapping("/join")
     public String joinForm(@ModelAttribute UserRequestDto userRequestDto,
                            @RequestParam(value = "msg", required = false) String msg,
                            Model model){
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
-        return "user/join";
+        return "seller/join";
     }
 
     @PostMapping("/certify")
@@ -83,12 +95,6 @@ public class SellerController {
         }
         sellerService.expireToken(sellerId);
         attributes.addAttribute("msg", msg);
-        return "redirect:/";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session){
-        session.invalidate();
         return "redirect:/";
     }
 

@@ -25,7 +25,7 @@ public class UserRequestDto {
     // private Address address;
 
     public Customer toCustomer(){
-        return (Customer) Customer.builder()
+        return Customer.builder()
                 .email(email)
                 .password(password)
                 .name(name)
@@ -33,7 +33,7 @@ public class UserRequestDto {
     }
 
     public Seller toSeller(){
-        return (Seller) Seller.builder()
+        return Seller.builder()
                 .email(email)
                 .name(name)
                 .password(password)

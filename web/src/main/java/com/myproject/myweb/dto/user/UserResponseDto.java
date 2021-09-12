@@ -13,6 +13,7 @@ public abstract class UserResponseDto implements UserDetails { // abstract ?
     protected Long id;
     protected String name;
     protected String email;
+    protected String password;
     protected Boolean certified;
     // protected Address address;
 

@@ -28,6 +28,18 @@ public class CustomerController {
     private final CustomerService customerService;
     private final MessageSource messageSource;
 
+    @GetMapping("/login")
+    public String loginForm(){
+        return "user/login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session){
+        session.invalidate();
+        log.info("logout controller 거침"); // security 들리나 안 들리나?
+        return "redirect:/";
+    }
+
     @GetMapping("/join")
     public String joinForm(@ModelAttribute UserRequestDto userRequestDto,
                            @RequestParam(value = "msg", required = false) String msg,
@@ -75,11 +87,6 @@ public class CustomerController {
         return "redirect:/";
     }
 
-    @GetMapping("/login")
-    public String loginForm(@ModelAttribute UserRequestDto userRequestDto){
-        return "user/login";
-    }
-
     /*
     @PostMapping("/login")
     public String login(@Valid UserRequestDto userRequestDto,
@@ -115,10 +122,4 @@ public class CustomerController {
         return "redirect:/";
     }
      */
-
-    @GetMapping("/logout") // security 들리나 안 들리나?
-    public String logout(HttpSession session){
-        session.invalidate();
-        return "redirect:/";
-    }
 }

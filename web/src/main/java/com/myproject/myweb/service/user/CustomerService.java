@@ -38,7 +38,7 @@ public class CustomerService implements UserService{
     @Override
     public CustomerResponseDto loadUserByUsername(String email) { // login에 사용됨
         Customer customer = customerRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundByException"));
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         return new CustomerResponseDto(customer);
     }
 

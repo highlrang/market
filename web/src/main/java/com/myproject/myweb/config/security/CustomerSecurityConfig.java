@@ -1,8 +1,11 @@
 package com.myproject.myweb.config.security;
 
+import com.myproject.myweb.handler.CustomerLoginSuccessHandler;
 import com.myproject.myweb.service.user.CustomerService;
 import com.myproject.myweb.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -10,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@Order(1)
+@Configuration
 @RequiredArgsConstructor
 public class CustomerSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -32,6 +37,7 @@ public class CustomerSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                     .loginPage("/login")
                     .loginProcessingUrl("/login")
+                    .successHandler(new CustomerLoginSuccessHandler())
                     .successForwardUrl("/")
                     .permitAll()
                     .and()

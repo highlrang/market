@@ -6,18 +6,16 @@
 </head>
 <body>
 
-<form action="/login" method="post" th:object="${userRequestDto}">
+<form action="/login" method="post">
   <div>
-      <input type="text" placeholder="email" th:field="*{email}">
-      <span th:if="${#fields.hasErrors('email')}" th:errors="#{email}"></span>
+      <input type="text" placeholder="email" name="username">
   </div>
   <div>
-      <input type="password" placeholder="password" th:field="*{password}">
-      <span th:if="${#fields.hasErrors('password')}" th:errors="#{password}"></span>
+      <input type="password" placeholder="password" name="password">
+      <!-- <span th:if="${#fields.hasErrors('password')}" th:errors="#{password}"></span>-->
   </div>
   <div>
-      <input type="submit" value="고객 로그인">
-      <input type="submit" value="판매자 로그인" formaction="/seller/login">
+      <input type="submit" value="로그인">
   </div>
 </form>
 </body>

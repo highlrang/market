@@ -5,7 +5,9 @@ import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.coupon.CouponDto;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +23,7 @@ public class CustomerResponseDto extends UserResponseDto {
         this.id = entity.getId();
         this.name = entity.getName();
         this.email = entity.getEmail();
+        this.password = entity.getPassword();
         if(entity.getCart() != null) this.cartId = entity.getCart().getId();
         this.coupons = entity.getCouponList() // list니까 null이어도 에러 안남
                 .stream()
@@ -31,17 +34,19 @@ public class CustomerResponseDto extends UserResponseDto {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> auth = new ArrayList<>();
+        auth.add(new SimpleGrantedAuthority("normal"));
+        return auth;
     }
 
     @Override
     public String getPassword() {
-        return getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return email;
     }
 
     @Override

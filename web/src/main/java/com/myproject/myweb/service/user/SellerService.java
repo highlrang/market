@@ -30,7 +30,7 @@ public class SellerService implements UserService{
     private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Override // login 역할
+    @Override
     public SellerResponseDto loadUserByUsername(String email) {
         Seller seller = sellerRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));

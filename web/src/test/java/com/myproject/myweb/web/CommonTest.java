@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,22 +35,11 @@ public class CommonTest{
     @Autowired CustomerRepository customerRepository;
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemRepository itemRepository;
+    @Autowired BCryptPasswordEncoder passwordEncoder;
 
     @Test
-    public void query_fetch_batch_test(){
-        Customer customer = Customer.builder()
-                .name("customer")
-                .build();
-        customerRepository.save(customer);
+    public void 테스트(){
 
-
-        Coupon coupon1 = Coupon.createCoupon("coupon1", customer, 5, LocalDateTime.now());
-        Coupon coupon2 = Coupon.createCoupon("coupon2", customer, 5, LocalDateTime.now());
-        couponRepository.saveAll(Arrays.asList(coupon1, coupon2));
-
-
-        List<Customer> customers = customerRepository.findAll();
-        customers.get(0).getCouponList().forEach(coupon -> System.out.println(coupon.getName()));
     }
 
     @Test

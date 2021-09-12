@@ -15,6 +15,7 @@ public class SellerResponseDto extends UserResponseDto{
         this.id = entity.getId();
         this.name = entity.getName();
         this.email = entity.getEmail();
+        this.password = entity.getPassword();
         this.certified = entity.getCertified();
     }
 
@@ -25,12 +26,12 @@ public class SellerResponseDto extends UserResponseDto{
 
     @Override
     public String getPassword() {
-        return getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return email;
     }
 
     @Override
