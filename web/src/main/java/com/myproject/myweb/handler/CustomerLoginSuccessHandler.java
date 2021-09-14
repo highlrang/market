@@ -12,18 +12,14 @@ import java.io.IOException;
 public class CustomerLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
                                         Authentication authentication) {
-
+        System.out.println(authentication.getPrincipal().toString());
         HttpSession session = request.getSession();
-        System.out.println(authentication.getPrincipal());
-
         session.setAttribute("customer", authentication.getPrincipal());
 
-        try {
-            response.sendRedirect("/");
-
-        } catch (IOException ignored) {}
+        // response.sendRedirect("/");
     }
 
 }

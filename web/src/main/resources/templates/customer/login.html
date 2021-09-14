@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
+
+<div layout:fragment="content">
+    <form action="/customer/login" method="post">
+      <div class="mb-3">
+          <input type="text" class="form-control" placeholder="email" name="username">
+      </div>
+      <div class="mb-3">
+          <input type="password" class="form-control" placeholder="password" name="password">
+          <!-- <span th:if="${#fields.hasErrors('password')}" th:errors="#{password}"></span>-->
+      </div>
+      <div class="mb-3">
+          <input type="submit" value="로그인">
+      </div>
+    </form>
+</div>
+
+</html>

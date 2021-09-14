@@ -1,24 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
-<body>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var msg = [[ ${msg} ]];
-        /*]]*/
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
 
-        $(document).ready(function(){
-            if(msg != null){
-                alert(msg);
-            }
-        });
-    </script>
-
-
+<div layout:fragment="content">
     <div th:each="order : ${orders}">
         <div th:text="${order.getOrderItemsName}"></div>
         <div th:text="${order.totalPrice}"></div>
@@ -29,5 +14,6 @@
         </div>
         <br>
     </div>
-</body>
+</div>
+
 </html>

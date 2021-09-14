@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout/basic">
-
+<body>
 <div layout:fragment="content">
-    <form action="/seller/certify" method="post" th:object="${userRequestDto}">
+    <form action="/customer/certify" method="post" th:object="${userRequestDto}">
         <div class="mb-3">
             <input type="text" th:field="*{email}" class="form-control" placeholder="email">
             <span th:if="${#fields.hasErrors('email')}" th:errors="#{email}"></span>
@@ -23,5 +23,5 @@
         </div>
     </form>
 </div>
-
+</body>
 </html>

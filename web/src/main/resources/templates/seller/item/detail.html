@@ -1,24 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
-<body>
-<script th:inline="javascript">
-        /*<![CDATA[*/
-        var msg = [[ ${msg} ]];
-        /*]]*/
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
 
-        $(document).ready(function(){
-            if(msg != null){
-                alert(msg);
-            }
-        });
-    </script>
-
-
+<div layout:fragment="content">
   <div>
     <div>
       <div th:text="${item.category.getValue()}" readonly></div>
@@ -26,7 +11,7 @@
       <div th:text="${item.price}"></div>
       <div th:text="${item.stock}"></div>
       <div th:each="photo: ${item.photos}">
-        <img th:src="|../../../${photo.name}|" width="200" height="200">
+        <img th:src="|../../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}">
       </div>
     </div>
 
@@ -34,5 +19,6 @@
       <a th:href="@{/seller/item/update/{id}(id = ${item.id})}" th:text="수정"></a>
     </div>
   </div>
-</body>
+
+</div>
 </html>

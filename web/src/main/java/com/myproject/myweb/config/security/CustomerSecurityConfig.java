@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static com.myproject.myweb.config.security.SecurityConfig.SECURITY_PASSED_URLS;
+
 @Order(1)
 @Configuration
 @RequiredArgsConstructor
@@ -23,26 +25,26 @@ public class CustomerSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web){
-        web.ignoring().antMatchers("/js/**");
+        web.ignoring().antMatchers(SECURITY_PASSED_URLS);
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception{
         http
-                .authorizeRequests()
-                    .antMatchers("/", "/join", "/certify", "/certified", "/login")
-                    .permitAll()
+                .antMatcher("/customer/**")
+                    .authorizeRequests()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()
-                    .loginPage("/login")
-                    .loginProcessingUrl("/login")
+                    .loginPage("/customer/login")
+                    .loginProcessingUrl("/customer/login")
+                    .failureUrl("/customer/login?msg=LoginError")
                     .successHandler(new CustomerLoginSuccessHandler())
-                    .successForwardUrl("/")
+                    .defaultSuccessUrl("/")
                     .permitAll()
                     .and()
                 .logout()
-                    .logoutUrl("/logout")
+                    .logoutUrl("/customer/logout")
                     .logoutSuccessUrl("/")
                     .permitAll()
                     .and()

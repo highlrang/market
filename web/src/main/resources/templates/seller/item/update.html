@@ -1,48 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
-<body>
-  <script th:inline="javascript">
-    $(function(){
-      var msg = [[ ${msg} ]];
-      if(msg != null){
-        alert(msg);
-      }
-    });
-  </script>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
+
+<div layout:fragment="content">
 
   <form th:action="@{/seller/item/update/{id}(id=${item.id})}" method="post" enctype="multipart/form-data">
-    <div>
-      <input type="text" th:value="${item.category.getValue()}" readonly>
+    <div class="mb-3">
+      <input type="text" th:value="${item.category.getValue()}" class="form-control" readonly>
     </div>
 
-    <div>
-      <input type="text" th:value="${item.name}" name="name">
+    <div class="mb-3">
+      <input type="text" th:value="${item.name}" name="name" class="from-control">
     </div>
-    <div>
-      <input type="text" th:value="${item.price}" name="price">
+
+    <div class="mb-3">
+      <input type="text" th:value="${item.price}" name="price" class="form-control">
     </div>
-    <div>
-      <input type="text" th:value="${item.stock}" name="stock">
+
+    <div class="mb-3">
+      <input type="text" th:value="${item.stock}" name="stock" class="form-control">
     </div>
 
     <div th:each="photo : ${item.photos}">
       <input type="hidden" name="photo" th:value="${photo.id}">
-      <img th:src="|../../../${photo.name}|" th:alt="${photo.originName}" width="200" height="200" onclick="if(confirm('삭제하시겠습니까?')){$(this).siblings().remove(); $(this).remove();}">
+      <img th:src="|../../../${photo.name}|" th:alt="${photo.originName}"
+           class="img-thumbnail"
+           onclick="if(confirm('삭제하시겠습니까?')){$(this).siblings().remove(); $(this).remove();}">
     </div>
 
-    <div>
-      <input type="file" name="file" multiple>
+    <div class="mb-3">
+      <input type="file" class="form-control" name="file" multiple>
     </div>
 
-    <div>
+    <div class="mb-3">
       <input type="submit" value="저장">
     </div>
   </form>
 
-</body>
+</div>
+
 </html>

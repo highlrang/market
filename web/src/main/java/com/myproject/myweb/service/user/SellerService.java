@@ -72,7 +72,7 @@ public class SellerService implements UserService{
         if(seller.getName() != null) name = seller.getName() + "님께 ";
         String context = "<h3>이메일 인증을 위하여 " + name
                 + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='http://127.0.0.1:8081/certified?user="+seller.getId()
+                + "<a href='http://127.0.0.1:8081/seller/certified?user="+seller.getId()
                 + "&token="+seller.getCertificationToken()
                 + "'>여기를 클릭해주세요!</a>";
 

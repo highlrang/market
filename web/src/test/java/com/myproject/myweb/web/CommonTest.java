@@ -39,7 +39,6 @@ public class CommonTest{
 
     @Test
     public void 테스트(){
-
     }
 
     @Test

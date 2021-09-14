@@ -1,54 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
-<body>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var msg = [[ ${msg} ]];
-        /*]]*/
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
 
-        $(document).ready(function(){
-            if(msg != null){
-                alert(msg);
-            }
-        });
-    </script>
-
+<div layout:fragment="content">
     <form method="post" action="/order/payment/ready">
         <div>
-            <div>
-                <div th:text="${item.name}"></div>
-                <div th:text="${item.price}"></div>
-                <div th:each="photo: ${item.photos}">
-                    <img th:src="|../../${photo.name}|" width="200" height="200">
-                </div>
-                <div>
-                    <input type="hidden" name="item_id" th:value="${item.id}">
-                    <input type="hidden" name="customer_id" th:value="${session.customer.id}">
-                </div>
-            </div>
+            <input type="hidden" name="item_id" th:value="${item.id}">
+            <input type="hidden" name="customer_id" th:value="${session.customer.id}">
+        </div>
 
+        <div class="mb-3">
+            <input class="form-control" th:text="${item.name}" readonly>
+        </div>
 
-            <div><input type="text" name="count" value="1"></div>
+        <div class="mb-3">
+            <div class="form-control" th:text="${item.price}"></div>
+        </div>
 
-            <div>
-               <select name="coupon">
-                   <option value="null">선택안함</option>
-                   <span th:each="coupon: ${coupons}">
+        <div th:each="photo: ${item.photos}">
+            <img th:src="|../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}">
+        </div>
+
+        <div class="mb-3">
+            <input type="text" class="form-control" name="count" value="1">
+        </div>
+
+        <div>
+            <select name="coupon" class="form-select">
+                <option value="null">선택안함</option>
+                <span th:each="coupon: ${coupons}">
                     <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.discountPer}% - ${coupon.expirationDate}까지|"></option>
-                   </span>
-               </select>
-            </div>
+               </span>
+            </select>
+        </div>
 
-            <div>
-                <input type="submit" value="장바구니 담기" formaction="/cart/save">
-                <input type="submit" value="주문하기">
-            </div>
+        <div>
+            <input type="submit" value="장바구니 담기" formaction="/cart/save">
+            <input type="submit" value="주문하기">
         </div>
     </form>
-</body>
+</div>
+
 </html>

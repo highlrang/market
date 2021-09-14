@@ -1,52 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-다른 모든 템플릿에
-<html xmlns:th="http://www.thymeleaf.org"
-     xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
-     layout:decorator="layout/basic">
-적용
-
 <header th:fragment="headerFragment">
-  <!--
-  <script>
-        $(document).ready(function(){
-            $("#list").click();
-        });
-    </script>
   <div id="header">
-
-    <div style="display:none">
-      <input type="button" id="list"/>
-    </div>
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">홈페이지</a>
+        <a class="navbar-brand" href="#">땡땡마켓</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
-            <span id="categoryList"></span>
+            <a class="nav-link active" aria-current="page" href="/">HOME</a>
 
-            <span th:each="category : ${categories}">
-                <a class="nav-link" th:href="@{/post/list(cateId=${category.id})}" th:text="${category.name}"></a>
+            <span th:if="${session.customer != null}">
+              <span th:each="category : ${categories}">
+                <a class="nav-link" th:href="@{ /item/list/{category}(category = ${cate.getKey()}) }" th:text="${cate.getValue()}"></a>
+              </span>
+              <span th:if="${session.customer.cartId} != null">
+                <a class="nav-link" th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니 이동</a>
+              </span>
+              <a class="nav-link" href="/customer/logout">로그아웃</a>
             </span>
 
-            <span th:if="${session.user==null}">
-                        <a class="nav-link" href="/login">Login</a>
-                    </span>
-            <span th:if="${session.user!=null}">
-                        <a class="nav-link" href="/mypage">MyPage</a>
-                    </span>
+            <span th:if="${session.seller}">
+              <a class="nav-link" href="/item/save">상품 등록하기</a>
+              <a class="nav-link" href="/seller/item/index">등록한 상품 목록</a>
+              <a class="nav-link" href="/seller/logout">로그아웃</a>
+            </span>
+
+            <span th:if="${session.customer} == null and ${session.seller} == null">
+              <a class="nav-link" href="/customer/join">고객 회원가입 드롭다운으로 만들기</a>
+              <a class="nav-link" href="/seller/join">판매자 회원가입</a>
+
+              <a class="nav-link" href="/customer/login">고객 로그인</a>
+              <a class="nav-link" href="/seller/login">판매자 로그인</a>
+            </span>
           </div>
         </div>
       </div>
     </nav>
   </div>
-  -->
+
 
 </header>
 </html>

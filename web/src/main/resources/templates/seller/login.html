@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
 
-<form action="/seller/login" method="post">
-    <div>
-        <input type="text" placeholder="email" name="username">
-    </div>
-    <div>
-        <input type="password" placeholder="password" name="password">
-    </div>
-    <div>
-        <input type="submit" value="로그인">
-    </div>
-</form>
-</body>
+<div layout:fragment="content">
+    <form action="/seller/login" method="post">
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="email" name="username">
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" placeholder="password" name="password">
+        </div>
+        <div class="mb-3">
+            <input type="submit" value="로그인">
+        </div>
+    </form>
+</div>
+
 </html>

@@ -5,12 +5,16 @@ import com.myproject.myweb.service.user.SellerService;
 import com.myproject.myweb.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import static com.myproject.myweb.config.security.SecurityConfig.SECURITY_PASSED_URLS;
 
 @Order(2)
 @Configuration
@@ -21,18 +25,24 @@ public class SellerSecurityConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
+    public void configure(WebSecurity web){
+        web.ignoring().antMatchers(SECURITY_PASSED_URLS);
+    }
+
+    @Override
     public void configure(HttpSecurity http) throws Exception{
         http
-                .authorizeRequests()
-                    .antMatchers("/", "/seller/join", "/seller/certify", "/seller/certified", "/seller/login")
-                    .permitAll()
+                .antMatcher("/seller/**")
+                    .authorizeRequests()
                     .anyRequest().authenticated()
                     .and()
+                // .requestMatchers()
                 .formLogin()
                     .loginPage("/seller/login")
                     .loginProcessingUrl("/seller/login")
+                    .failureUrl("/seller/login?msg=LoginError")
                     .successHandler(new SellerLoginSuccessHandler())
-                    .successForwardUrl("/")
+                    .defaultSuccessUrl("/")
                     .permitAll()
                     .and()
                 .logout()

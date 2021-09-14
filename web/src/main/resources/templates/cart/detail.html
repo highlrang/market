@@ -1,115 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
-<body>
-<script th:inline="javascript">
-    /*<![CDATA[*/
-        var msg = [[ ${msg} ]];
-    /*]]*/
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
 
-    $(document).ready(function(){
-        if(msg != null){
-            alert(msg);
-        }
-    });
-</script>
-<script>
-    $(document).ready(function(){
+<div layout:fragment="headFragment">
+    <script src="/js/cart.js"></script>
+</div>
 
-        $("#checkAll").click(function(){
-            if($("input:checkbox[id='checkAll']").prop("checked")){
-                $("input[type=checkbox]").prop("checked", true);
-            }else{
-                $("input[type=checkbox]").prop("checked", false);
-            }
-        });
-
-        $("#order").click(function(){
-            var item_id_list = [];
-            $("input:checkbox[name='item_id']:checked").each(function(){
-                item_id_list.push($(this).val());
-            });
-
-            if(item_id_list.length == 0){
-                alert("상품을 선택해주세요.");
-                return false;
-            }
-
-            var data = {
-                customer_id: $("#customer_id").val(),
-                cart_id: $("#cart_id").val(),
-                item_id: item_id_list
-            };
-
-            var form = document.createElement('form');
-            form.setAttribute('method', 'post');
-            form.setAttribute('action', '/order/payment/ready');
-            document.charset = "utf-8";
-            for (var key in data) {
-                var hiddenField = document.createElement('input');
-                hiddenField.setAttribute('type', 'hidden');
-                hiddenField.setAttribute('name', key);
-                hiddenField.setAttribute('value', data[key]);
-                form.appendChild(hiddenField);
-            }
-            document.body.appendChild(form);
-            form.submit();
-
-            /*
-            $.ajax({
-                type: 'post',
-                url: '/order/payment/ready',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                data: data,
-                success: function(data) {
-                    alert(data);
-                },
-                error : function(request, status, error) {
-                    console.log(request, status, error);
-                }
-            });
-            */
-        });
-
-        $("#cart").click(function(){
-            var item_id_list = [];
-            $("input:checkbox[name='item_id']:checked").each(function(){
-                item_id_list.push($(this).val());
-            });
-
-            if(item_id_list.length == 0){
-                alert("상품을 선택해주세요.");
-                return false;
-            }
-
-            var data = {
-                cart_id: $("#cart_id").val(),
-                item_id: item_id_list
-            };
-
-            var form = document.createElement('form');
-            form.setAttribute('method', 'post');
-            form.setAttribute('action', '/cart/remove');
-            document.charset = "utf-8";
-            for (var key in data) {
-                var hiddenField = document.createElement('input');
-                hiddenField.setAttribute('type', 'hidden');
-                hiddenField.setAttribute('name', key);
-                hiddenField.setAttribute('value', data[key]);
-                form.appendChild(hiddenField);
-            }
-            document.body.appendChild(form);
-            form.submit();
-
-        });
-    });
-
-
-</script>
+<div layout:fragment="content">
 
     <div th:if="${#lists.size(cart.cartItems)} == 0">
         장바구니에 상품이 없습니다.
@@ -123,18 +21,24 @@
     <div th:each="cartItem : ${cart.cartItems}">
         <form method="post" action="/cart/update">
             <div><input type="hidden" name="cartItem_id" th:value="${cartItem.id}"></div>
-            <div><input type="checkbox" name="item_id" th:value="${cartItem.itemId}"></div>
 
-            <div th:text="${cartItem.itemName}"></div>
-            <div th:text="|${cartItem.itemPrice}원|"></div>
-
-            <div><input type="text" th:value="${cartItem.itemCount}" name="count"></div>
-
-            <div th:if="${cartItem.coupon} != null">
-                <span th:text="${cartItem.coupon.name}"></span>
+            <div class="form-check">
+                <input class="form-check-input" name="item_id" th:value="${cartItem.itemId}" id="flexCheckDefault" type="checkbox">
+                <label class="form-check-label" for="flexCheckDefault">
+                    <span th:text="|${cartItem.itemName} - ${cartItem.itemPrice}원|"></span>
+                </label>
             </div>
-            <div>
-                <select name="coupon">
+
+            <div class="mb-3">
+                <input th:value="${cartItem.itemCount}" name="count" class="form-control" type="text">
+            </div>
+
+            <div th:if="${cartItem.coupon} != null" class="mb-3">
+                <input th:text="${cartItem.coupon.name}" class="form-control" readonly>
+            </div>
+
+            <div class="mb-3">
+                <select class="form-select" name="coupon">
                     <option value="null">선택안함</option>
                     <span th:each="coupon: ${coupons}">
                         <option th:value="${coupon.id}" th:text="|${coupon.name} ${coupon.discountPer} ${coupon.expirationDate}|"></option>
@@ -142,22 +46,21 @@
                 </select>
             </div>
 
-            <div><input type="submit" value="수정"></div>
+            <div class="mb-3"><input type="submit" value="수정"></div>
         </form>
-    </div>
-
-    <br>
-    <div th:text="|전체 금액 ${cart.totalPrice}원|"></div>
-    <br>
-    <div>
-        <label for="checkAll">전체 선택</label>
-        <input type="checkbox" id="checkAll">
     </div><br>
+
+    <div th:text="|전체 금액 ${cart.totalPrice}원|"></div><br>
+
+    <div class="form-check">
+        <input class="form-check-input" id="check_all" th:value="${cartItem.itemId}" type="checkbox">
+        <label class="form-check-label" for="check_all">전체 선택</label>
+    </div><br>
+
     <div>
-        <input type="button" value="선택 삭제하기" id="cart">
+        <input type="button" value="선택 삭제하기" id="cart-delete">
         <input type="button" value="선택 주문하기" id="order">
     </div>
 
-</form>
-</body>
+</div>
 </html>

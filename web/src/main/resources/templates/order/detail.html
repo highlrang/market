@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
+
+<div layout:fragment="content">
     <div>
         <div><input type="hidden" th:value="${order.id}" name="id"></div>
 
@@ -22,5 +21,7 @@
 
         <div th:text="${order.deliveryStatus}"></div>
     </div>
-</body>
+
+</div>
+
 </html>
