@@ -30,9 +30,9 @@ function itemListChange(data){
     var itemList = "";
     $.each(data["list"], function(index, item){
         itemList += "<div>"
-                 + "<div><a href='/item/detail/" + item.id + "'>"  + item.name + "</a></div>"
-                 + "<div>" + item.price + "</div>"
-                 + "<div>" + item.stock + "</div>"
+                 + "<div class='md-3'><a href='/item/detail/" + item.id + "'>"  + item.name + "</a></div>"
+                 + "<div class='md-3'><input type='text' class='form-control' value='" + item.price + "' readonly></div>"
+                 + "<div class='md-3'><input type='text' class='form-control' value='" + item.stock + "' readonly></div>"
                  + "</div><br>";
     });
 

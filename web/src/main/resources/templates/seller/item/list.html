@@ -3,9 +3,9 @@
       xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout/basic">
 
-<div layout:fragment="headFragment">
+<th:block layout:fragment="script">
     <script src="/js/item-list.js"></script>
-</div>
+</th:block>
 
 <div layout:fragment="content">
     <script>
@@ -15,20 +15,22 @@
             $("#size").val([[ ${nowSize} ]]).prop("selected", true);
         });
     </script>
-    <div>
+
+    <div class="md-3">
         <select class="form-select" id="size">
             <option value="5">5개</option>
             <option value="10">10개</option>
         </select>
     </div>
+    <br>
 
     <div id="itemList">
         <div th:each="item: ${items}">
-            <div>
+            <div class="md-3">
                 <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
             </div>
-            <div th:text="|${item.price}원|"></div>
-            <div th:text="|재고 ${item.stock}개|"></div>
+            <div class="md-3"><input type="text" class="form-control" th:value="|${item.price}원|" readonly></div>
+            <div class="md-3"><input type="text" class="form-control" th:value="|재고 ${item.stock}개|" readonly></div>
             <br>
         </div>
     </div>

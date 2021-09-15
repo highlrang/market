@@ -5,17 +5,16 @@
 
 <div layout:fragment="content">
   <div>
-    <div>
-      <div th:text="${item.category.getValue()}" readonly></div>
-      <div th:text="${item.name}"></div>
-      <div th:text="${item.price}"></div>
-      <div th:text="${item.stock}"></div>
-      <div th:each="photo: ${item.photos}">
-        <img th:src="|../../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}">
-      </div>
+    <div class="md-3"><input type="text" th:value="${item.category.getValue()}" class="form-control" readonly></div>
+    <div class="md-3"><input type="text" th:value="${item.name}" class="form-control" readonly></div>
+    <div class="md-3"><input type="text" th:value="${item.price}" class="form-control" readonly></div>
+    <div class="md-3"><input type="text" th:value="${item.stock}" class="form-control" readonly></div>
+
+    <div th:each="photo: ${item.photos}">
+      <img th:src="|../../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}">
     </div>
 
-    <div>
+    <div class="md-3">
       <a th:href="@{/seller/item/update/{id}(id = ${item.id})}" th:text="수정"></a>
     </div>
   </div>

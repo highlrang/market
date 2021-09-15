@@ -25,24 +25,20 @@ public class SellerSecurityConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public void configure(WebSecurity web){
-        web.ignoring().antMatchers(SECURITY_PASSED_URLS);
-    }
-
-    @Override
     public void configure(HttpSecurity http) throws Exception{
         http
-                .antMatcher("/seller/**")
-                    .authorizeRequests()
+                .requestMatchers()
+                    .antMatchers("/seller/**")
+                    .and()
+                .authorizeRequests()
+                    .antMatchers(SECURITY_PASSED_URLS).permitAll()
                     .anyRequest().authenticated()
                     .and()
-                // .requestMatchers()
                 .formLogin()
                     .loginPage("/seller/login")
                     .loginProcessingUrl("/seller/login")
                     .failureUrl("/seller/login?msg=LoginError")
                     .successHandler(new SellerLoginSuccessHandler())
-                    .defaultSuccessUrl("/")
                     .permitAll()
                     .and()
                 .logout()

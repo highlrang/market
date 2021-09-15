@@ -15,11 +15,15 @@ public class CustomerLoginSuccessHandler implements AuthenticationSuccessHandler
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) {
-        System.out.println(authentication.getPrincipal().toString());
+        System.out.println("customer login 완료 " + authentication.getPrincipal().toString());
         HttpSession session = request.getSession();
         session.setAttribute("customer", authentication.getPrincipal());
 
-        // response.sendRedirect("/");
+        try {
+            response.sendRedirect("/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -45,56 +45,17 @@ public class ItemController {
     private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
-    @GetMapping("/save")
-    public String saveForm(Model model){
-        model.addAttribute("categories", Category.values());
-        return "item/save";
-    }
-
-
-    @PostMapping("/save")
-    public String save(@RequestParam(value="category") String category,
-                       @RequestParam(value="seller_id") Long sellerId, // form으로 생성하기
-                       @RequestParam(value="name") String name,
-                       @RequestParam(value="price") int price,
-                       @RequestParam(value="stock") int stock,
-                       @RequestParam(value="file") List<MultipartFile> files){
-
-        List<PhotoDto> namedPhotos;
-        try {
-            namedPhotos = fileHandler.photoProcess(files);
-
-        }catch(IOException e){
-            RedirectAttributes attributes = new RedirectAttributesModelMap();
-            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
-            return "redirect:/save";
-        }
-
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
-                .category(Category.valueOf(category))
-                .sellerId(sellerId)
-                .name(name)
-                .price(price)
-                .stock(stock)
-                .photos(namedPhotos)
-                .build();
-
-        itemService.save(itemRequestDto);
-
-        return "redirect:/item/list";
-    }
-
     // 판매자 상관없이 카테고리별 상품 목록
     @GetMapping("/list/{category}")
     public String list(@PathVariable String category, Model model){
         ItemService.ListByPaging<ItemResponseDto> itemList =
-                itemService.findByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(3));
+                itemService.findByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(5));
 
         model.addAttribute("items", itemList.getList());
         model.addAttribute("totalPage", itemList.getTotalPage());
 
         model.addAttribute("nowPage", "1");
-        model.addAttribute("nowSize", "3");
+        model.addAttribute("nowSize", "5");
         model.addAttribute("category", category);
 
         return "item/list";

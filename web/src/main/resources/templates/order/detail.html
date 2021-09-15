@@ -5,21 +5,32 @@
 
 <div layout:fragment="content">
     <div>
-        <div><input type="hidden" th:value="${order.id}" name="id"></div>
-
-        <div th:each="item: ${order.orderItems}">
-            <div><input type="hidden" th:value="${item.itemId}" name="itemId"></div>
-            <div th:text="${item.name}"></div>
-            <div th:text="${item.price}"></div>
-            <div th:text="${item.count}"></div>
+        <div>
+            <input type="hidden" th:value="${order.id}" name="id">
         </div>
 
-        <div th:text="${order.totalPrice}"></div>
+        <div class="md-3" th:each="item: ${order.orderItems}">
+            <div><input type="hidden" th:value="${item.itemId}" name="itemId"></div>
+            <input type="text" class="form-control" th:value="${item.name}" readonly>
+            <input type="text" class="form-control" th:value="${item.price}" readonly>
+            <input type="text" class="form-control" th:value="${item.count}" readonly>
+        </div>
 
-        <div th:text="${order.orderStatus}"></div>
-        <div th:text="${order.orderDate}"></div>
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${order.totalPrice}" readonly>
+        </div>
 
-        <div th:text="${order.deliveryStatus}"></div>
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${order.orderStatus}" readonly>
+        </div>
+
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${order.orderDate}" readonly>
+        </div>
+
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${order.deliveryStatus}" readonly>
+        </div>
     </div>
 
 </div>

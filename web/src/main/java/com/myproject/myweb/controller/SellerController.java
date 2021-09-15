@@ -40,15 +40,10 @@ public class SellerController {
     private final MessageSource messageSource;
 
     @GetMapping("/login")
-    public String loginForm(){
+    public String loginForm(@RequestParam(value = "msg", required = false) String msg,
+                            Model model){
+        if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "seller/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session){
-        session.invalidate();
-        log.info("logout controller 거침"); // security 들리나 안 들리나?
-        return "redirect:/";
     }
 
     @GetMapping("/join")
@@ -98,7 +93,49 @@ public class SellerController {
         return "redirect:/";
     }
 
-    @GetMapping("/item/index") // 판매자의 상품 리스트
+
+    /***********************************************************************************/
+
+    @GetMapping("/item/save")
+    public String saveForm(Model model){
+        model.addAttribute("categories", Category.values());
+        return "seller/item/save";
+    }
+
+
+    @PostMapping("/item/save")
+    public String save(@RequestParam(value="category") String category,
+                       @RequestParam(value="seller_id") Long sellerId, // form으로 생성하기
+                       @RequestParam(value="name") String name,
+                       @RequestParam(value="price") int price,
+                       @RequestParam(value="stock") int stock,
+                       @RequestParam(value="file") List<MultipartFile> files){
+
+        List<PhotoDto> namedPhotos;
+        try {
+            namedPhotos = fileHandler.photoProcess(files);
+
+        }catch(IOException e){
+            RedirectAttributes attributes = new RedirectAttributesModelMap();
+            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
+            return "redirect:/seller/item/save";
+        }
+
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+                .category(Category.valueOf(category))
+                .sellerId(sellerId)
+                .name(name)
+                .price(price)
+                .stock(stock)
+                .photos(namedPhotos)
+                .build();
+
+        Long id = itemService.save(itemRequestDto);
+
+        return "redirect:/seller/item/detail/" + id;
+    }
+
+    @GetMapping("/item/index") // 판매자의 상품 리스트 보기 위한 카테고리 나열
     public String categoryList(Model model){
         model.addAttribute("categories", Category.values());
         return "seller/item/index";

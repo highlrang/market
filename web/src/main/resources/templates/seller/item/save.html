@@ -4,12 +4,12 @@
       layout:decorator="layout/basic">
 
 <div layout:fragment="content">
-    <form action="/item/save" method="post" enctype="multipart/form-data">
+    <form action="/seller/item/save" method="post" enctype="multipart/form-data">
         <div>
             <input type="hidden" name="seller_id" th:value="${session.seller.id}">
         </div>
 
-        <div>
+        <div class="mb-3">
             <select name="category" class="form-select" aria-label="Default select example">
                 <div th:each="cate : ${categories}">
                     <option th:value="${cate.getKey()}" th:text="${cate.getValue()}"></option>
@@ -31,7 +31,7 @@
             <input class="form-control" type="file" name="file" multiple>
         </div>
 
-        <div class="mb-3"><input type="submit" value="save"></div>
+        <div class="mb-3"><input type="submit" value="저장"></div>
     </form>
 </div>
 </html>

@@ -14,11 +14,15 @@ public class SellerLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
 
-        System.out.println(authentication.getPrincipal().toString());
+        System.out.println("seller login 완료 " + authentication.getPrincipal().toString());
         HttpSession session = request.getSession();
         session.setAttribute("seller", authentication.getPrincipal());
 
-        // response.sendRedirect("/");
+        try {
+            response.sendRedirect("/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

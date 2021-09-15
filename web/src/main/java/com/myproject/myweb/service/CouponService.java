@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,17 +44,26 @@ public class CouponService {
         3. 결제에 사용되지 않은(isUsed=false) 쿠폰만 보내기
         */
 
-        List<Coupon> selectedCoupons = customer.getCart().getCartItems()
-                .stream()
-                .map(CartItem::getCoupon)
-                .collect(Collectors.toList());
+        try {
+            List<Coupon> selectedCoupons = customer.getCart().getCartItems()
+                    .stream()
+                    .map(CartItem::getCoupon)
+                    .collect(Collectors.toList());
 
-        return coupons.stream()
-                .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
-                .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
-                .filter(coupon -> !selectedCoupons.contains(coupon))
-                .map(CouponDto::new)
-                .collect(Collectors.toList());
+            return coupons.stream()
+                    .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
+                    .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
+                    .filter(coupon -> !selectedCoupons.contains(coupon))
+                    .map(CouponDto::new)
+                    .collect(Collectors.toList());
+
+        }catch (NullPointerException e){
+            return coupons.stream()
+                    .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
+                    .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
+                    .map(CouponDto::new)
+                    .collect(Collectors.toList());
+        }
     }
 
 }

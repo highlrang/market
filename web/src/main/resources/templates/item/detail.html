@@ -15,7 +15,7 @@
         </div>
 
         <div class="mb-3">
-            <div class="form-control" th:text="${item.price}"></div>
+            <div class="form-control" th:text="${item.price}" readonly></div>
         </div>
 
         <div th:each="photo: ${item.photos}">
@@ -26,7 +26,7 @@
             <input type="text" class="form-control" name="count" value="1">
         </div>
 
-        <div>
+        <div class="mb-3">
             <select name="coupon" class="form-select">
                 <option value="null">선택안함</option>
                 <span th:each="coupon: ${coupons}">
@@ -35,7 +35,7 @@
             </select>
         </div>
 
-        <div>
+        <div class="mb-3">
             <input type="submit" value="장바구니 담기" formaction="/cart/save">
             <input type="submit" value="주문하기">
         </div>

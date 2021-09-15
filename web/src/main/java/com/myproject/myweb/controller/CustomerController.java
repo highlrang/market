@@ -27,15 +27,10 @@ public class CustomerController {
     private final MessageSource messageSource;
 
     @GetMapping("/login")
-    public String loginForm(){
+    public String loginForm(@RequestParam(value = "msg", required = false) String msg,
+                            Model model){
+        if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "customer/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session){
-        session.invalidate();
-        log.info("logout controller 거침"); // security 들리나 안 들리나?
-        return "redirect:/";
     }
 
     @GetMapping("/join")
