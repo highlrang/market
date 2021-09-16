@@ -11,7 +11,7 @@
     </div>
 
     <div class="mb-3">
-      <input type="text" th:value="${item.name}" name="name" class="from-control">
+      <input type="text" th:value="${item.name}" name="name" class="form-control">
     </div>
 
     <div class="mb-3">
@@ -26,7 +26,8 @@
       <input type="hidden" name="photo" th:value="${photo.id}">
       <img th:src="|../../../${photo.name}|" th:alt="${photo.originName}"
            class="img-thumbnail"
-           onclick="if(confirm('삭제하시겠습니까?')){$(this).siblings().remove(); $(this).remove();}">
+           onclick="if(confirm('삭제하시겠습니까?')){$(this).siblings().remove(); $(this).remove();}"
+           width="200" height="200">
     </div>
 
     <div class="mb-3">

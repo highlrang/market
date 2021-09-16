@@ -109,7 +109,7 @@ public class SellerController {
                        @RequestParam(value="name") String name,
                        @RequestParam(value="price") int price,
                        @RequestParam(value="stock") int stock,
-                       @RequestParam(value="file") List<MultipartFile> files){
+                       @RequestParam(value="file", required = false) List<MultipartFile> files){
 
         List<PhotoDto> namedPhotos;
         try {
@@ -187,12 +187,12 @@ public class SellerController {
     }
 
     @PostMapping("/item/update/{id}")
-    public String update(@PathVariable Long id,
+    public String update(@PathVariable(value="id") Long id,
                          @RequestParam(value="name") String name,
                          @RequestParam(value="price") int price,
                          @RequestParam(value="stock") int stock,
-                         @RequestParam(value="file") List<MultipartFile> files,
-                         @RequestParam(value="photo") List<Long> photoIds){
+                         @RequestParam(value="file", required = false) List<MultipartFile> files,
+                         @RequestParam(value="photo", required = false) List<Long> photoIds){
 
         List<PhotoDto> namedPhotos;
         try {
@@ -211,7 +211,8 @@ public class SellerController {
                 .photos(namedPhotos)
                 .build();
 
-        itemService.update(id, photoIds, itemRequestDto);
+        itemService.deletePhoto(id, photoIds);
+        itemService.update(id, itemRequestDto);
         return "redirect:/seller/item/detail/" + id;
     }
 

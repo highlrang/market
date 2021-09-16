@@ -7,6 +7,7 @@ import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
+import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerRepository;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +38,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final SellerRepository sellerRepository;
     private final PhotoRepository photoRepository;
+    private final FileHandler fileHandler;
 
     public ItemResponseDto findById(Long id){
 
@@ -63,16 +66,27 @@ public class ItemService {
     }
 
     @Transactional
-    public void update(Long id, List<Long> photoIds, ItemRequestDto itemRequestDto){
-        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
+    public void deletePhoto(Long itemId, List<Long> photoIds) {
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
-        // 사진 삭제 처리 >> item의 photoList까지 연결
-        photoRepository.deleteAllInBatch(
-                item.getPhotoList()
-                        .stream()
-                        .filter(photo -> !photoIds.contains(photo.getId()))
-                        .collect(Collectors.toList())
-        );
+        // 실제 서버 사진까지 삭제
+        if (photoIds == null) {
+            fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
+            photoRepository.deleteAllInBatch();
+
+        } else {
+            List<Photo> photos = item.getPhotoList()
+                    .stream()
+                    .filter(photo -> !photoIds.contains(photo.getId()))
+                    .collect(Collectors.toList());
+            fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
+            photoRepository.deleteAllInBatch(photos);
+        }
+    }
+
+    @Transactional
+    public void update(Long id, ItemRequestDto itemRequestDto){
+        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         // 사진 추가
         List<Photo> photoList = itemRequestDto.getPhotos()

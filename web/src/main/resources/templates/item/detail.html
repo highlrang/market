@@ -10,16 +10,20 @@
             <input type="hidden" name="customer_id" th:value="${session.customer.id}">
         </div>
 
-        <div class="mb-3">
-            <input class="form-control" th:text="${item.name}" readonly>
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${item.category.getValue()}" readonly>
         </div>
 
         <div class="mb-3">
-            <div class="form-control" th:text="${item.price}" readonly></div>
+            <input type="text" class="form-control" th:value="${item.name}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <input type="text" class="form-control" th:value="${item.price}" readonly>
         </div>
 
         <div th:each="photo: ${item.photos}">
-            <img th:src="|../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}">
+            <img th:src="|../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
         </div>
 
         <div class="mb-3">

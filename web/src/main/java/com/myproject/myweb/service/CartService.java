@@ -51,7 +51,7 @@ public class CartService {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         CartItem cartItem = CartItem.createCartItem(item, count);
-        if(couponId != null) {
+        if(!couponId.equals("null")) {
             Coupon coupon = couponRespository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
             cartItem.setCoupon(coupon);
         }

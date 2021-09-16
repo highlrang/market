@@ -80,4 +80,15 @@ public class FileHandler {
         return extension;
     }
 
+    public void photoDelete(List<String> pathList){
+        pathList.forEach(
+                path -> {
+                    File file = new File(path);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    log.info(String.valueOf(file.exists()));
+                }
+        );
+    }
 }

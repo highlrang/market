@@ -4,7 +4,7 @@
       layout:decorator="layout/basic">
 
 <th:block layout:fragment="script">
-    <script src="/js/item-list.js"></script>
+    <script src="/js/item-list-customer.js"></script>
 </th:block>
 
 <div layout:fragment="content">
@@ -21,7 +21,7 @@
             <option value="5">5개</option>
             <option value="10">10개</option>
         </select>
-    </div>
+    </div><br>
 
     <div id="itemList">
         <div th:each="item: ${items}">

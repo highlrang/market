@@ -2,12 +2,12 @@ $(function(){
     $.ajax({
             type: 'get',
             url: '/api/category/list',
-            dataType: 'application/json',
+            // dataType: 'application/json',
             success: function(data) {
                 var categories = "";
-                $.each(data, function(index, category){
-                    categories += "<li><a class='dropdown-item' th:href='@{/item/list/{category}(category=" +
-                    category.getKey() + ")}'>" + category.getValue() + "</a></li>";
+                $.each(data, function(key, value){
+                    categories += "<li><a class='dropdown-item' href='/item/list/" +
+                    key + "'>" + value + "</a></li>";
                 });
 
                 $("#header-category").empty();

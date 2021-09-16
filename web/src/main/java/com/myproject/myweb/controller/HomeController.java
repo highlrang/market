@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Locale;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -26,8 +26,12 @@ public class HomeController {
 
     @GetMapping("/api/category/list")
     @ResponseBody
-    public Category[] APIcategory(){
-        return Category.values();
+    public Map<String, String> ApiCategory(){
+        Map<String, String> categories = new HashMap<>();
+        for (Category category : Category.values()) {
+            categories.put(category.getKey(), category.getValue());
+        }
+        return categories;
     }
 
 }

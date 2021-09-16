@@ -60,7 +60,8 @@ public class CartController {
             msg = "CartSave";
 
         }catch(IllegalArgumentException e){
-            msg = e.getMessage();
+            e.printStackTrace();
+            msg = "CartSaveFail";
         }
 
         attributes.addAttribute("msg", msg);

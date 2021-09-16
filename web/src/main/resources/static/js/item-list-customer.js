@@ -32,7 +32,6 @@ function itemListChange(data){
         itemList += "<div>"
                  + "<div class='md-3'><a href='/item/detail/" + item.id + "'>"  + item.name + "</a></div>"
                  + "<div class='md-3'><input type='text' class='form-control' value='" + item.price + "' readonly></div>"
-                 + "<div class='md-3'><input type='text' class='form-control' value='" + item.stock + "' readonly></div>"
                  + "</div><br>";
     });
 
