@@ -40,6 +40,8 @@ public class CommonTest{
 
     @Test
     public void 테스트(){
+        // 쿠폰 발급하기
+
     }
 
     @Test

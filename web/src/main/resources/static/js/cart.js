@@ -53,7 +53,8 @@ $(document).ready(function(){
 
         var data = {
             cart_id: $("#cart_id").val(),
-            item_id: item_id_list
+            delete_item_id: item_id_list
+            // order에 상품 id 사용하기에 cart-delete에도 cartItem id가 아닌 상품 id 전달
         };
 
         var form = document.createElement('form');

@@ -4,10 +4,12 @@
       layout:decorator="layout/basic">
 
 <div layout:fragment="content">
-
+    <div th:if="${#lists.size(orders) == 0}" class="md-3">
+        <input type="text" class="form-control" value="주문 내역이 없습니다." readonly>
+    </div>
     <div th:each="order : ${orders}">
 
-        <div class="md-3"><input type="text" th:value="${order.getOrderItemsName}" class="form-control" readonly></div>
+        <div class="md-3"><a class="form-control" th:text="${order.getOrderItemsName}" th:href="@{/order/detail/{id}(id=${order.id})}"></a></div>
         <div class="md-3"><input type="text" th:value="${order.totalPrice}" class="form-control" readonly></div>
         <div class="md-3"><input type="text" th:value="${order.orderDate}" class="form-control" readonly></div>
         <div class="md-3"><input type="text" th:value="${order.orderStatus}" class="form-control" readonly></div>

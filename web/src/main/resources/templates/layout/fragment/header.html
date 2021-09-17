@@ -27,9 +27,11 @@
                 </ul>
               </li>
 
-              <li class="nav-item dropdown" th:if="${session.customer.cartId != null}">
+              <li class="nav-item" th:if="${session.customer.cartId != null}">
                 <a class="nav-link" th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니 이동</a>
               </li>
+
+              <li class="nav-item"><a class="nav-link" href="/order/list">주문 내역</a></li>
 
               <li class="nav-item"><a class="nav-link" href="/customer/logout">로그아웃</a></li>
             </span>

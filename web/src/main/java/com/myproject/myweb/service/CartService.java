@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +47,7 @@ public class CartService {
     }
 
     @Transactional
-    public void put(Long customerId, Long itemId, int count, String couponId) throws IllegalArgumentException{
+    public void put(Long customerId, Long itemId, int count, String couponId) throws IllegalArgumentException, IllegalStateException{
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
@@ -56,16 +57,12 @@ public class CartService {
             cartItem.setCoupon(coupon);
         }
 
-        try {
-            Cart userCart = cartRepository.findById(customer.getCart().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
-
+        if(customer.getCart() != null){
+            Cart userCart = cartRepository.findById(customer.getCart().getId()).get();
             // boolean anyMatch = userCart.getCartItems().stream().anyMatch(existing -> existing.getItem().equals(item));
             userCart.addCartItem(cartItem); // cascade 설정 안 했기에 연관관계 먼저 넣기
             cartItemRepository.save(cartItem);
-
-
-        }catch (IllegalArgumentException e){
+        }else{
             Cart cart = Cart.createCart(customer, cartItem);
             cartRepository.save(cart);
         }

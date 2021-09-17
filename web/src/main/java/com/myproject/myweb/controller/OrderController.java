@@ -42,7 +42,8 @@ public class OrderController {
                                @RequestParam(value = "item_id") List<Long> itemIds,
                                @RequestParam(value = "count", required = false) String count,
                                @RequestParam(value = "coupon") String couponId,
-                               @RequestParam(value = "cart_id", required = false) String cartId){
+                               @RequestParam(value = "cart_id", required = false) String cartId,
+                               HttpSession session){
 
         Boolean orderImpossible = orderService.orderImpossible(customerId);
         String url;
@@ -63,10 +64,13 @@ public class OrderController {
             if (cartId != null) {
                 // 장바구니에서 주문 (단건, 복수건) >> user exception >> common handler home redirect
                 orderId = cartService.order(customerId, itemIds);
+                session.setAttribute("order", "cart");
             } else {
                 // 상품 단건 바로 주문 >> user or item exception >> common handler home redirect
                 orderId = orderService.order(customerId, itemIds.get(0), Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
+                session.setAttribute("order", "direct");
             }
+
         }catch (ItemStockException e){
             String msg = messageSource.getMessage(e.getMessage(), e.getArgs(), Locale.getDefault());
             itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
@@ -79,7 +83,8 @@ public class OrderController {
             if (finalUrl != null) return "redirect:" + finalUrl;
 
         }catch (WebClientResponseException e){
-            log.error("status code = " + e.getRawStatusCode() + " " + e.getMessage() + " >> 결제 요청 실패로 주문 삭제");
+            log.error("카카오결제 준비 에러 = " + e.getResponseBodyAsString() + " >> 주문 삭제");
+            e.printStackTrace();
             orderService.remove(orderId);
         }
 
@@ -116,24 +121,22 @@ public class OrderController {
                 .map(OrderItemDto::getItemId)
                 .collect(Collectors.toList());
 
-        Long cartId = 0L;
-        try {
-            cartId = cartService.findByCustomer(customer.getId()).getId();
-        } catch(IllegalArgumentException ignored){ }
-
+        String orderkind = (String) session.getAttribute("order");
         try {
             paymentService.approve(customer.getId(), order.getId(), pg_token);
 
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 없을 가능성이 높아 common handler로만 처리
-            if (cartId != 0L) {
-                cartService.remove(cartId, itemIds);
+            if (orderkind.equals("cart")){
+                cartService.remove(customer.getCartId(), itemIds);
             }
             return "redirect:/order/detail/" + order.getId();
 
         }catch (WebClientResponseException e) {
             // 400 Bad Request Error etc...
+            log.error(e.getResponseBodyAsString());
+
             orderRedirectAttributes("PaymentFailed");
-            if (cartId != 0L) return "redirect:/cart/detail/" + cartId;
+            if (orderkind.equals("cart")) return "redirect:/cart/detail/" + customer.getCartId();
             return "redirect:/item/detail/" + order.getOrderItems().get(0).getId();
         }
     }

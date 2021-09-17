@@ -4,7 +4,7 @@
       layout:decorator="layout/basic">
 
 <div layout:fragment="content">
-    <form method="post" action="/order/payment/ready">
+    <form method="post">
         <div>
             <input type="hidden" name="item_id" th:value="${item.id}">
             <input type="hidden" name="customer_id" th:value="${session.customer.id}">
@@ -41,7 +41,7 @@
 
         <div class="mb-3">
             <input type="submit" value="장바구니 담기" formaction="/cart/save">
-            <input type="submit" value="주문하기">
+            <input type="submit" value="주문하기" formaction="/order/payment/ready">
         </div>
     </form>
 </div>

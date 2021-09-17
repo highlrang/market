@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor
@@ -38,6 +39,10 @@ public class Cart {
     }
 
     public void addCartItem(CartItem cartItem){ // Cart 최초 생성 시 + 추가로 장바구니 상품 추가 시
+        List<Long> itemIds = cartItems.stream().map(c -> c.getItem().getId()).collect(Collectors.toList());
+        if(itemIds.contains(cartItem.getItem().getId())) {
+            throw new IllegalStateException("CartItemAlreadyExistedInCart");
+        }
         cartItems.add(cartItem);
         cartItem.setCart(this);
     }

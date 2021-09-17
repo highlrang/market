@@ -44,7 +44,7 @@ public class CustomerController {
     @PostMapping("/certify")
     public String certify(@Valid UserRequestDto userRequestDto, BindingResult bindingResult,
                           RedirectAttributes attributes){
-        if(bindingResult.hasErrors()) return "user/join";
+        if(bindingResult.hasErrors()) return "customer/join";
 
         Long customerId = null;
         try {

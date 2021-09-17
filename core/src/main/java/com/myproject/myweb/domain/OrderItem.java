@@ -51,11 +51,11 @@ public class OrderItem {
 
     public void cancel(){
         item.addStock(count);
-        coupon.setIsUsed(false);
+        if(coupon != null) coupon.setIsUsed(false);
     }
 
     public int getTotalPrice(){
-        if(coupon != null) return price * count;
+        if(coupon == null) return price * count;
         int finalPrice = price - (price * (coupon.getDiscountPer() / 100)); // 할인가
         return finalPrice * count;
     }

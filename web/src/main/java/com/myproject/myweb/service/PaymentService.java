@@ -27,8 +27,12 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
+    private static String cid;
+
     @Value("${kakaopay.cid}")
-    private static String cid; // final
+    public void setCid(String cid){
+        this.cid = cid;
+    }
 
     private MultiValueMap<String, String> getParameterMap(@RequestParam("customer_id") Long customerId, Long orderId) {
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
@@ -57,7 +61,7 @@ public class PaymentService {
         parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
         parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
 
-        Mono<ResponseEntity<PaymentReadyDto>> mono = webClient
+        Mono<PaymentReadyDto> mono = webClient
                     .mutate()
                     .baseUrl(kakaopayUrl)
                     // "application/x-www-form-urlencoded;charset=utf-8"
@@ -69,6 +73,7 @@ public class PaymentService {
                     .post()
                     .body(BodyInserters.fromFormData(parameterMap))
                     .retrieve()
+                    .bodyToMono(PaymentReadyDto.class);
                     /*
                     .bodyToMono()
                     .onErrorResume(throwable -> {
@@ -81,13 +86,11 @@ public class PaymentService {
                                                             .map(body -> new RuntimeException(body))
                     )
                      */
-                    .toEntity(PaymentReadyDto.class);
 
-        ResponseEntity<PaymentReadyDto> responseEntity = mono.block();
         // if(responseEntity.getStatusCode().is2xxSuccessful()) {}
-        PaymentReadyDto dto = responseEntity.getBody();
-        this.saveTid(orderId, dto.getTid());
-        return dto.getNext_redirect_pc_url();
+        PaymentReadyDto paymentReadyDto = mono.block();
+        this.saveTid(orderId, paymentReadyDto.getTid());
+        return paymentReadyDto.getNext_redirect_pc_url();
     }
 
     @Transactional
@@ -105,7 +108,7 @@ public class PaymentService {
 
         String baseUrl = "https://kapi.kakao.com/v1/payment/approve";
 
-        ResponseEntity<Object> response = webClient.mutate()
+        webClient.mutate()
                     .baseUrl(baseUrl)
                     .defaultHeaders(httpHeaders -> {
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -114,9 +117,7 @@ public class PaymentService {
                     .build()
                     .post()
                     .body(BodyInserters.fromFormData(parameterMap))
-                    .retrieve()
-                    .toEntity(Object.class)
-                    .block();
+                    .retrieve();
     }
 
     @Transactional

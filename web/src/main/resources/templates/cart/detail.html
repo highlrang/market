@@ -9,8 +9,8 @@
 
 <div layout:fragment="content">
 
-    <div th:if="${#lists.size(cart.cartItems)} == 0">
-        장바구니에 상품이 없습니다.
+    <div class="md-3" th:if="${#lists.size(cart.cartItems)} == 0">
+        <input type="text" value="장바구니에 상품이 없습니다." class="form-control" readonly>
     </div>
 
     <div>
@@ -23,8 +23,8 @@
             <div><input type="hidden" name="cartItem_id" th:value="${cartItem.id}"></div>
 
             <div class="form-check">
-                <input class="form-check-input" name="item_id" th:value="${cartItem.itemId}" id="flexCheckDefault" type="checkbox">
-                <label class="form-check-label" for="flexCheckDefault">
+                <label>
+                    <input class="form-check-input" name="item_id" th:value="${cartItem.itemId}" type="checkbox">
                     <span th:text="|${cartItem.itemName} - ${cartItem.itemPrice}원|"></span>
                 </label>
             </div>
@@ -33,8 +33,8 @@
                 <input th:value="${cartItem.itemCount}" name="count" class="form-control" type="text">
             </div>
 
-            <div th:if="${cartItem.coupon} != null" class="mb-3">
-                <input th:text="${cartItem.coupon.name}" class="form-control" readonly>
+            <div class="mb-3" th:if="${cartItem.coupon} != null">
+                <input type="text" th:text="${cartItem.coupon.name}" class="form-control" readonly>
             </div>
 
             <div class="mb-3">
@@ -48,16 +48,16 @@
 
             <div class="mb-3"><input type="submit" value="수정"></div>
         </form>
-    </div><br>
+    </div>
 
-    <div th:text="|전체 금액 ${cart.totalPrice}원|"></div><br>
+    <div class="mb-3"><input type="text" th:value="|전체 금액 ${cart.totalPrice}원|" class="form-control" readonly></div>
 
     <div class="form-check">
-        <input class="form-check-input" id="check_all" th:value="${cartItem.itemId}" type="checkbox">
+        <input class="form-check-input" id="check_all" type="checkbox">
         <label class="form-check-label" for="check_all">전체 선택</label>
     </div><br>
 
-    <div>
+    <div class="mb-3">
         <input type="button" value="선택 삭제하기" id="cart-delete">
         <input type="button" value="선택 주문하기" id="order">
     </div>

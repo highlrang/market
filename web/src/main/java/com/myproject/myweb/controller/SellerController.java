@@ -57,7 +57,7 @@ public class SellerController {
     @PostMapping("/certify")
     public String certify(@Valid UserRequestDto userRequestDto, BindingResult bindingResult,
                           RedirectAttributes attributes){
-        if(bindingResult.hasErrors()) return "user/join";
+        if(bindingResult.hasErrors()) return "seller/join";
 
         Long sellerId = null;
         try {

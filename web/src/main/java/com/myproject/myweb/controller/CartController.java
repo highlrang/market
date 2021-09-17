@@ -59,9 +59,9 @@ public class CartController {
             cartService.put(customerId, itemId, count, couponId);
             msg = "CartSave";
 
-        }catch(IllegalArgumentException e){
-            e.printStackTrace();
-            msg = "CartSaveFail";
+        }catch(IllegalArgumentException | IllegalStateException e){
+            // msg = "CartSaveFail";
+            msg = e.getMessage();
         }
 
         attributes.addAttribute("msg", msg);
@@ -91,7 +91,7 @@ public class CartController {
     @PostMapping("/remove") // 장바구니에서만 호출
     public String remove(
             @RequestParam("cart_id") Long cartId,
-            @RequestParam("item_id") List<Long> itemIds,
+            @RequestParam("delete_item_id") List<Long> itemIds,
             RedirectAttributes attributes){
         try {
             cartService.remove(cartId, itemIds);
