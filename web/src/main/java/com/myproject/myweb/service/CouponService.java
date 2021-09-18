@@ -52,7 +52,7 @@ public class CouponService {
 
             return coupons.stream()
                     .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
-                    .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
+                    .filter(coupon -> coupon.getExpirationDate().isAfter(LocalDateTime.now()))
                     .filter(coupon -> !selectedCoupons.contains(coupon))
                     .map(CouponDto::new)
                     .collect(Collectors.toList());
@@ -60,7 +60,7 @@ public class CouponService {
         }catch (NullPointerException e){
             return coupons.stream()
                     .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
-                    .filter(coupon -> coupon.getExpirationDate().isBefore(LocalDateTime.now()))
+                    .filter(coupon -> coupon.getExpirationDate().isAfter(LocalDateTime.now()))
                     .map(CouponDto::new)
                     .collect(Collectors.toList());
         }

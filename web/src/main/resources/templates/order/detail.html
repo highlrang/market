@@ -9,28 +9,35 @@
             <input type="hidden" th:value="${order.id}" name="id">
         </div>
 
+        <div class="md-3">
+            <input type="text" class="form-control" th:value="${order.orderDate}" readonly>
+        </div><br><br>
+
+        <div class="md-3"><input type="text" value="주문 상품" class="form-control" readonly></div>
         <div class="md-3" th:each="item: ${order.orderItems}">
             <div><input type="hidden" th:value="${item.itemId}" name="itemId"></div>
             <input type="text" class="form-control" th:value="${item.name}" readonly>
             <input type="text" class="form-control" th:value="${item.price}" readonly>
             <input type="text" class="form-control" th:value="${item.count}" readonly>
-        </div>
+            <span th:if="${item.coupon != null}">
+                <input type="text" class="form-control" th:value="|${item.coupon.name} - ${item.coupon.discountPer}%|" readonly>
+            </span>
+            <br>
+        </div><br><br>
 
         <div class="md-3">
-            <input type="text" class="form-control" th:value="${order.totalPrice}" readonly>
+            <input type="text" class="form-control" th:value="|총가격 ${order.totalPrice}원|" readonly>
         </div>
 
-        <div class="md-3">
-            <input type="text" class="form-control" th:value="${order.orderStatus}" readonly>
+        <div class="md-3" th:if="${order.orderStatus} != '주문 취소'">
+            <div><input type="text" class="form-control" th:value="${order.deliveryStatus}" readonly></div>
+            <div><a th:href="@{/order/cancel/{orderId}(orderId=${order.id})}">주문 취소</a></div>
         </div>
 
-        <div class="md-3">
-            <input type="text" class="form-control" th:value="${order.orderDate}" readonly>
+        <div class="md-3" th:if="${order.orderStatus} == '주문 취소'">
+            <input type="text" class="form-control" value="주문 취소" readonly>
         </div>
 
-        <div class="md-3">
-            <input type="text" class="form-control" th:value="${order.deliveryStatus}" readonly>
-        </div>
     </div>
 
 </div>

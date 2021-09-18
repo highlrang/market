@@ -59,11 +59,12 @@ public class SellerController {
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "seller/join";
 
-        Long sellerId = null;
+        Long sellerId;
         try {
             sellerId = sellerService.join(userRequestDto);
         }catch (IllegalStateException e){
             bindingResult.rejectValue("email", e.getMessage());
+            return "redirect:/seller/join";
         }
 
         String msg;

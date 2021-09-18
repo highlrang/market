@@ -2,10 +2,7 @@ package com.myproject.myweb.web;
 
 
 
-import com.myproject.myweb.domain.Category;
-import com.myproject.myweb.domain.Coupon;
-import com.myproject.myweb.domain.Item;
-import com.myproject.myweb.domain.OrderStatus;
+import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.repository.*;
@@ -36,13 +33,14 @@ public class CommonTest{
     @Autowired CustomerRepository customerRepository;
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemRepository itemRepository;
+    @Autowired PhotoRepository photoRepository;
     @Autowired BCryptPasswordEncoder passwordEncoder;
 
     @Test
     public void 테스트(){
-        // 쿠폰 발급하기
-
+        // 쿠폰 발급 - 연관관계까지
     }
+
 
     @Test
     public void 페이징(){

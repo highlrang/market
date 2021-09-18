@@ -34,7 +34,7 @@
             </div>
 
             <div class="mb-3" th:if="${cartItem.coupon} != null">
-                <input type="text" th:text="${cartItem.coupon.name}" class="form-control" readonly>
+                <input type="text" th:value="${cartItem.coupon.name}" class="form-control" readonly>
             </div>
 
             <div class="mb-3">
@@ -53,7 +53,7 @@
     <div class="mb-3"><input type="text" th:value="|전체 금액 ${cart.totalPrice}원|" class="form-control" readonly></div>
 
     <div class="form-check">
-        <input class="form-check-input" id="check_all" type="checkbox">
+        <input class="form-check-input" id="check_all" type="checkbox" checked>
         <label class="form-check-label" for="check_all">전체 선택</label>
     </div><br>
 

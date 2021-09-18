@@ -56,7 +56,7 @@ public class OrderItem {
 
     public int getTotalPrice(){
         if(coupon == null) return price * count;
-        int finalPrice = price - (price * (coupon.getDiscountPer() / 100)); // 할인가
-        return finalPrice * count;
+        double finalPrice = price - (price * (coupon.getDiscountPer() / 100.0)); // 할인가
+        return (int)finalPrice * count;
     }
 }

@@ -55,7 +55,7 @@ public class CartItem {
 
     public int getTotalPrice(){
         if(coupon == null) return item.getPrice() * count;
-        return (item.getPrice() - (item.getPrice() * coupon.getDiscountPer()/100)) * count;
+        return (item.getPrice() - (int)(item.getPrice() * coupon.getDiscountPer()/100.0)) * count;
     }
 
 

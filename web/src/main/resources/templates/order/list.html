@@ -13,10 +13,6 @@
         <div class="md-3"><input type="text" th:value="${order.totalPrice}" class="form-control" readonly></div>
         <div class="md-3"><input type="text" th:value="${order.orderDate}" class="form-control" readonly></div>
         <div class="md-3"><input type="text" th:value="${order.orderStatus}" class="form-control" readonly></div>
-
-        <div class="md-3" th:if="${order.orderStatus} == '주문 완료'">
-            <a th:href="@{/order/cancel/{orderId}(orderId=${order.id})}">주문 취소</a>
-        </div>
         <br>
 
     </div>

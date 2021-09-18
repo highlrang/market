@@ -41,7 +41,7 @@ public class OrderController {
     public String readyPayment(@RequestParam(value = "customer_id") Long customerId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
                                @RequestParam(value = "count", required = false) String count,
-                               @RequestParam(value = "coupon") String couponId,
+                               @RequestParam(value = "coupon", required = false) String couponId,
                                @RequestParam(value = "cart_id", required = false) String cartId,
                                HttpSession session){
 
@@ -113,7 +113,6 @@ public class OrderController {
 
     @RequestMapping("/payment/approve") //GET
     public String approvePayment(@RequestParam(value = "pg_token") String pg_token, HttpSession session){
-
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
         OrderResponseDto order = orderService.findOrderReady(customer.getId());
 
@@ -142,7 +141,7 @@ public class OrderController {
     }
 
     @RequestMapping("/cancel/{orderId}")
-    public String orderCancel(@RequestParam(value = "orderId") Long orderId){
+    public String orderCancel(@PathVariable(value = "orderId") Long orderId){
         String msg = "";
         try{
             paymentService.cancel(orderId); // orderService.cancel() 까지 호출, exception은 common으로 해결
@@ -155,7 +154,7 @@ public class OrderController {
             log.error(e.getMessage());
 
         }catch (WebClientResponseException e){
-            log.error("status code = " + e.getRawStatusCode() + " " + e.getMessage() + " 결제 취소 실패");
+            log.error("결제 취소 실패 >> " + e.getResponseBodyAsString());
             msg = "PaymentCancelFailed";
         }
 

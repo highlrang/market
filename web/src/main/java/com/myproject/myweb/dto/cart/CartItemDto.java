@@ -13,6 +13,7 @@ public class CartItemDto {
     private String itemName;
     private int itemCount;
     private int itemPrice;
+    private int totalPrice;
     private CouponDto coupon;
 
     private Long customerId;
@@ -24,6 +25,8 @@ public class CartItemDto {
         this.itemName = entity.getItem().getName();
         this.itemCount = entity.getCount();
         this.itemPrice = entity.getItem().getPrice(); // 현재 상품 가격으로 장바구니
+        this.totalPrice = entity.getTotalPrice();
+
         if(entity.getCoupon() != null) this.coupon = new CouponDto(entity.getCoupon());
 
         this.customerId = entity.getCart().getCustomer().getId();

@@ -48,7 +48,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
 
-        String myHost = "http://127.0.0.1:8081/order/payment";
+        String myHost = "http://127.0.0.1:8080/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
         MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
@@ -130,8 +130,7 @@ public class PaymentService {
         parameterMap.add("cancel_amount", String.valueOf(order.getTotalPrice()));
         parameterMap.add("cancel_tax_free_amount", "0");
 
-        String msg;
-        Mono<ResponseEntity<Object>> mono = webClient.mutate()
+        webClient.mutate()
                 .baseUrl("https://kapi.kakao.com/v1/payment/cancel")
                 .defaultHeaders(
                         httpHeaders -> {
@@ -142,12 +141,8 @@ public class PaymentService {
                 .build()
                 .post()
                 .body(BodyInserters.fromFormData(parameterMap))
-                .retrieve()
-                .toEntity(Object.class);
+                .retrieve();
 
-        ResponseEntity<Object> response = mono.block();
-
-        // if(response.getStatusCode().is2xxSuccessful()) {
         orderService.cancel(orderId);
     }
 

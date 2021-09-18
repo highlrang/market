@@ -46,11 +46,12 @@ public class CustomerController {
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "customer/join";
 
-        Long customerId = null;
+        Long customerId;
         try {
             customerId = customerService.join(userRequestDto);
         }catch (IllegalStateException e){
             bindingResult.rejectValue("email", e.getMessage());
+            return "redirect:/customer/join";
         }
 
         String msg;

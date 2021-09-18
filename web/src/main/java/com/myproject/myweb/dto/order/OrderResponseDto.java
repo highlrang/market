@@ -16,7 +16,7 @@ public class OrderResponseDto {
 
     private Long id;
     private String deliveryStatus;
-    private List<OrderItemDto> orderItems;
+    private List<OrderItemDto> orderItems; // coupon
     private int totalPrice;
     private int totalCount;
     private String orderDate;
@@ -30,7 +30,6 @@ public class OrderResponseDto {
                                 .stream()
                                 .map(OrderItemDto::new)
                                 .collect(Collectors.toList());
-
         this.totalPrice = entity.getTotalPrice();
         this.totalCount = orderItems.stream()
                                     .mapToInt(OrderItemDto::getCount)
@@ -38,6 +37,7 @@ public class OrderResponseDto {
         this.orderDate = entity.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.orderStatus = entity.getOrderStatus().getName();
         this.tid = entity.getTid();
+
     }
 
     public String getOrderItemsName(){
