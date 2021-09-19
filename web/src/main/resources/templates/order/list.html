@@ -7,15 +7,22 @@
     <div th:if="${#lists.size(orders) == 0}" class="md-3">
         <input type="text" class="form-control" value="주문 내역이 없습니다." readonly>
     </div>
-    <div th:each="order : ${orders}">
 
-        <div class="md-3"><a class="form-control" th:text="${order.getOrderItemsName}" th:href="@{/order/detail/{id}(id=${order.id})}"></a></div>
-        <div class="md-3"><input type="text" th:value="${order.totalPrice}" class="form-control" readonly></div>
-        <div class="md-3"><input type="text" th:value="${order.orderDate}" class="form-control" readonly></div>
-        <div class="md-3"><input type="text" th:value="${order.orderStatus}" class="form-control" readonly></div>
-        <br>
-
+    <div class="list-group">
+        <div th:each="order : ${orders}">
+            <a th:href="@{/order/detail/{id}(id=${order.id})}" class="list-group-item list-group-item-action"> <!--aria-current="true"-->
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1" th:text="${order.getOrderItemsName}"></h5>                                <!--small class='text-muted'-->
+                    <small th:text="${order.orderDate}"></small>
+                </div>
+                <p class="mb-1" th:text="${order.totalPrice}"></p>
+                <small th:if="${order.orderStatus == '주문 취소'}" th:text="${order.orderStatus}"></small>
+                <small th:if="${order.orderStatus != '주문 취소'}" th:text="${order.deliveryStatus}"></small>
+            </a>
+        </div>
     </div>
+
+    <!-- th:onclick=" 'location.href=\'' + @{/order/detail/{id}(id=${order.id})} + '\'' ">-->
 </div>
 
 </html>

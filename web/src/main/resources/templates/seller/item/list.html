@@ -25,13 +25,14 @@
     <br>
 
     <div id="itemList">
-        <div th:each="item: ${items}">
-            <div class="md-3">
-                <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
-            </div>
-            <div class="md-3"><input type="text" class="form-control" th:value="|${item.price}원|" readonly></div>
-            <div class="md-3"><input type="text" class="form-control" th:value="|재고 ${item.stock}개|" readonly></div>
-            <br>
+        <div th:each="item : ${items}">
+            <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" class="list-group-item list-group-item-action"> <!--aria-current="true"-->
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1" th:text="${item.name}"></h5>                                <!--small class='text-muted'-->
+                </div>
+                <p class="mb-1" th:text="|${item.price}원|"></p>
+                <p class="mb-1" th:text="|${item.stock}개 남음|"></p>
+            </a>
         </div>
     </div>
 
@@ -41,6 +42,7 @@
         <input type="hidden" id="category" th:value="${category}">
     </div>
 
+    <br>
     <div id="pagination"></div>
 
 </div>

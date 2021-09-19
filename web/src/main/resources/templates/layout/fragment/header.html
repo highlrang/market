@@ -10,18 +10,19 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">HOME</a>
-            </li>
 
-            <span th:if="${session.customer != null}">
+          <span th:if="${session.customer != null}">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/">HOME</a>
+              </li>
+
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   카테고리
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                  <span id="header-category">
+                  <span id="customer-category">
 
                   </span>
                 </ul>
@@ -34,23 +35,44 @@
               <li class="nav-item"><a class="nav-link" href="/order/list">주문 내역</a></li>
 
               <li class="nav-item"><a class="nav-link" href="/customer/logout">로그아웃</a></li>
-            </span>
+            </ul>
+          </span>
 
 
-            <span th:if="${session.seller != null}">
+          <span th:if="${session.seller != null}">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/">HOME</a>
+              </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="/seller/item/save">상품 등록하기</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/seller/item/index">등록한 상품 목록</a>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  등록한 상품 목록
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown4">
+                  <span id="seller-category">
+
+                  </span>
+                </ul>
               </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="/seller/logout">로그아웃</a>
               </li>
-            </span>
+            </ul>
+          </span>
 
 
-            <span th:if="${session.customer} == null and ${session.seller} == null">
+          <span th:if="${session.customer} == null and ${session.seller} == null">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/">HOME</a>
+              </li>
+
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   고객
@@ -70,9 +92,9 @@
                   <li><a class="dropdown-item" href="/seller/login">로그인</a></li>
                 </ul>
               </li>
-            </span>
+            </ul>
+          </span>
 
-          </ul>
         </div>
       </div>
     </nav>

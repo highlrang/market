@@ -1,7 +1,7 @@
 function pagination(first_page, size, total_page){ // 현재 페이지는 쿼리 페이지+1로 넘어옴
     var pages = "";
     if(first_page > 1){
-        pages += "<input type='button' name='previous' value='이전'>";
+        pages += "<input type='button' class='btn btn-light' name='previous' value='이전'>";
     }
 
     total_page = parseInt(total_page) + 1; // 마지막 페이지 포함이기에 +1
@@ -13,26 +13,28 @@ function pagination(first_page, size, total_page){ // 현재 페이지는 쿼리
     for(var i=first_page; i<end; i++){
         pages += "<input type='button' name='page' value='" + i + "'";
         if(i == now_page){
-            pages += " class='btn btn-black'";
+            pages += " class='btn btn-dark'";
+        }else{
+            pages += " class='btn btn-light'";
         }
         pages += ">";
     }
 
     if(end != total_page) {
-        pages += "<input type='button' name='next' value='다음'>";
+        pages += "<input type='button' class='btn btn-light' name='next' value='다음'>";
     }
 
     $("#pagination").empty();
-    $("#pagination").append(pages);
+    $("#pagination").append(pages); // .trigger("create")
 }
 
 function itemListChange(data){
     var itemList = "";
     $.each(data["list"], function(index, item){
-        itemList += "<div>"
-                 + "<div class='md-3'><a href='/item/detail/" + item.id + "'>"  + item.name + "</a></div>"
-                 + "<div class='md-3'><input type='text' class='form-control' value='" + item.price + "' readonly></div>"
-                 + "</div><br>";
+        itemList += "<a href='/item/detail/" + item.id + "' class='list-group-item list-group-item-action>"
+                 + "<div class='d-flex w-100 justify-content-between'><h5 class='mb-1'>" + item.name + "</h5></div>"
+                 + "<p class='mb-1'>" + item.price + "원</p>"
+                 + "</a>";
     });
 
     $("#itemList").empty();
@@ -71,8 +73,8 @@ $(function(){
 
 $(function(){
     $(document).on("click", "input[name='page']", function(){
-        $("input[name='page']").attr('class', '');
-        $(this).attr('class', 'btn btn-black');
+        $("input[name='page']").attr('class', 'btn btn-light');
+        $(this).attr('class', 'btn btn-dark');
 
         var page = $(this).val();
         var data = {

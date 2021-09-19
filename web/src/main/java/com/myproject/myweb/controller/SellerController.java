@@ -136,12 +136,6 @@ public class SellerController {
         return "redirect:/seller/item/detail/" + id;
     }
 
-    @GetMapping("/item/index") // 판매자의 상품 리스트 보기 위한 카테고리 나열
-    public String categoryList(Model model){
-        model.addAttribute("categories", Category.values());
-        return "seller/item/index";
-    }
-
     @GetMapping("/item/list/{category}") // 첫 리스트 요청
     public String listByCategory(@PathVariable("category") String category,
                                  HttpSession session, Model model){

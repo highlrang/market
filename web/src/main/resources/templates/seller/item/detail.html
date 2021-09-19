@@ -4,20 +4,17 @@
       layout:decorator="layout/basic">
 
 <div layout:fragment="content">
-  <form>
-    <div class="md-3"><input type="text" th:value="${item.category.getValue()}" class="form-control" readonly></div>
-    <div class="md-3"><input type="text" th:value="${item.name}" class="form-control" readonly></div>
-    <div class="md-3"><input type="text" th:value="${item.price}" class="form-control" readonly></div>
-    <div class="md-3"><input type="text" th:value="${item.stock}" class="form-control" readonly></div>
 
-    <div th:each="photo: ${item.photos}">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item" th:text="${item.category.getValue()}"></li>
+    <li class="list-group-item" th:text="${item.name}"></li>
+    <li class="list-group-item" th:text="${item.price}"></li>
+    <li class="list-group-item" th:text="${item.stock}"></li>
+    <li class="list-group-item" th:each="photo: ${item.photos}">
       <img th:src="|../../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
-    </div>
-
-    <div class="md-3">
-      <a th:href="@{/seller/item/update/{id}(id = ${item.id})}" th:text="수정"></a>
-    </div>
-  </form>
+    </li>
+    <li class="list-group-item"><a class="btn btn-light" th:href="@{/seller/item/update/{id}(id = ${item.id})}">수정</a></li>
+  </ul>
 
 </div>
 </html>
