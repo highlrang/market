@@ -48,16 +48,7 @@ public class ItemController {
     // 판매자 상관없이 카테고리별 상품 목록
     @GetMapping("/list/{category}")
     public String list(@PathVariable String category, Model model){
-        ItemService.ListByPaging<ItemResponseDto> itemList =
-                itemService.findByCategoryAndPaging(Category.valueOf(category), Pageable.ofSize(5));
-
-        model.addAttribute("items", itemList.getList());
-        model.addAttribute("totalPage", itemList.getTotalPage());
-
-        model.addAttribute("nowPage", "1");
-        model.addAttribute("nowSize", "5");
         model.addAttribute("category", category);
-
         return "item/list";
     }
 
@@ -67,11 +58,7 @@ public class ItemController {
             @RequestParam(name = "category") String category,
             Pageable pageable // ?page=n&size=n 으로 전달하기
     ){
-
-        return itemService.findByCategoryAndPaging(
-                        Category.valueOf(category),
-                        pageable
-                );
+        return itemService.findByCategoryAndPaging(Category.valueOf(category), pageable);
     }
 
     @GetMapping("/detail/{id}")

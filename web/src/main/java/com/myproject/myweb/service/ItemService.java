@@ -103,7 +103,7 @@ public class ItemService {
 
     public ListByPaging<ItemResponseDto> findByCategoryAndPaging(Category category, Pageable pageable){
         PageRequest pageRequest =
-                PageRequest.of(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
 
         return new ListByPaging<>(items.getTotalPages(), items.getContent().stream()
@@ -113,7 +113,7 @@ public class ItemService {
 
     public ListByPaging<ItemResponseDto> findBySellerAndCategory(Long id, Category category, Pageable pageable){
         PageRequest pageRequest =
-                PageRequest.of(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Page<Item> items = itemRepository.findAllBySeller_IdAndCategory(id, category, pageRequest);
         return new ListByPaging<>(
                 items.getTotalPages(),

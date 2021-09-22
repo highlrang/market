@@ -13,6 +13,7 @@ import com.myproject.myweb.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -167,14 +168,17 @@ public class OrderController {
         attributes.addAttribute("msg", msg);
     }
 
-    @GetMapping("/list")
-    public String list(@RequestParam(value = "msg", required = false) String msg,
-                       HttpSession session, Model model){
-        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
-        List<OrderResponseDto> orders = orderService.findByCustomerId(customer.getId());
-        model.addAttribute("orders", orders);
+    @GetMapping("/list") // 페이징 처리
+    public String list(@RequestParam(value = "msg", required = false) String msg, Model model){
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "order/list";
+    }
+
+    @GetMapping("/list/api")
+    @ResponseBody
+    public ItemService.ListByPaging<OrderResponseDto> listApi(HttpSession session, Pageable pageable){
+        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
+        return orderService.findByCustomerAndPaging(customer.getId(), pageable);
     }
 
     @GetMapping("/detail/{id}")

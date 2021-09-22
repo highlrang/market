@@ -3,24 +3,47 @@
       xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout/basic">
 
+<th:block layout:fragment="script">
+    <script src="/js/order-list.js"></script>
+    <script src="/js/pagination.js"></script>
+</th:block>
+
 <div layout:fragment="content">
-    <div th:if="${#lists.size(orders) == 0}" class="md-3">
-        <input type="text" class="form-control" value="주문 내역이 없습니다." readonly>
+    <script>
+        $(function(){
+            $.ajax({
+                type: 'get',
+                url: '/order/list/api?page=' + 1 + '&size=' + 5,
+                success: function(data) {
+                    $("#total_page").val(data["totalPage"]);
+                    $("#size").val("5").prop("selected", true);
+
+                    orderListChange(data);
+                    pagination("1", "5", data["totalPage"]);
+                },
+                error : function(request, status, error) {
+                    console.log(request, status, error);
+                }
+            });
+        });
+    </script>
+
+    <div class="md-3">
+        <select class="form-select" id="size">
+            <option value="5">5개</option>
+            <option value="10">10개</option>
+        </select>
+    </div><br>
+
+    <div id="orderList"></div>
+
+    <div>
+        <input type="hidden" id="now_page" value="1">
+        <input type="hidden" id="total_page">
     </div>
 
-    <div class="list-group">
-        <div th:each="order : ${orders}">
-            <a th:href="@{/order/detail/{id}(id=${order.id})}" class="list-group-item list-group-item-action"> <!--aria-current="true"-->
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1" th:text="${order.getOrderItemsName}"></h5>                                <!--small class='text-muted'-->
-                    <small th:text="${order.orderDate}"></small>
-                </div>
-                <p class="mb-1" th:text="${order.totalPrice}"></p>
-                <small th:if="${order.orderStatus == '주문 취소'}" th:text="${order.orderStatus}"></small>
-                <small th:if="${order.orderStatus != '주문 취소'}" th:text="${order.deliveryStatus}"></small>
-            </a>
-        </div>
-    </div>
+    <br>
+    <div id="pagination"></div>
 
     <!-- th:onclick=" 'location.href=\'' + @{/order/detail/{id}(id=${order.id})} + '\'' ">-->
 </div>

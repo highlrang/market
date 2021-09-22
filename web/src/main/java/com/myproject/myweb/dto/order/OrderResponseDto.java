@@ -23,6 +23,8 @@ public class OrderResponseDto {
     private String orderStatus;
     private String tid;
 
+    private String orderItemsName;
+
     public OrderResponseDto(Order entity){
         this.id = entity.getId();
         this.deliveryStatus = entity.getDelivery().getStatus().getName();
@@ -37,7 +39,7 @@ public class OrderResponseDto {
         this.orderDate = entity.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.orderStatus = entity.getOrderStatus().getName();
         this.tid = entity.getTid();
-
+        this.orderItemsName = getOrderItemsName();
     }
 
     public String getOrderItemsName(){

@@ -136,32 +136,22 @@ public class SellerController {
         return "redirect:/seller/item/detail/" + id;
     }
 
-    @GetMapping("/item/list/{category}") // 첫 리스트 요청
+    @GetMapping("/item/list/{category}")
     public String listByCategory(@PathVariable("category") String category,
-                                 HttpSession session, Model model){
-
-        SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
-        ItemService.ListByPaging<ItemResponseDto> itemList =
-                itemService.findBySellerAndCategory(seller.getId(), Category.valueOf(category), Pageable.ofSize(5));
-
-        model.addAttribute("totalPage", itemList.getTotalPage());
-        model.addAttribute("items", itemList.getList());
-
-        model.addAttribute("nowPage", 1);
-        model.addAttribute("nowSize", 5);
+                                 Model model){
         model.addAttribute("category", category);
-
         return "seller/item/list";
     }
 
-    @GetMapping("/item/list/api") // 이후 리스트 요청(페이지 넘겨서)
+    @GetMapping("/item/list/api")
     @ResponseBody
     public ItemService.ListByPaging<ItemResponseDto> listByCategoryApi(
-            @RequestParam("seller_id") Long sellerId, // 이렇게 session이 아닌 값으로 하는 게 날지
+            HttpSession session,
             @RequestParam("category") String category,
             Pageable pageable
     ){
-        return itemService.findBySellerAndCategory(sellerId, Category.valueOf(category), pageable);
+        SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
+        return itemService.findBySellerAndCategory(seller.getId(), Category.valueOf(category), pageable);
     }
 
 

@@ -11,6 +11,10 @@ import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,11 +37,15 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
-    public List<OrderResponseDto> findByCustomerId(Long customerId){
-        List<Order> orders = orderRepository.findAllByCustomer_Id(customerId);
-        return orders.stream()
-                .map(OrderResponseDto::new)
-                .collect(Collectors.toList());
+    public ItemService.ListByPaging<OrderResponseDto> findByCustomerAndPaging(Long customerId, Pageable pageable){
+        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        Page<Order> orders = orderRepository.findAllByCustomer_Id(customerId, pageRequest);
+        return new ItemService.ListByPaging<>(
+                orders.getTotalPages(),
+                orders.getContent().stream()
+                    .map(OrderResponseDto::new)
+                    .collect(Collectors.toList())
+        );
     }
 
     public Boolean orderImpossible(Long customerId){

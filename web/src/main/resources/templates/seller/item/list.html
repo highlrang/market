@@ -5,14 +5,26 @@
 
 <th:block layout:fragment="script">
     <script src="/js/item-list-seller.js"></script>
+    <script src="/js/pagination.js"></script>
 </th:block>
 
 <div layout:fragment="content">
     <script>
         $(function(){
-            // 처음에는 nowPage 1
-            pagination([[ ${nowPage} ]], [[ ${nowSize} ]], [[ ${totalPage} ]]);
-            $("#size").val([[ ${nowSize} ]]).prop("selected", true);
+            $.ajax({
+                type: 'get',
+                url: '/seller/item/list/api?category=' + $("#category").val() + '&page=' + 1 + '&size=' + 5,
+                success: function(data) {
+                    $("#total_page").val(data["totalPage"]);
+                    $("#size").val("5").prop("selected", true);
+
+                    itemListChange(data);
+                    pagination("1", "5", data["totalPage"]);
+                },
+                error : function(request, status, error) {
+                    console.log(request, status, error);
+                }
+            });
         });
     </script>
 
@@ -24,21 +36,11 @@
     </div>
     <br>
 
-    <div id="itemList">
-        <div th:each="item : ${items}">
-            <a th:href="@{/seller/item/detail/{id}(id=${item.id})}" class="list-group-item list-group-item-action"> <!--aria-current="true"-->
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1" th:text="${item.name}"></h5>                                <!--small class='text-muted'-->
-                </div>
-                <p class="mb-1" th:text="|${item.price}원|"></p>
-                <p class="mb-1" th:text="|${item.stock}개 남음|"></p>
-            </a>
-        </div>
-    </div>
+    <div id="itemList"></div>
 
     <div>
-        <input type="hidden" id="now_page" th:value="${nowPage}">
-        <input type="hidden" id="total_page" th:value="${totalPage}">
+        <input type="hidden" id="now_page" value="1">
+        <input type="hidden" id="total_page">
         <input type="hidden" id="category" th:value="${category}">
     </div>
 
