@@ -73,7 +73,7 @@ public class OrderController {
             }
 
         }catch (ItemStockException e){
-            String msg = messageSource.getMessage(e.getMessage(), e.getArgs(), Locale.getDefault());
+            String msg = messageSource.getMessage(e.getMessage(), new String[]{e.getArgs()[1]}, Locale.getDefault());
             itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
             orderRedirectAttributes(msg);
             return url;

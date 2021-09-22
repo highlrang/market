@@ -15,7 +15,6 @@ import java.util.List;
 
 @Getter @Setter
 @MappedSuperclass
-@NoArgsConstructor
 public abstract class User {
 
     private String name;
@@ -28,8 +27,4 @@ public abstract class User {
     private String certificationToken;
     @ColumnDefault("false")
     private Boolean certified;
-
-    public Boolean checkPassword(String password){
-        return this.password.equals(password);
-    }
 }

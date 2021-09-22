@@ -1,6 +1,7 @@
 package com.myproject.myweb.config.security;
 
 import com.myproject.myweb.handler.SellerLoginSuccessHandler;
+import com.myproject.myweb.service.SellerNoticeService;
 import com.myproject.myweb.service.user.SellerService;
 import com.myproject.myweb.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import static com.myproject.myweb.config.security.SecurityConfig.SECURITY_PASSED
 public class SellerSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SellerService sellerService;
+    private final SellerNoticeService sellerNoticeService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -38,7 +40,7 @@ public class SellerSecurityConfig extends WebSecurityConfigurerAdapter {
                     .loginPage("/seller/login")
                     .loginProcessingUrl("/seller/login")
                     .failureUrl("/seller/login?msg=LoginError")
-                    .successHandler(new SellerLoginSuccessHandler())
+                    .successHandler(new SellerLoginSuccessHandler(sellerNoticeService))
                     .permitAll()
                     .and()
                 .logout()
