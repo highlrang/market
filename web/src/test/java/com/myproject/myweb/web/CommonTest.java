@@ -5,11 +5,12 @@ package com.myproject.myweb.web;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.repository.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hibernate.criterion.Order;
+import com.myproject.myweb.service.SellerNoticeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +21,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,11 +33,32 @@ public class CommonTest{
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemRepository itemRepository;
     @Autowired PhotoRepository photoRepository;
+    @Autowired
+    SellerNoticeRepository sellerNoticeRepository;
+    @Autowired SellerNoticeService noticeService;
     @Autowired BCryptPasswordEncoder passwordEncoder;
 
     @Test
     public void 테스트(){
         // 쿠폰 발급 - 연관관계까지
+
+        // 알림 저장
+        Seller seller = sellerRepository.findByEmail("seller@seller.com").get();
+        SellerNotice notice = sellerNoticeRepository.save(SellerNotice.builder()
+                .seller(seller)
+                .title("test용 메세지")
+                .build());
+        sellerNoticeRepository.save(
+                SellerNotice.builder()
+                        .seller(seller)
+                        .title("읽음으로 테스트할 알림")
+                        .content("여기는 내용영역입니다. 특정 상품의 재고가 부족합니다.")
+                        .build()
+        );
+        System.out.println(notice.getId() + " " + notice.getConfirm() + " " + notice.getDatetime());
+
+        Long count = noticeService.countUnreadBySeller(seller.getId());
+        System.out.println(count);
     }
 
 

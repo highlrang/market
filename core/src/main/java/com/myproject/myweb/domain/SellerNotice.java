@@ -10,6 +10,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class SellerNotice extends Notice {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

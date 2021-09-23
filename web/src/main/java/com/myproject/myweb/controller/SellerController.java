@@ -4,10 +4,12 @@ import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
+import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
+import com.myproject.myweb.service.SellerNoticeService;
 import com.myproject.myweb.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import java.util.Locale;
 public class SellerController {
 
     private final SellerService sellerService;
+    private final SellerNoticeService sellerNoticeService;
     private final ItemService itemService;
     private final FileHandler fileHandler;
     private final MessageSource messageSource;
@@ -201,5 +204,25 @@ public class SellerController {
         return "redirect:/seller/item/detail/" + id;
     }
 
+    @GetMapping("/notice")
+    public String notice(HttpSession session, Model model){
+        SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
+        List<SellerNoticeDto> notices = sellerNoticeService.findAllBySeller(seller.getId());
+        model.addAttribute("notices", notices);
+        return "seller/notice-list";
+    }
 
+    @PostMapping("/notice/check") // >> ajax 처리하기
+    public String noticeCheck(@RequestParam("seller_id") Long sellerId,
+                              @RequestParam("id") Long id, HttpSession session){
+        sellerNoticeService.readNotice(id);
+        session.setAttribute("unreadNotice", sellerNoticeService.countUnreadBySeller(sellerId));
+        return "redirect:/seller/notice";
+    }
+
+    @PostMapping("/notice/remove")
+    public String noticeRemove(@RequestParam("id") Long id){
+        sellerNoticeService.remove(id);
+        return "redirect:/seller/notice";
+    }
 }

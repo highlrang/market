@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/basic">
+
+<th:block layout:fragment="script"></th:block>
+
+<div layout:fragment="content">
+    <script></script>
+
+    <div th:each="notice: ${notices}" class="mx-auto" style="width: 50%; height: 50%;">
+        <span th:if="${notice.confirm==false}">
+            <div class="alert alert-info" role="alert">
+                <h6 class="alert-heading" th:text="${notice.title}" style="font-weight: bold"></h6>
+                <p th:text="${notice.content}"></p>
+                <hr>
+                <form action="/seller/notice/check" method="post">
+                    <input type="hidden" th:value="${session.seller.id}" name="seller_id">
+                    <input type="hidden" th:value="${notice.id}" name="id">
+                    <input type="submit" value="확인 완료">
+                </form>
+                <p class="mb-0"></p>
+            </div>
+        </span>
+
+        <span th:if="${notice.confirm==true}">
+            <div class="alert alert-secondary" role="alert">
+                <h6 class="alert-heading" th:text="${notice.title}" style="font-weight: bold"></h6>
+                <p th:text="${notice.content}"></p>
+                <hr>
+                <form action="/seller/notice/remove" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
+                    <input type="hidden" th:value="${notice.id}" name="id">
+                    <input type="submit" value="삭제">
+                </form>
+            </div>
+        </span>
+    </div>
+</div>

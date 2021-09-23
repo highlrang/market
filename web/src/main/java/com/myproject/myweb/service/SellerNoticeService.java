@@ -1,17 +1,20 @@
 package com.myproject.myweb.service;
 
+import com.myproject.myweb.domain.SellerNotice;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.repository.SellerNoticeRepository;
 import com.myproject.myweb.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SellerNoticeService {
 
     private final SellerRepository sellerRepository;
@@ -33,5 +36,17 @@ public class SellerNoticeService {
                 .stream()
                 .map(SellerNoticeDto::SellerNoticeResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void readNotice(Long id){
+        SellerNotice notice = sellerNoticeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("NoticeNotFoundException")); // 에러처리
+        notice.confirmed();
+    }
+
+    @Transactional
+    public void remove(Long id){
+        sellerNoticeRepository.deleteById(id);
     }
 }
