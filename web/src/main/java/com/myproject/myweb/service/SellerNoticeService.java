@@ -6,6 +6,10 @@ import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.repository.SellerNoticeRepository;
 import com.myproject.myweb.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,28 +24,35 @@ public class SellerNoticeService {
     private final SellerRepository sellerRepository;
     private final SellerNoticeRepository sellerNoticeRepository;
 
-    public Long countUnreadBySeller(Long sellerId){
+    public Integer countUnreadBySeller(Long sellerId){
         Seller seller = sellerRepository.findById(sellerId)
-                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException")); // 에러 처리
-        return sellerNoticeRepository.findAllBySeller(seller).stream()
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        return sellerNoticeRepository.countBySellerAndConfirmFalse(seller);
+                /*
                 .filter(notice -> !notice.getConfirm())
                 .count();
+                 */
     }
 
-    public List<SellerNoticeDto> findAllBySeller(Long sellerId){
+    public ItemService.ListByPaging<SellerNoticeDto> findAllBySeller(Long sellerId, Pageable pageable){
         Seller seller = sellerRepository.findById(sellerId)
-                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException")); // 에러 처리
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
 
-        return sellerNoticeRepository.findAllBySeller(seller)
-                .stream()
-                .map(SellerNoticeDto::SellerNoticeResponseDto)
-                .collect(Collectors.toList());
+        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        Page<SellerNotice> noticeList = sellerNoticeRepository.findAllBySeller(seller, pageRequest);
+
+        return new ItemService.ListByPaging<>(
+                noticeList.getTotalPages(),
+                noticeList.getContent().stream()
+                        .map(SellerNoticeDto::SellerNoticeResponseDto)
+                        .collect(Collectors.toList())
+        );
     }
 
     @Transactional
     public void readNotice(Long id){
         SellerNotice notice = sellerNoticeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("NoticeNotFoundException")); // 에러처리
+                .orElseThrow(() -> new IllegalArgumentException("NoticeNotFoundException"));
         notice.confirmed();
     }
 

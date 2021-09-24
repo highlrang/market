@@ -25,8 +25,7 @@ public class CommonExceptionHandler {
 
         String msg = messageSource.getMessage(exception.getMessage(), null, Locale.getDefault());
         model.addAttribute("msg", msg); // alert로 전달
-        log.error("error msg = " + msg);
-        log.info("이전 url = " + request.getHeader("REFERER"));
+        log.error("error msg = " + msg + " 이전 url = " + request.getHeader("REFERER"));
 
         return "redirect:/";
     }

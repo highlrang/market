@@ -14,6 +14,7 @@ import com.myproject.myweb.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -205,11 +206,15 @@ public class SellerController {
     }
 
     @GetMapping("/notice")
-    public String notice(HttpSession session, Model model){
-        SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
-        List<SellerNoticeDto> notices = sellerNoticeService.findAllBySeller(seller.getId());
-        model.addAttribute("notices", notices);
+    public String notice(){
         return "seller/notice-list";
+    }
+
+    @GetMapping("/notice/list/api")
+    @ResponseBody
+    public ItemService.ListByPaging<SellerNoticeDto> noticeApi(HttpSession session, Pageable pageable){
+        SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
+        return sellerNoticeService.findAllBySeller(seller.getId(), pageable);
     }
 
     @PostMapping("/notice/check") // >> ajax 처리하기

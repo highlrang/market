@@ -10,12 +10,14 @@ import com.myproject.myweb.repository.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
@@ -42,22 +44,18 @@ public class CommonTest{
     public void 테스트(){
         // 쿠폰 발급 - 연관관계까지
 
-        // 알림 저장
         Seller seller = sellerRepository.findByEmail("seller@seller.com").get();
-        SellerNotice notice = sellerNoticeRepository.save(SellerNotice.builder()
-                .seller(seller)
-                .title("test용 메세지")
-                .build());
+        ItemService.ListByPaging<SellerNoticeDto> notices =
+                noticeService.findAllBySeller(seller.getId(), PageRequest.of(1, 5));
+        System.out.println(notices.getTotalPage() + " " + notices.getList().size());
+
         sellerNoticeRepository.save(
                 SellerNotice.builder()
                         .seller(seller)
-                        .title("읽음으로 테스트할 알림")
-                        .content("여기는 내용영역입니다. 특정 상품의 재고가 부족합니다.")
+                        .title("테스트용")
                         .build()
         );
-        System.out.println(notice.getId() + " " + notice.getConfirm() + " " + notice.getDatetime());
-
-        Long count = noticeService.countUnreadBySeller(seller.getId());
+        int count = noticeService.countUnreadBySeller(seller.getId());
         System.out.println(count);
     }
 

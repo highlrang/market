@@ -13,6 +13,8 @@ function pagination(first_page, size, total_page){ // 현재 페이지는 쿼리
     for(var i=first_page; i<end; i++){
         pages += "<input type='button' name='page' value='" + i + "'";
         if(i == $("#now_page").val()){
+            // 첫 로딩과 사이즈 변경 시만 사용 됨 == now_page는 항상 1
+            // 이전 다음에서는 페이지 어디인지 알려주기는 함
             pages += " class='btn btn-dark'";
         }else{
             pages += " class='btn btn-light'";

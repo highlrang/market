@@ -22,6 +22,5 @@ public class ExpiredCouponRemoveScheduler {
     public void couponRemove(){
         List<Coupon> coupons = couponRepository.findAllByExpirationDateBefore(LocalDateTime.now());
         couponRepository.deleteAllInBatch(coupons); // in query로 해야하는지 확인
-        log.info("스케줄러 실행 완료!");
     }
 }
