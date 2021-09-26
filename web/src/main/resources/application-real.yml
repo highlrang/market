@@ -1,0 +1,13 @@
+# profile = real 인 설정파일
+# RDS 환경 구성
+
+spring:
+  profiles:
+    include: real-db # 후에 추가
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  session:
+    store-type: jdbc

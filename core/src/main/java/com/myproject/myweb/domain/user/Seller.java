@@ -13,9 +13,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class Seller extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<Item> itemList = new ArrayList<>();

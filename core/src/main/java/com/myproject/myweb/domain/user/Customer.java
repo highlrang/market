@@ -15,9 +15,6 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 public class Customer extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @OneToOne(mappedBy = "customer", fetch = FetchType.LAZY)
     private Cart cart;
