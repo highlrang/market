@@ -2,8 +2,6 @@
 /.gradle/
 /.idea/
 
-/gradle/
-
 /core/build/
 /core/out/
 
