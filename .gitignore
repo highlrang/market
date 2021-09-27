@@ -17,14 +17,14 @@
 /internal-api/build/
 /internal-api/out/
 
-/upload/
+upload/
 
 
-/core/src/main/resources/*.yml
-/web/src/main/resources/*.yml
+core/src/main/resources/*.yml
+web/src/main/resources/*.yml
 !web/src/main/resources/application-real.yml
-/batch/src/main/resources/*.yml
-/internal-api/src/main/resources/*.yml
-/admin-monitoring-server/src/main/resources/*.yml
+batch/src/main/resources/*.yml
+internal-api/src/main/resources/*.yml
+admin-monitoring-server/src/main/resources/*.yml
 
-/web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
+web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
