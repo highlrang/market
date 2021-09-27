@@ -79,7 +79,7 @@ public class CommonTest{
         );
     }
 
-    @Test @Commit
+    @Test
     public void item_save(){
         Customer customer = customerRepository.save(
                 Customer.builder()
