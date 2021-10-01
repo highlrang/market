@@ -36,3 +36,12 @@ test {
     exclude '**/*'
     // useJUnitPlatform()
 }
+
+jar{
+    enabled = false
+}
+
+bootJar{
+    enabled = true
+}
+// jar에 classifier로 이름 설정 가능
