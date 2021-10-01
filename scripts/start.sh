@@ -23,7 +23,8 @@ echo "> $JAR_NAME 실행"
 IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 샐행합니다."
-# classpath 뒤에 web 추가 >> 되는지 확인, 변수로 치환하기
+
+# classpath web으로 지정
 nohup java -jar \
       -Dspring.config.location=classpath:/web/application-$IDLE_PROFILE.yml,\
       home/ec2-user/app/application-real-db.properties \
