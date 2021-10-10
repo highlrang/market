@@ -60,7 +60,7 @@ public class Item {
         stock += stockQuantity;
     }
 
-    public void removeStrock(int stockQuantity){
+    public void removeStock(int stockQuantity){
         int nowStock = stock - stockQuantity;
         if(nowStock < 0){
             throw new ItemStockException("StockZeroException", String.valueOf(id), name);

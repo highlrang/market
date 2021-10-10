@@ -54,6 +54,12 @@ project(':web'){
     }
 }
 
+project(':internal-api'){
+    dependencies{
+        compile project(':core')
+    }
+}
+
 group 'com.myproject'
 version '1.0-SNAPSHOT-' + new Date().format("yyyyMMddHHmmss")
 

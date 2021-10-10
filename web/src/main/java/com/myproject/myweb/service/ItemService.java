@@ -129,6 +129,7 @@ public class ItemService {
         }
     }
 
+    // test 필요
     public void stockNotice(Long itemId){
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
         Seller seller = item.getSeller();

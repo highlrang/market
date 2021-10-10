@@ -29,7 +29,7 @@
               </li>
 
               <li class="nav-item" th:if="${session.customer.cartId != null}">
-                <a class="nav-link" th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니 이동</a>
+                <a class="nav-link" th:href="@{/cart/detail/{id}(id=${session.customer.cartId})}">장바구니</a>
               </li>
 
               <li class="nav-item"><a class="nav-link" href="/order/list">주문 내역</a></li>
@@ -46,12 +46,12 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="/seller/item/save">상품 등록하기</a>
+                <a class="nav-link" href="/seller/item/save">상품등록</a>
               </li>
 
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  등록한 상품 목록
+                  상품목록
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown4">
                   <span id="seller-category">
@@ -61,7 +61,7 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="/seller/notice">
+                <a class="nav-link position-relative" href="/seller/notice">
                   알림
                   <span id="seller-unread-notice"></span>
                 </a>

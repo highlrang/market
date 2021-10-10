@@ -11,9 +11,9 @@ public class SecurityConfig {
 
     public static final String[] SECURITY_PASSED_URLS = {
             "/", "/js/**", "/css/**",
-            "/profile",
-            "/customer/join", "/customer/certify", "/customer/certified", "/customer/login",
-            "/seller/join", "/seller/certify", "/seller/certified", "/seller/login"
+            "/profile", "/api/category/list",
+            "/customer/join", "/customer/certify", "/customer/certified",
+            "/seller/join", "/seller/certify", "/seller/certified"
     };
 
     @Bean

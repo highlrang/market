@@ -45,7 +45,7 @@ public class OrderItem {
         orderItem.price = orderPrice;
         orderItem.count = count;
 
-        item.removeStrock(count);
+        item.removeStock(count);
         return orderItem;
     }
 

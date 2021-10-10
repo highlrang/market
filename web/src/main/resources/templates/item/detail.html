@@ -10,34 +10,28 @@
             <input type="hidden" name="customer_id" th:value="${session.customer.id}">
         </div>
 
-        <div class="md-3">
-            <input type="text" class="form-control" th:value="${item.category.getValue()}" readonly>
-        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:text="${item.category.getValue()}"></li>
+            <li class="list-group-item" th:text="${item.name}"></li>
+            <li class="list-group-item" th:text="${item.price}"></li>
 
-        <div class="mb-3">
-            <input type="text" class="form-control" th:value="${item.name}" readonly>
-        </div>
+            <li class="list-group-item" th:each="photo: ${item.photos}">
+                <img th:src="|../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
+            </li>
 
-        <div class="mb-3">
-            <input type="text" class="form-control" th:value="${item.price}" readonly>
-        </div>
+            <li class="list-group-item">
+                <input type="text" class="form-control" name="count" value="1">
+            </li>
 
-        <div th:each="photo: ${item.photos}">
-            <img th:src="|../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
-        </div>
-
-        <div class="mb-3">
-            <input type="text" class="form-control" name="count" value="1">
-        </div>
-
-        <div class="mb-3">
-            <select name="coupon" class="form-select">
-                <option value="null">선택안함</option>
-                <span th:each="coupon: ${coupons}">
-                    <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.discountPer}% - ${coupon.expirationDate}까지|"></option>
-               </span>
-            </select>
-        </div>
+            <li class="list-group-item">
+                <select name="coupon" class="form-select">
+                    <option value="null">선택안함</option>
+                    <span th:each="coupon: ${coupons}">
+                        <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.expirationDate}까지|"></option>
+                    </span>
+                </select>
+            </li>
+        </ul>
 
         <div class="mb-3">
             <input type="submit" value="장바구니 담기" formaction="/cart/save">

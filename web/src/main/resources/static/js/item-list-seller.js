@@ -3,7 +3,7 @@ function itemListChange(data){
     $.each(data["list"], function(index, item){
         itemList += "<a href='/seller/item/detail/" + item.id + "' class='list-group-item list-group-item-action'>"
                  + "<div class='d-flex w-100 justify-content-between'>"
-                 + "<h5 class='mb-1'>" + item.name + "원</h5></div>"
+                 + "<h5 class='mb-1'>" + item.name + "</h5></div>"
                  + "<p class='mb-1'>" + item.price + "원</p>"
                  + "<p class='mb-1'>" + item.stock + "개 남음</p>"
                  + "</a>";

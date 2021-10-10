@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,28 +37,48 @@ public class CommonTest{
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemRepository itemRepository;
     @Autowired PhotoRepository photoRepository;
-    @Autowired
-    SellerNoticeRepository sellerNoticeRepository;
+    @Autowired SellerNoticeRepository sellerNoticeRepository;
     @Autowired SellerNoticeService noticeService;
     @Autowired BCryptPasswordEncoder passwordEncoder;
 
     @Test
-    public void 테스트(){
-        // 쿠폰 발급 - 연관관계까지
-
-        Seller seller = sellerRepository.findByEmail("seller@seller.com").get();
-        ItemService.ListByPaging<SellerNoticeDto> notices =
-                noticeService.findAllBySeller(seller.getId(), PageRequest.of(1, 5));
-        System.out.println(notices.getTotalPage() + " " + notices.getList().size());
-
-        sellerNoticeRepository.save(
-                SellerNotice.builder()
-                        .seller(seller)
-                        .title("테스트용")
-                        .build()
+    public void 쿠폰() {
+        Customer customer = customerRepository.findByEmail("jhw127@naver.com").get();
+        List<Coupon> coupons = couponRepository.saveAll(
+                Arrays.asList(
+                        Coupon.createCoupon("신규 회원 5% 할인 쿠폰", customer, 5, LocalDateTime.now().plusMonths(6)),
+                        Coupon.createCoupon("1주년 기념 10% 할인 쿠폰", customer, 10, LocalDateTime.now().plusMonths(6))
+                )
         );
-        int count = noticeService.countUnreadBySeller(seller.getId());
-        System.out.println(count);
+
+    }
+
+    @Test @Commit
+    public void 판매자_알림(){
+        Seller seller = sellerRepository.findByEmail("seller@seller.com").get();
+        List<SellerNotice> notices = sellerNoticeRepository.saveAll(
+                Arrays.asList(
+                        SellerNotice.builder()
+                                .seller(seller)
+                                .title("판매 100개 돌파")
+                                .content("축하합니다. 동물용품 카테고리의 A상품의 판매가 100개를 돌파했습니다.")
+                                .build(),
+                        SellerNotice.builder()
+                                .seller(seller)
+                                .title("재고 관련 알림")
+                                .content("동물용품 카테고리의 A상품의 재고가 소진되었습니다.")
+                                .build()
+                )
+        );
+
+        notices.forEach(
+                n -> {
+                    System.out.println(n.getId() + n.getTitle());
+                    if(n.getTitle().equals("판매 100개 돌파")){
+                        n.confirmed();
+                    }
+                }
+        );
     }
 
 

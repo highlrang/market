@@ -41,7 +41,7 @@
                 <select class="form-select" name="coupon">
                     <option value="null">선택안함</option>
                     <span th:each="coupon: ${coupons}">
-                        <option th:value="${coupon.id}" th:text="|${coupon.name} ${coupon.discountPer} ${coupon.expirationDate}|"></option>
+                        <option th:value="${coupon.id}" th:text="|${coupon.name} - ${coupon.expirationDate}까지|"></option>
                     </span>
                 </select>
             </div>
@@ -53,7 +53,7 @@
     <div class="mb-3"><input type="text" th:value="|전체 금액 ${cart.totalPrice}원|" class="form-control" readonly></div>
 
     <div class="form-check">
-        <input class="form-check-input" id="check_all" type="checkbox" checked>
+        <input class="form-check-input" id="check_all" type="checkbox">
         <label class="form-check-label" for="check_all">전체 선택</label>
     </div><br>
 
