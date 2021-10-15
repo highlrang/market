@@ -107,7 +107,7 @@ public class CartService {
     }
 
     @Transactional
-    public void remove(Long cartId, List<Long> itemIds) throws IllegalArgumentException{
+    public void remove(Long cartId, List<Long> itemIds) throws IllegalArgumentException{ // 아니면 도메인 메서드로도 가능
         List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(cartId) // 쿼리에서 일부분 꺼내와서 stream로직 처리!!!
                 .stream()
                 .filter(cartItem -> itemIds.contains(cartItem.getItem().getId()))

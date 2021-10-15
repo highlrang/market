@@ -19,7 +19,7 @@ public class OlderNoticeRemoveScheduler {
     private final SellerNoticeRepository sellerNoticeRepository;
     // CustomerNoticeService
 
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "0 0 1 * * *") // fixed delay
     public void noticeRemove(){
         List<SellerNotice> sellerNoticeList = sellerNoticeRepository.findAllByDatetimeBefore(LocalDateTime.now().minusYears(1));
         sellerNoticeRepository.deleteAllInBatch(sellerNoticeList);

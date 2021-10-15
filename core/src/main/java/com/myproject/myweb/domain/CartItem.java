@@ -58,6 +58,4 @@ public class CartItem {
         return (item.getPrice() - (int)(item.getPrice() * coupon.getDiscountPer()/100.0)) * count;
     }
 
-
-
 }

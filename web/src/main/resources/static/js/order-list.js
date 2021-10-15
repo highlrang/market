@@ -42,16 +42,12 @@ $(function(){
                 $("#total_page").val(data["totalPage"]);
 
                 orderListChange(data);
-
                 pagination("1", size, data["totalPage"]);
             },
             error : function(request, status, error) {
                 console.log(request, status, error);
             }
-        });
 
-    });
-});
 
 $(function(){
     $(document).on("click", "input[name='page']", function(){
