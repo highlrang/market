@@ -70,7 +70,6 @@ public class OrderService {
 
         // 배송, 주문상품 넣어서 >> 주문 생성
         Order order = Order.createOrder(customer, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)
-
         return orderRepository.save(order).getId();
     }
 

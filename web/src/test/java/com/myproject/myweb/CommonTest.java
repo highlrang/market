@@ -1,4 +1,4 @@
-package com.myproject.myweb.web;
+package com.myproject.myweb;
 
 
 
