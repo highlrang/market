@@ -7,6 +7,7 @@ import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.repository.CustomerRepository;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.OrderRepository;
+import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.OrderService;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
@@ -19,7 +20,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,4 +132,67 @@ public class OrderServiceUnitTestByMock {
         assertThat(item.getStock()).isEqualTo(stock);
     }
 
+    @Test
+    public void redirectUrlItemVer(){
+        Item item = Item.createItem(Category.ANIMAL_GOODS, Seller.builder().build(), "test item", 10000, 10);
+        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), 1);
+        Order order = Order.createOrder(Customer.builder().build(), Delivery.builder().status(DeliveryStatus.READY).build(), orderItem);
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L);
+
+        assertTrue(redirectUrl.contains("item"));
+    }
+
+    // @Test
+    public void redirectUrlCartVer(){ // 실제 로직 수정 필요
+        Item item = Item.createItem(Category.ANIMAL_GOODS, Seller.builder().build(), "test item", 10000, 10);
+        Customer customer = Customer.builder().build();
+        Cart.createCart(customer, CartItem.createCartItem(item, 1));
+
+        OrderItem orderItem = OrderItem.createOrderItem(item, 10000, 10);
+
+        Order order = Order.createOrder(customer, Delivery.builder().build(), orderItem);
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L);
+
+        System.out.println(redirectUrl);
+        assertTrue(redirectUrl.contains("cart"));
+    }
+
+    @Test
+    public void list_0개(){
+        Page<Order> orders = Page.empty();
+        given(orderRepository.findAllByCustomer_Id(1L, PageRequest.of(1, 5)))
+            .willReturn(orders);
+        ItemService.ListByPaging<OrderResponseDto> orderListByPaging =
+                orderService.findByCustomerAndPaging(1L, PageRequest.of(1, 5));
+        assertThat(orderListByPaging.getTotalPage()).isEqualTo(0);
+        assertThat(orderListByPaging.getList().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void list_10개_2페이지(){
+        List<Order> orders = new ArrayList<>();
+        OrderItem orderItem = OrderItem.createOrderItem(
+                Item.createItem(Category.ANIMAL_GOODS, Seller.builder().build(), "test item", 10000, 100),
+                10000, 1);
+        Order order = Order.createOrder(Customer.builder().build(), Delivery.builder().build(), orderItem);
+        for(int i=0; i<10; i++) {
+            orders.add(order);
+        }
+
+        PageRequest pageRequest = PageRequest.of(1, 5);
+        Page<Order> ordersByPaging = new PageImpl<>(orders.subList((int) pageRequest.getOffset(), orders.size()), pageRequest, orders.size());
+        given(orderRepository.findAllByCustomer_Id(1L, pageRequest))
+                .willReturn(ordersByPaging);
+
+        ItemService.ListByPaging<OrderResponseDto> orderDtosByPaging =
+                orderService.findByCustomerAndPaging(1L, pageRequest);
+
+
+        assertThat(orderDtosByPaging.getTotalPage()).isEqualTo(2); // ?
+        assertThat(orderDtosByPaging.getList().size()).isEqualTo(10);
+    }
 }

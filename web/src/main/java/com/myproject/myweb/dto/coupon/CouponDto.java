@@ -13,12 +13,13 @@ public class CouponDto {
     private int discountPer;
     // private UserResponseDto user;
     private String expirationDate;
+    private Boolean isUsed;
 
     public CouponDto(Coupon entity){
         this.id = entity.getId();
         this.name = entity.getName();
         this.discountPer = entity.getDiscountPer();
         this.expirationDate = entity.getExpirationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+        this.isUsed = entity.getIsUsed();
     }
 }
