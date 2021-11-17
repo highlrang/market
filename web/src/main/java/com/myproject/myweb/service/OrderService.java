@@ -37,8 +37,12 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
-    public ItemService.ListByPaging<OrderResponseDto> findByCustomerAndPaging(Long customerId, Pageable pageable){
-        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+    public ItemService.ListByPaging<OrderResponseDto> findByCustomerAndPaging(Long customerId, PageRequest pageRequest){
+        /* controller에서 처음부터 pageRequest로 보냄
+           PageRequest pageRequest = PageRequest.of(pageable.getPageNumber() - 1,
+                                                    pageable.getPageSize(),
+                                                    Sort.by(Sort.Direction.DESC, "id"));
+         */
         Page<Order> orders = orderRepository.findAllByCustomer_Id(customerId, pageRequest);
         return new ItemService.ListByPaging<>(
                 orders.getTotalPages(),

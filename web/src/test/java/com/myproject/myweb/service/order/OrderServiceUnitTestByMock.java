@@ -174,25 +174,26 @@ public class OrderServiceUnitTestByMock {
 
     @Test
     public void list_10개_2페이지(){
+        int offset = 1; // controller 기준
+        int size = 5;
         List<Order> orders = new ArrayList<>();
         OrderItem orderItem = OrderItem.createOrderItem(
                 Item.createItem(Category.ANIMAL_GOODS, Seller.builder().build(), "test item", 10000, 100),
                 10000, 1);
-        Order order = Order.createOrder(Customer.builder().build(), Delivery.builder().build(), orderItem);
+        Order order = Order.createOrder(Customer.builder().build(), Delivery.builder().status(DeliveryStatus.READY).build(), orderItem);
         for(int i=0; i<10; i++) {
             orders.add(order);
         }
 
-        PageRequest pageRequest = PageRequest.of(1, 5);
-        Page<Order> ordersByPaging = new PageImpl<>(orders.subList((int) pageRequest.getOffset(), orders.size()), pageRequest, orders.size());
+        PageRequest pageRequest = PageRequest.of(offset, size);
+        Page<Order> ordersByPaging = new PageImpl<>(orders.subList(0, size), pageRequest, orders.size());
         given(orderRepository.findAllByCustomer_Id(1L, pageRequest))
                 .willReturn(ordersByPaging);
 
         ItemService.ListByPaging<OrderResponseDto> orderDtosByPaging =
                 orderService.findByCustomerAndPaging(1L, pageRequest);
 
-
-        assertThat(orderDtosByPaging.getTotalPage()).isEqualTo(2); // ?
-        assertThat(orderDtosByPaging.getList().size()).isEqualTo(10);
+        assertThat(orderDtosByPaging.getTotalPage()).isEqualTo(orders.size()/size);
+        assertThat(orderDtosByPaging.getList().size()).isEqualTo(size);
     }
 }
