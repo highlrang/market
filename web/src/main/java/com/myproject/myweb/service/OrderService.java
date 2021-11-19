@@ -86,9 +86,9 @@ public class OrderService {
     public String getRedirectUrlByItemOneOrMany(Long orderId){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         if(order.getOrderItems().size() == 1){
-            return "item/detail/" + order.getOrderItems().get(0).getId();
+            return "/item/detail/" + order.getOrderItems().get(0).getId();
         }
-        return "cart/detail" + order.getCustomer().getCart().getId();
+        return "/cart/detail" + order.getCustomer().getCart().getId();
     }
 
     @Transactional

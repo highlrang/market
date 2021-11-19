@@ -4,7 +4,6 @@ import com.myproject.myweb.domain.OrderStatus;
 import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
-import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.ItemService;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,22 +41,22 @@ public class OrderController {
     @PostMapping("/payment/ready")
     public String readyPayment(@RequestParam(value = "customer_id") Long customerId,
                                @RequestParam(value = "item_id") List<Long> itemIds,
-                               @RequestParam(value = "count", required = false) String count,
-                               @RequestParam(value = "coupon", required = false) String couponId,
-                               @RequestParam(value = "cart_id", required = false) String cartId,
+                               @RequestParam(value = "count", required = false) String count, // item
+                               @RequestParam(value = "coupon", required = false) String couponId, // item?
+                               @RequestParam(value = "cart_id", required = false) String cartId, // cart
                                HttpSession session){
 
         Boolean orderImpossible = orderService.orderImpossible(customerId);
-        String url;
+        String redirectUrl;
         if(cartId == null) {
-            url = "redirect:/item/detail/" + itemIds.get(0);
+            redirectUrl = "redirect:/item/detail/" + itemIds.get(0);
         }else{
-            url = "redirect:/cart/detail/" + cartId;
+            redirectUrl = "redirect:/cart/detail/" + cartId;
         }
 
         if(orderImpossible) {
             orderRedirectAttributes("OrderAlreadyInProgress");
-            return url;
+            return redirectUrl;
             // 주문 페이지 따로 생기기 전까지는 item detail 또는 cart detail 페이지로
         }
 
@@ -78,12 +76,12 @@ public class OrderController {
             String msg = messageSource.getMessage(e.getMessage(), new String[]{e.getArgs()[1]}, Locale.getDefault());
             itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
             orderRedirectAttributes(msg);
-            return url;
+            return redirectUrl;
         }
 
         try {
-            String finalUrl = paymentService.ready(customerId, orderId);
-            if (finalUrl != null) return "redirect:" + finalUrl;
+            String paymentUrl = paymentService.ready(customerId, orderId);
+            if (paymentUrl != null) return "redirect:" + paymentUrl;
 
         }catch (WebClientResponseException e){
             log.error("카카오결제 준비 에러 = " + e.getResponseBodyAsString() + " >> 주문 삭제");
@@ -91,16 +89,16 @@ public class OrderController {
             orderService.remove(orderId);
         }
 
-        return url;
+        return redirectUrl;
     }
 
     @RequestMapping("/payment/cancel")
     public String paymentCancel(@RequestParam(value = "orderId") Long orderId){
         // status QUIT_PAYMENT 확인하기
         String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
-        orderService.remove(orderId); // 결제 중 취소이기에 배달 완료 익셉션 NO
+        orderService.remove(orderId); // 결제 중 취소이기에 배달 완료 익셉션 처리 NO
         orderRedirectAttributes("PaymentCancel");
-        return "redirect:/" + url;
+        return "redirect:" + url;
         // 일단 item 하나일 경우 상품 상세 페이지, 여러 개일 경우 장바구니 페이지로
     }
 
@@ -108,9 +106,9 @@ public class OrderController {
     public String orderFail(@RequestParam(value = "orderId") Long orderId){
         // status QUIT_PAYMENT 확인하기
         String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
-        orderService.remove(orderId); // 결제 중 취소, 배달 완료 NO
+        orderService.remove(orderId); // 결제 중 취소, 배달 완료 익셉션 처리 NO
         orderRedirectAttributes("PaymentFailed");
-        return "redirect:/" + url;
+        return "redirect:" + url;
         // 일단 item 하나일 경우 상품 상세 페이지, 여러 개일 경우 장바구니 페이지로
     }
 
@@ -123,12 +121,12 @@ public class OrderController {
                 .map(OrderItemDto::getItemId)
                 .collect(Collectors.toList());
 
-        String orderkind = (String) session.getAttribute("order");
+        String orderKind = (String) session.getAttribute("order");
         try {
             paymentService.approve(customer.getId(), order.getId(), pg_token);
 
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 없을 가능성이 높아 common handler로만 처리
-            if (orderkind.equals("cart")){
+            if (orderKind.equals("cart")){
                 cartService.remove(customer.getCartId(), itemIds);
             }
             return "redirect:/order/detail/" + order.getId();
@@ -138,7 +136,7 @@ public class OrderController {
             log.error(e.getResponseBodyAsString());
 
             orderRedirectAttributes("PaymentFailed");
-            if (orderkind.equals("cart")) return "redirect:/cart/detail/" + customer.getCartId();
+            if (orderKind.equals("cart")) return "redirect:/cart/detail/" + customer.getCartId();
             return "redirect:/item/detail/" + order.getOrderItems().get(0).getId();
         }
     }

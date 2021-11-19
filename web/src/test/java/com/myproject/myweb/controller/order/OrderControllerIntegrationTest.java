@@ -69,15 +69,9 @@ public class OrderControllerIntegrationTest {
     @Autowired private OrderService orderService;
     @Autowired private OrderController orderController;
     @Autowired private MockMvc mockMvc;
-    // @Autowired private MockHttpSession session;
-
-    @Before
-    public void setUp(){
-        mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
-    }
 
     @Test
-    public void detailview() throws Exception{
+    public void detail_view() throws Exception{
         Customer customer = customerRepository.save(Customer.builder()
                 .name("test customer")
                 .email("test email")
@@ -115,7 +109,7 @@ public class OrderControllerIntegrationTest {
     }
 
     @Test
-    public void listview() throws Exception{
+    public void list_view() throws Exception{
         mockMvc.perform(get("/order/list"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("order/list"))
@@ -123,7 +117,7 @@ public class OrderControllerIntegrationTest {
     }
 
     @Test
-    public void listapi(){
+    public void list_api(){
         int page = 1;
         int size = 5;
         Customer customer = customerRepository.save(Customer.builder()

@@ -110,7 +110,7 @@ public class OrderServiceUnitTestByMock {
     }
 
     @Test
-    public void orderCancle(){
+    public void orderCancel(){
         int stock = 20;
         Item item = Item.createItem(
                 Category.ANIMAL_GOODS,
