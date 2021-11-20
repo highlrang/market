@@ -4,6 +4,8 @@ import com.myproject.myweb.controller.OrderController;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.dto.order.OrderResponseDto;
+import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.ItemService;
@@ -13,6 +15,8 @@ import com.myproject.myweb.service.user.CustomerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +25,26 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.servlet.FlashMap;
 
 import javax.mail.FetchProfile;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -49,11 +60,9 @@ public class OrderControllerIntegrationTestByMocking {
     @MockBean private PaymentService paymentService;
     @MockBean private CartService cartService;
     @MockBean private OrderService orderService;
-    @MockBean private Logger log;
     @Autowired private MockMvc mockMvc;
     // @Autowired private MockHttpSession session;
 
-    // 통합 테스트도 하기
     @Test
     public void payment_ready_by_item_page(){
         try {
@@ -134,7 +143,6 @@ public class OrderControllerIntegrationTestByMocking {
                 .andExpect(redirectedUrl(redirectUrl))
                 .andExpect(status().isFound())
                 .andDo(print());
-
     }
 
     @Test
@@ -231,17 +239,12 @@ public class OrderControllerIntegrationTestByMocking {
     }
 
     @Test
-    public void payment_approve() throws Exception{
-
-    }
-
-    @Test
     public void order_cancel_success() throws Exception{
         long mockId = 1L;
 
         doNothing().when(paymentService).cancel(mockId);
 
-        mockMvc.perform(get("/order/cancel/" + mockId))
+       mockMvc.perform(get("/order/cancel/" + mockId))
                 .andExpect(redirectedUrl("/order/list"))
                 .andExpect(status().isFound())
                 .andDo(print());
@@ -260,5 +263,16 @@ public class OrderControllerIntegrationTestByMocking {
                 .andDo(print());
     }
 
+    @Test
+    public void order_cancel_throws_WebClientResponseException() throws Exception{
+        long mockId = 1L;
 
+        doThrow(new WebClientResponseException("msg", 400, "400", HttpHeaders.EMPTY, new byte[1], Charset.defaultCharset()))
+                .when(paymentService).cancel(mockId);
+
+        mockMvc.perform(get("/order/cancel/" + mockId))
+                .andExpect(redirectedUrl("/order/list"))
+                .andExpect(status().isFound())
+                .andDo(print());
+    }
 }
