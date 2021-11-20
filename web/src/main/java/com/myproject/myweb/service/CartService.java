@@ -114,8 +114,11 @@ public class CartService {
                 .collect(Collectors.toList());
 
         if(!cartItems.isEmpty()) {
-            // cart.removeCartItems(cartItems); cascade로 삭제 됨
-            cartItemRepository.deleteAll(cartItems); // 쿠폰은 삭제 안 되고 남음
+            // 쿠폰 삭제 안 되고 남기에 사용여부 false로 복구
+            cartItems.forEach(cartItem -> {if(cartItem.getCoupon() != null) cartItem.getCoupon().setIsUsed(false);});
+            Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
+            cart.removeCartItems(cartItems); // cart 중심 연관관계이기에 cartItem 행위는 따로 처리 필요
+            cartItemRepository.deleteAll(cartItems);
         }
     }
 

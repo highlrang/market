@@ -126,9 +126,9 @@ public class OrderController {
             paymentService.approve(customer.getId(), order.getId(), pg_token);
 
             orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 없을 가능성이 높아 common handler로만 처리
-            if (orderKind.equals("cart")){
-                cartService.remove(customer.getCartId(), itemIds);
-            }
+
+            if (orderKind.equals("cart")) cartService.remove(customer.getCartId(), itemIds);
+
             return "redirect:/order/detail/" + order.getId();
 
         }catch (WebClientResponseException e) {
@@ -137,7 +137,7 @@ public class OrderController {
 
             orderRedirectAttributes("PaymentFailed");
             if (orderKind.equals("cart")) return "redirect:/cart/detail/" + customer.getCartId();
-            return "redirect:/item/detail/" + order.getOrderItems().get(0).getId();
+            return "redirect:/item/detail/" + order.getOrderItems().get(0).getItemId();
         }
     }
 

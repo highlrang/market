@@ -7,10 +7,8 @@ import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
-import com.myproject.myweb.repository.CustomerRepository;
-import com.myproject.myweb.repository.ItemRepository;
-import com.myproject.myweb.repository.OrderRepository;
-import com.myproject.myweb.repository.SellerRepository;
+import com.myproject.myweb.exception.ItemStockException;
+import com.myproject.myweb.repository.*;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.OrderService;
@@ -31,6 +29,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,14 +43,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,11 +66,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class OrderControllerIntegrationTest {
+    @Autowired private CartRepository cartRepository;
     @Autowired private SellerRepository sellerRepository;
     @Autowired private CustomerRepository customerRepository;
     @Autowired private ItemRepository itemRepository;
     @Autowired private OrderRepository orderRepository;
-    @Autowired private OrderService orderService;
+
+    @SpyBean private ItemService itemService;
+    @SpyBean private PaymentService paymentService;
+    @SpyBean private CartService cartService;
+    @SpyBean private OrderService orderService;
+
     @Autowired private OrderController orderController;
     @Autowired private MockMvc mockMvc;
 
@@ -170,5 +180,149 @@ public class OrderControllerIntegrationTest {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void payment_ready_by_item() throws Exception {
+        Customer customer = customerRepository.save(Customer.builder()
+                .name("test customer")
+                .email("test email")
+                .password("test pw").build());
+        Seller seller = sellerRepository.save(Seller.builder()
+                .name("test seller")
+                .email("test email")
+                .password("test pw").build());
+        Item item = itemRepository.save(Item.createItem(Category.HOUSEHOLD_GOODS,
+                seller, "test item", 10000, 100
+        ));
+        Order order = orderRepository.save(Order.createOrder(
+                customer, Delivery.builder().status(DeliveryStatus.READY).build(),
+                OrderItem.createOrderItem(item, item.getPrice(), 1)));
+
+        String paymentUrl = "/paymentUrl";
+        given(orderService.orderImpossible(customer.getId()))
+                .willReturn(false);
+        given(orderService.order(customer.getId(), item.getId(), 1, "null"))
+                .willReturn(order.getId());
+        given(paymentService.ready(customer.getId(), order.getId()))
+                .willReturn(paymentUrl);
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.add("customer_id", String.valueOf(customer.getId()));
+        requestParam.add("item_id", String.valueOf(item.getId()));
+        requestParam.add("count", "1");
+        requestParam.add("coupon", "null");
+        mockMvc.perform(post("/order/payment/ready")
+                .params(requestParam))
+                .andExpect(redirectedUrl(paymentUrl))
+                .andExpect(status().isFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void payment_ready_by_cart_throws_ItemStockException() throws Exception{
+        Customer customer = customerRepository.save(Customer.builder()
+                .name("test customer")
+                .email("test email")
+                .password("test pw").build());
+        Seller seller = sellerRepository.save(Seller.builder()
+                .name("test seller")
+                .email("test email")
+                .password("test pw").build());
+        Item item = itemRepository.save(Item.createItem(Category.HOUSEHOLD_GOODS,
+                seller, "test item", 10000, 100
+        ));
+        Cart cart = cartRepository.save(Cart.createCart(customer,
+                CartItem.createCartItem(item, 1)));
+
+        String redirectUrl = "/cart/detail/" + cart.getId();
+        doThrow(new ItemStockException("StockZeroException", String.valueOf(item.getId()), item.getName()))
+                .when(cartService).order(customer.getId(), Arrays.asList(item.getId()));
+        doNothing().when(itemService).stockNotice(item.getId());
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.add("customer_id", String.valueOf(customer.getId()));
+        requestParam.add("item_id", String.valueOf(item.getId()));
+        requestParam.add("cart_id", String.valueOf(cart.getId()));
+        mockMvc.perform(post("/order/payment/ready")
+                .params(requestParam))
+                .andExpect(redirectedUrl(redirectUrl))
+                .andExpect(status().isFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void payment_approve_by_cart() throws Exception{
+        String pgToken = "pg-token-1234";
+        Customer customer = customerRepository.save(Customer.builder()
+                .name("test customer")
+                .email("test email")
+                .password("test pw")
+                .build());
+        Seller seller = sellerRepository.save(Seller.builder()
+                .name("test seller")
+                .email("test email")
+                .password("test pw")
+                .build());
+        Item item = itemRepository.save(Item.createItem(Category.ELECTRONICS, seller, "test item", 50000, 100));
+        Order order = orderRepository.save(Order.createOrder(
+                customer, Delivery.builder().status(DeliveryStatus.READY).build(),
+                OrderItem.createOrderItem(item, 50000, 1)
+        ));
+        Cart cart = cartRepository.save(Cart.createCart(customer, CartItem.createCartItem(item, 1)));
+        CustomerResponseDto customerDto = new CustomerResponseDto(customer);
+
+        doNothing().when(paymentService).approve(customer.getId(), order.getId(), pgToken);
+
+        assertThat(cart.getCartItems().size()).isNotEqualTo(0);
+
+        mockMvc.perform(get("/order/payment/approve")
+                .param("pg_token", pgToken)
+                .sessionAttr("customer", customerDto)
+                .sessionAttr("order", "cart"))
+                .andExpect(redirectedUrl("/order/detail/" + order.getId()))
+                .andExpect(status().isFound())
+                .andDo(print());
+
+        verify(orderService).findOrderReady(customer.getId());
+        verify(orderService).updateOrderStatus(order.getId(), OrderStatus.COMP);
+
+        // cartService.remove() 검증
+        Cart cartAfter = cartRepository.findById(cart.getId()).get();
+        assertThat(cartAfter.getCartItems().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void payment_approve_throws_WebClientException() throws Exception{
+        String pgToken = "pg-token-1234";
+        Customer customer = customerRepository.save(Customer.builder()
+                .name("test customer")
+                .email("test email")
+                .password("test pw")
+                .build());
+        Seller seller = sellerRepository.save(Seller.builder()
+                .name("test seller")
+                .email("test email")
+                .password("test pw")
+                .build());
+        Item item = itemRepository.save(Item.createItem(Category.ELECTRONICS, seller, "test item", 50000, 100));
+        Order order = orderRepository.save(Order.createOrder(
+                customer, Delivery.builder().status(DeliveryStatus.READY).build(),
+                OrderItem.createOrderItem(item, 50000, 1)
+        ));
+        // cartRepository.save(Cart.createCart(customer, CartItem.createCartItem(item, 1)));
+        CustomerResponseDto customerDto = new CustomerResponseDto(customer);
+
+        doThrow(new WebClientResponseException("msg", 400, "400", HttpHeaders.EMPTY, new byte[1], Charset.defaultCharset()))
+                .when(paymentService).approve(customer.getId(), order.getId(), pgToken);
+
+        mockMvc.perform(get("/order/payment/approve")
+                .param("pg_token", pgToken)
+                .sessionAttr("customer", customerDto)
+                .sessionAttr("order", "direct")) // cart
+                .andExpect(redirectedUrl("/item/detail/" + item.getId()))
+                // "/cart/detail/" + customerDto.getCartId()
+                .andExpect(status().isFound())
+                .andDo(print());
     }
 }
