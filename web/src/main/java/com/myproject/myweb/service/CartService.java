@@ -26,7 +26,7 @@ public class CartService {
     private final ItemRepository itemRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final CouponRepository couponRespository;
+    private final CouponRepository couponRepository;
     private final OrderRepository orderRepository;
 
     public CartResponseDto findById(Long cartId){
@@ -53,7 +53,7 @@ public class CartService {
 
         CartItem cartItem = CartItem.createCartItem(item, count);
         if(!couponId.equals("null")) {
-            Coupon coupon = couponRespository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
+            Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
             cartItem.setCoupon(coupon);
         }
 
@@ -99,7 +99,7 @@ public class CartService {
     public void update(Long cartItemId, int count, String couponId) throws IllegalArgumentException{
         CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(() -> new IllegalArgumentException("CartItemNotFoundException"));
         if(!couponId.equals("null")) {
-            Coupon coupon = couponRespository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
+            Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
             cartItem.update(count, coupon);
         }else{
             cartItem.update(count, null);

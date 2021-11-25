@@ -36,7 +36,6 @@ public class ItemService {
     private final FileHandler fileHandler;
 
     public ItemResponseDto findById(Long id){
-
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
@@ -129,7 +128,6 @@ public class ItemService {
         }
     }
 
-    // test 필요
     public void stockNotice(Long itemId){
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
         Seller seller = item.getSeller();

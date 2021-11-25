@@ -64,7 +64,7 @@ public class OrderControllerIntegrationTestByMocking {
     // @Autowired private MockHttpSession session;
 
     @Test
-    public void payment_ready_by_item_page(){
+    public void payment_ready_by_item(){
         try {
             int count = 2;
             long mockId = 1L;
@@ -98,7 +98,7 @@ public class OrderControllerIntegrationTestByMocking {
     }
 
     @Test
-    public void payment_ready_by_cart_page() throws Exception {
+    public void payment_ready_by_cart() throws Exception {
         long mockId = 1L;
         String paymentUrl = "/paymentUrl";
         given(orderService.orderImpossible(mockId))

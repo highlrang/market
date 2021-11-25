@@ -70,6 +70,7 @@ public class CartController {
 
     @PostMapping("/update")
     public String update(
+            @RequestParam(value = "cart_id") Long cartId,
             @RequestParam(value = "cartItem_id") Long cartItemId,
             @RequestParam(value = "count") int count,
             @RequestParam(value = "coupon", required = false) String couponId,
@@ -81,8 +82,8 @@ public class CartController {
             attributes.addAttribute("msg", e.getMessage());
         }
 
-        Long cartId = cartService.findCartIdByCartItemId(cartItemId);
-        // 이건 에러 나면 common exception handler가 해결
+        // Long cartId = cartService.findCartIdByCartItemId(cartItemId);
+        // 쿼리 줄이기 위해 변수로 가져옴
 
         return "redirect:/cart/detail/" + cartId;
     }
