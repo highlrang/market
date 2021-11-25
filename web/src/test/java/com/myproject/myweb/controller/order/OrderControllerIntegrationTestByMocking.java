@@ -226,13 +226,17 @@ public class OrderControllerIntegrationTestByMocking {
         long mockId = 1L;
         String redirectUrl = "/item/detail/" + mockId;
 
-        given(orderService.getRedirectUrlByItemOneOrMany(mockId))
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("order", "direct");
+        given(orderService.getRedirectUrlByItemOneOrMany(mockId, (String) session.getAttribute("order")))
                 .willReturn(redirectUrl);
 
         doNothing().when(orderService).remove(mockId);
 
         mockMvc.perform(get("/order/payment/cancel")
-                .param("orderId", String.valueOf(mockId)))
+                .param("orderId", String.valueOf(mockId))
+                .session(session)
+        )
                 .andExpect(redirectedUrl(redirectUrl))
                 .andExpect(status().isFound())
                 .andDo(print());

@@ -83,12 +83,12 @@ public class OrderService {
         order.setOrderStatus(status);
     }
 
-    public String getRedirectUrlByItemOneOrMany(Long orderId){
+    public String getRedirectUrlByItemOneOrMany(Long orderId, String orderKind){
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
-        if(order.getOrderItems().size() == 1){
-            return "/item/detail/" + order.getOrderItems().get(0).getId();
+        if(orderKind.equals("direct")){
+            return "/item/detail/" + order.getOrderItems().get(0).getItem().getId();
         }
-        return "/cart/detail" + order.getCustomer().getCart().getId();
+        return "/cart/detail/" + order.getCustomer().getCart().getId();
     }
 
     @Transactional

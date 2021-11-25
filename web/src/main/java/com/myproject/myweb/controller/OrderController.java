@@ -93,9 +93,10 @@ public class OrderController {
     }
 
     @RequestMapping("/payment/cancel")
-    public String paymentCancel(@RequestParam(value = "orderId") Long orderId){
+    public String paymentCancel(@RequestParam(value = "orderId") Long orderId, HttpSession session){
         // status QUIT_PAYMENT 확인하기
-        String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
+        String orderKind = (String) session.getAttribute("order");
+        String url = orderService.getRedirectUrlByItemOneOrMany(orderId, orderKind);
         orderService.remove(orderId); // 결제 중 취소이기에 배달 완료 익셉션 처리 NO
         orderRedirectAttributes("PaymentCancel");
         return "redirect:" + url;
@@ -103,9 +104,10 @@ public class OrderController {
     }
 
     @RequestMapping("/payment/fail")
-    public String orderFail(@RequestParam(value = "orderId") Long orderId){
+    public String orderFail(@RequestParam(value = "orderId") Long orderId, HttpSession session){
         // status QUIT_PAYMENT 확인하기
-        String url = orderService.getRedirectUrlByItemOneOrMany(orderId);
+        String orderKind = (String) session.getAttribute("order");
+        String url = orderService.getRedirectUrlByItemOneOrMany(orderId, orderKind);
         orderService.remove(orderId); // 결제 중 취소, 배달 완료 익셉션 처리 NO
         orderRedirectAttributes("PaymentFailed");
         return "redirect:" + url;
@@ -155,7 +157,7 @@ public class OrderController {
             log.error(e.getMessage());
 
         }catch (WebClientResponseException e){
-            log.error("결제 취소 실패 >> " + e.getResponseBodyAsString());
+            log.error("주문 취소 중 결제 취소 에러 발생 >> " + e.getResponseBodyAsString());
             msg = "PaymentCancelFailed";
         }
 

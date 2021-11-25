@@ -139,13 +139,13 @@ public class OrderServiceUnitTestByMock {
         Order order = Order.createOrder(Customer.builder().build(), Delivery.builder().status(DeliveryStatus.READY).build(), orderItem);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L);
+        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L, "direct");
 
         assertTrue(redirectUrl.contains("item"));
     }
 
-    // @Test
-    public void redirectUrlCartVer(){ // 실제 로직 수정 필요
+    @Test
+    public void redirectUrlCartVer(){
         Item item = Item.createItem(Category.ANIMAL_GOODS, Seller.builder().build(), "test item", 10000, 10);
         Customer customer = Customer.builder().build();
         Cart.createCart(customer, CartItem.createCartItem(item, 1));
@@ -155,7 +155,7 @@ public class OrderServiceUnitTestByMock {
         Order order = Order.createOrder(customer, Delivery.builder().build(), orderItem);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L);
+        String redirectUrl = orderService.getRedirectUrlByItemOneOrMany(1L, "cart");
 
         System.out.println(redirectUrl);
         assertTrue(redirectUrl.contains("cart"));
