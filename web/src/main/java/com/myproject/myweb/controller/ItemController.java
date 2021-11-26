@@ -71,7 +71,7 @@ public class ItemController {
 
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
         if(customer != null){
-            List<CouponDto> coupons = couponService.findByCustomerAndCanUse(customer.getId());
+            List<CouponDto> coupons = couponService.findAvailableCouponByCustomer(customer.getId());
             model.addAttribute("coupons", coupons);
         }
 

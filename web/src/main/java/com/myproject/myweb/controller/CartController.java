@@ -40,7 +40,7 @@ public class CartController {
         model.addAttribute("cart", cart);
 
         CustomerResponseDto user = (CustomerResponseDto) session.getAttribute("customer");
-        model.addAttribute("coupons", couponService.findByCustomerAndCanUse(user.getId()));
+        model.addAttribute("coupons", couponService.findAvailableCouponByCustomer(user.getId()));
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage("msg", null, Locale.getDefault()));
         return "cart/detail";

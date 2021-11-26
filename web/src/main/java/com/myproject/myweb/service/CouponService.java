@@ -34,9 +34,9 @@ public class CouponService {
                 .collect(Collectors.toList());
     }
 
-    public List<CouponDto> findByCustomerAndCanUse(Long customerId){
+    public List<CouponDto> findAvailableCouponByCustomer(Long customerId){
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
-        List<Coupon> coupons = customer.getCouponList();
+        List<Coupon> coupons = customer.getCouponList(); // 개인의 쿠폰량은 대량이 아니기에 모두 불러서 stream 처리
 
         /*
         1. cartItem에 사용되지 않은
