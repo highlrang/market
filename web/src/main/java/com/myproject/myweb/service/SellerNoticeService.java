@@ -34,11 +34,10 @@ public class SellerNoticeService {
                  */
     }
 
-    public ItemService.ListByPaging<SellerNoticeDto> findAllBySeller(Long sellerId, Pageable pageable){
+    public ItemService.ListByPaging<SellerNoticeDto> findAllBySeller(Long sellerId, PageRequest pageRequest){
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
 
-        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Page<SellerNotice> noticeList = sellerNoticeRepository.findAllBySeller(seller, pageRequest);
 
         return new ItemService.ListByPaging<>(

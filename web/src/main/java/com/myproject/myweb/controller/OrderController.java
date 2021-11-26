@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -179,12 +180,11 @@ public class OrderController {
     @GetMapping("/list/api")
     @ResponseBody
     public ItemService.ListByPaging<OrderResponseDto> listApi(HttpSession session,
-                                                              @RequestParam("page") int page, // Pageable로도 가능
-                                                              @RequestParam("size") int size){
+                                                              Pageable pageable){
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
         return orderService.findByCustomerAndPaging(
                 customer.getId(),
-                PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "id"))
+                PageRequest.of((int) (pageable.getOffset()-1), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"))
         );
     }
 

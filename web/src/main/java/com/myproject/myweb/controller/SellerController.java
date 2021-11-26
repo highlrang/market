@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -214,7 +216,10 @@ public class SellerController {
     @ResponseBody
     public ItemService.ListByPaging<SellerNoticeDto> noticeApi(HttpSession session, Pageable pageable){
         SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
-        return sellerNoticeService.findAllBySeller(seller.getId(), pageable);
+        return sellerNoticeService.findAllBySeller(
+                seller.getId(),
+                PageRequest.of((int) (pageable.getOffset()-1), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"))
+        );
     }
 
     @PostMapping("/notice/check") // >> ajax 처리하기
