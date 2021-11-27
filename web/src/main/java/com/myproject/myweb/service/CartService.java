@@ -57,12 +57,14 @@ public class CartService {
             cartItem.setCoupon(coupon);
         }
 
-        if(customer.getCart() != null){
-            Cart userCart = cartRepository.findById(customer.getCart().getId()).get();
-            // boolean anyMatch = userCart.getCartItems().stream().anyMatch(existing -> existing.getItem().equals(item));
+        try{
+            Cart userCart = cartRepository.findById(customer.getCart().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("CartNotExistException"));
             userCart.addCartItem(cartItem); // cascade 설정 안 했기에 연관관계 먼저 넣기
             cartItemRepository.save(cartItem);
-        }else{
+
+        }catch(NullPointerException | IllegalArgumentException e){
+            log.debug(e.getMessage());
             Cart cart = Cart.createCart(customer, cartItem);
             cartRepository.save(cart);
         }
