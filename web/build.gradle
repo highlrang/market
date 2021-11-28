@@ -34,9 +34,9 @@ dependencies {
 }
 
 test {
-    // exclude '**/*'
-    exclude 'com/myproject/myweb/controller/*'
-    exclude 'com/myproject/myweb/service/*'
+    exclude '**/*'
+    // exclude 'com/myproject/myweb/controller/*'
+    // exclude 'com/myproject/myweb/service/*'
     // useJUnitPlatform()
 }
 

@@ -86,7 +86,7 @@ public class CommonTest{
         );
     }
 
-    @Test @Commit
+    @Test // @Commit
     public void 데이터_저장(){
         String password = passwordEncoder.encode("test1234");
         Customer customer = customerRepository.save(
