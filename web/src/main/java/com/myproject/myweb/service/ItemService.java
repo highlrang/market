@@ -38,7 +38,6 @@ public class ItemService {
     public ItemResponseDto findById(Long id){
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
-
         return new ItemResponseDto(item);
     }
 
@@ -56,24 +55,28 @@ public class ItemService {
                     photo.setItem(item);
                 });
         // cascade로 photo 까지 save ..
-        return itemRepository.save(item).getId();
+        Item result = itemRepository.save(item);
+        return result.getId();
     }
 
     @Transactional
-    public void deletePhoto(Long itemId, List<Long> photoIds) {
+    public void deletePhoto(Long itemId, List<Long> photoIds) { // 실제 서버 사진까지 삭제
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
-        // 실제 서버 사진까지 삭제
+        // 모든 사진 삭제 요청
         if (photoIds == null) {
             fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
+            item.removePhoto(item.getPhotoList()); // 연관관계 매핑
             photoRepository.deleteAllInBatch();
 
+        // 일부 사진 삭제 요청
         } else {
             List<Photo> photos = item.getPhotoList()
                     .stream()
                     .filter(photo -> !photoIds.contains(photo.getId()))
                     .collect(Collectors.toList());
             fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
+            item.removePhoto(photos); // 연관관계 매핑
             photoRepository.deleteAllInBatch(photos);
         }
     }
@@ -95,20 +98,22 @@ public class ItemService {
         item.update(itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock(), photoList);
     }
 
-    public ListByPaging<ItemResponseDto> findByCategoryAndPaging(Category category, Pageable pageable){
-        PageRequest pageRequest =
-                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
-        Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
+    @Transactional
+    public void remove(Long id){
+        Item item = itemRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("ItemNotFoundExist"));
+        itemRepository.delete(item);
+    }
 
+    public ListByPaging<ItemResponseDto> findByCategory(Category category, PageRequest pageRequest){
+        Page<Item> items = itemRepository.findAllByCategory(category, pageRequest);
         return new ListByPaging<>(items.getTotalPages(), items.getContent().stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList()));
     }
 
-    public ListByPaging<ItemResponseDto> findBySellerAndCategory(Long id, Category category, Pageable pageable){
-        PageRequest pageRequest =
-                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
-        Page<Item> items = itemRepository.findAllBySeller_IdAndCategory(id, category, pageRequest);
+    public ListByPaging<ItemResponseDto> findByCategoryAndSeller(Long sellerId, Category category, PageRequest pageRequest){
+        Page<Item> items = itemRepository.findAllBySeller_IdAndCategory(sellerId, category, pageRequest);
         return new ListByPaging<>(
                 items.getTotalPages(),
                 items.getContent().stream()

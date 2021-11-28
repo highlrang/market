@@ -68,6 +68,10 @@ public class Item {
         stock = nowStock;
     }
 
+    public void removePhoto(List<Photo> photos){
+        photoList.removeAll(photos);
+    }
+
     public void update(String name, int price, int stock, List<Photo> photoList){
         this.name = name;
         this.price = price;

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,9 @@ public class ItemController {
             @RequestParam(name = "category") String category,
             Pageable pageable // ?page=n&size=n 으로 전달하기
     ){
-        return itemService.findByCategoryAndPaging(Category.valueOf(category), pageable);
+        PageRequest pageRequest =
+                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        return itemService.findByCategory(Category.valueOf(category), pageRequest);
     }
 
     @GetMapping("/detail/{id}")

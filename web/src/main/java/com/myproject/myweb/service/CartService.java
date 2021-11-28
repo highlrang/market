@@ -59,7 +59,7 @@ public class CartService {
 
         try{
             Cart userCart = cartRepository.findById(customer.getCart().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("CartNotExistException"));
+                    .orElseThrow(() -> new IllegalArgumentException("CartNotFoundException"));
             userCart.addCartItem(cartItem); // cascade 설정 안 했기에 연관관계 먼저 넣기
             cartItemRepository.save(cartItem);
 

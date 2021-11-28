@@ -157,7 +157,9 @@ public class SellerController {
             Pageable pageable
     ){
         SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
-        return itemService.findBySellerAndCategory(seller.getId(), Category.valueOf(category), pageable);
+        PageRequest pageRequest =
+                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        return itemService.findByCategoryAndSeller(seller.getId(), Category.valueOf(category), pageRequest);
     }
 
 

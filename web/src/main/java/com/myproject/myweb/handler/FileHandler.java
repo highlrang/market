@@ -20,7 +20,6 @@ import java.util.Map;
 public class FileHandler {
 
     public List<PhotoDto> photoProcess(List<MultipartFile> photos) throws IOException {
-
         List<PhotoDto> namedPhotos = new ArrayList<>();
 
         for (MultipartFile photo : photos) {
