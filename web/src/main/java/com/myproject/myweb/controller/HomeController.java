@@ -1,13 +1,16 @@
 package com.myproject.myweb.controller;
 
 import com.myproject.myweb.domain.Category;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Slf4j
@@ -24,14 +27,30 @@ public class HomeController {
         return "home";
     }
 
+    @Getter
+    static class CategoryResponse{
+        private String title;
+        private Map<String, String> categories;
+
+        public CategoryResponse(String title, Map<String, String> categories){
+            this.title = title;
+            this.categories = categories;
+        }
+    }
+
     @GetMapping("/api/category/list")
     @ResponseBody
-    public Map<String, String> ApiCategory(){
+    public CategoryResponse ApiCategory(HttpSession session){
+        String user = "";
+        if(session.getAttribute("customer") != null) user = "customer";
+        if(session.getAttribute("seller") != null) user = "seller";
+
         Map<String, String> categories = new HashMap<>();
         for (Category category : Category.values()) {
             categories.put(category.getKey(), category.getValue());
         }
-        return categories;
+
+        return new CategoryResponse(user, categories);
     }
 
 }

@@ -18,7 +18,6 @@
 /internal-api/out/
 
 upload/
-/scripts/deploy.sh
 
 core/src/main/resources/*.yml
 web/src/main/resources/*.yml

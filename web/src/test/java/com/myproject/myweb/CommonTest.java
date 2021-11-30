@@ -86,57 +86,6 @@ public class CommonTest{
         );
     }
 
-    @Test
-    public void 데이터_저장(){
-        String password = passwordEncoder.encode("test1234");
-        Customer customer = customerRepository.save(
-                Customer.builder()
-                        .name("test customer")
-                        .email("customer@test.com")
-                        .password(password)
-                        .build()
-        );
-        customer.setCertified(true);
-        Coupon coupon = Coupon.createCoupon("신규회원 10% 할인 쿠폰", customer, 10, LocalDateTime.now().plusMonths(6));
-        Coupon coupon2 = Coupon.createCoupon("1주년 기념 10% 할인 쿠폰", customer, 10, LocalDateTime.now().plusMonths(6));
-        couponRepository.saveAll(Arrays.asList(coupon, coupon2));
-
-        Seller seller = sellerRepository.save(
-                Seller.builder()
-                        .name("test seller")
-                        .email("seller@test.com")
-                        .password(password)
-                        .build()
-        );
-        seller.setCertified(true);
-
-
-        Item item = Item.createItem(Category.ANIMAL_GOODS, seller, "이동장", 50000, 100);
-        Item snack = Item.createItem(Category.ANIMAL_GOODS, seller, "간식-츄르", 3000, 500);
-        Item wash = Item.createItem(Category.ANIMAL_GOODS, seller, "워터리스 샴푸", 10000, 200);
-        Item foot = Item.createItem(Category.ANIMAL_GOODS, seller, "발톱깎이", 5000, 500);
-        Item clean = Item.createItem(Category.ANIMAL_GOODS, seller, "빗", 5000, 500);
-        Item food = Item.createItem(Category.ANIMAL_GOODS, seller, "사료-다이어트 사료", 40000, 200);
-        Item food2 = Item.createItem(Category.ANIMAL_GOODS, seller, "사료-키튼 사료", 20000, 200);
-        Item food3 = Item.createItem(Category.ANIMAL_GOODS, seller, "사료", 30000, 300);
-        Item play = Item.createItem(Category.ANIMAL_GOODS, seller, "장난감-낚시대", 3000, 500);
-        Item play2 = Item.createItem(Category.ANIMAL_GOODS, seller, "장난감-캣닢인형", 3000, 500);
-        Item play3 = Item.createItem(Category.ANIMAL_GOODS, seller, "스크레쳐-대형", 30000, 100);
-        Item play4 = Item.createItem(Category.ANIMAL_GOODS, seller, "스크레처-원목", 30000, 100);
-        // 이동장의 사진 저장은 계정 로그인해서 진행
-        itemRepository.saveAll(Arrays.asList(item, snack, wash, foot, clean, food, food2, food3, play, play2, play3, play4));
-
-
-        OrderItem orderItem1 = OrderItem.createOrderItem(item, item.getPrice(), 2);
-        Order order1 = Order.createOrder(customer, Delivery.builder().status(DeliveryStatus.READY).build(), orderItem1);
-        OrderItem orderItem2 = OrderItem.createOrderItem(food3, food3.getPrice(), 1);
-        Coupon usingCoupon = couponRepository.findAll().stream().filter(c -> c.getCustomer().equals(customer)).findAny().get();
-        orderItem2.setCoupon(usingCoupon);
-        OrderItem orderItem3 = OrderItem.createOrderItem(play, play.getPrice(), 1);
-        Order order2 = Order.createOrder(customer, Delivery.builder().status(DeliveryStatus.READY).build(), orderItem2, orderItem3);
-        orderRepository.saveAll(Arrays.asList(order1, order2));
-    }
-
 
     @Test
     public void 페이징(){
