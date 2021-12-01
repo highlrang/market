@@ -4,7 +4,15 @@
       layout:decorator="layout/basic">
 
 <div layout:fragment="content">
-    <script th:inline="javascript"></script>
+    <script th:inline="javascript">
+        $(function(){
+            if([[ ${session.customer} ]] != null){
+                window.location.href="/item/list/ANIMAL_GOODS";
+            }else if([[ ${session.seller} ]] != null){
+                window.location.href="/seller/item/list/ANIMAL_GOODS";
+            }
+        });
+    </script>
 
     <div>환영합니다.</div>
 

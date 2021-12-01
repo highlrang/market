@@ -37,7 +37,8 @@ public class OrderItem {
 
     public void setCoupon(Coupon coupon){
         this.coupon = coupon;
-    }  // 단방향
+        coupon.setOrderItem(this);
+    }
 
     public static OrderItem createOrderItem(Item item, int orderPrice, int count){
         OrderItem orderItem = new OrderItem();

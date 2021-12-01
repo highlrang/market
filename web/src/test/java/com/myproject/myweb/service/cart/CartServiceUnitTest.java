@@ -1,9 +1,10 @@
-package com.myproject.myweb.service;
+package com.myproject.myweb.service.cart;
 
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.repository.*;
+import com.myproject.myweb.service.CartService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

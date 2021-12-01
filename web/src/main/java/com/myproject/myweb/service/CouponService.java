@@ -39,31 +39,15 @@ public class CouponService {
         List<Coupon> coupons = customer.getCouponList(); // 개인의 쿠폰량은 대량이 아니기에 모두 불러서 stream 처리
 
         /*
-        1. cartItem에 사용되지 않은
-        2. 기간이 만료되지 않은
-        3. 결제에 사용되지 않은(isUsed=false) 쿠폰만 보내기
+        1. 기간이 만료되지 않은
+        2. 결제에 사용되지 않은(isUsed=false) 쿠폰만 보내기
         */
-
-        try {
-            List<Coupon> selectedCoupons = customer.getCart().getCartItems()
-                    .stream()
-                    .map(CartItem::getCoupon)
-                    .collect(Collectors.toList());
-
-            return coupons.stream()
-                    .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
-                    .filter(coupon -> coupon.getExpirationDate().isAfter(LocalDateTime.now()))
-                    .filter(coupon -> !selectedCoupons.contains(coupon))
-                    .map(CouponDto::new)
-                    .collect(Collectors.toList());
-
-        }catch (NullPointerException e){
-            return coupons.stream()
-                    .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
-                    .filter(coupon -> coupon.getExpirationDate().isAfter(LocalDateTime.now()))
-                    .map(CouponDto::new)
-                    .collect(Collectors.toList());
-        }
+        return coupons.stream()
+                .filter(coupon -> coupon.getIsUsed().equals(Boolean.FALSE))
+                .filter(coupon -> coupon.getExpirationDate().isAfter(LocalDateTime.now()))
+                // .filter(coupon -> !cartItemCoupons.contains(coupon))
+                .map(CouponDto::new)
+                .collect(Collectors.toList());
     }
 
 }

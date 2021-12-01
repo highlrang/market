@@ -43,9 +43,17 @@ public class CartItem {
         return cartItem;
     }
 
-    // 쿠폰 없을 수 있으니까 setter로 빼놓아야함
+    // 쿠폰 없을 수 있으니까 setter로 빼놓아야함. 연관관계 주인이 주도
     public void setCoupon(Coupon coupon){
+        if(coupon.getCartItem() != null){ // 다른 장바구니 상품이 쿠폰을 사용하고 있다면 제거
+            coupon.getCartItem().removeCoupon();
+        }
         this.coupon = coupon;
+        coupon.setCartItem(this);
+    }
+
+    public void removeCoupon(){
+        this.coupon = null;
     }
 
     public void update(int count, Coupon coupon){

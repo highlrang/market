@@ -1,39 +1,25 @@
 function customer_category(data){
     var category = "";
-    let id;
 
     $.each(data, function(key, value){
-        if(value == "동물용품") {
-            id = " id='expose_category'";
-        }else{
-            id = "";
-        }
         category += "<li><a class='dropdown-item' href='/item/list/"
-                 + key + "'" + id + ">" + value + "</a></li>";
+                 + key + "'>" + value + "</a></li>";
     });
 
     $("#customer-category").empty();
     $("#customer-category").append(category);
-    // $("#expose_category").get(0).click();
 }
 
 function seller_category(data){
     var category = "";
-    let id;
 
     $.each(data, function(key, value){
-        if(value == "동물용품") {
-            id = " id='expose_category";
-        }else{
-            id = "";
-        }
         category += "<li><a class='dropdown-item' href='/seller/item/list/"
-                 + key + "'" + id + ">" + value + "</a></li>";
+                 + key + "'>" + value + "</a></li>";
     });
 
     $("#seller-category").empty();
     $("#seller-category").append(category);
-    // $("#expose_category").trigger("click");
 }
 
 $(function(){
