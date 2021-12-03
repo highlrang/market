@@ -11,8 +11,16 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Value("${gmail.username}") private String username;
-    @Value("${gmail.password}") private String password;
+    private static String username;
+    @Value("${gmail.username}")
+    public void setUsername(String username){
+        this.username = username;
+    }
+    private static String password;
+    @Value("${gmail.password}")
+    public void setPassword(String password){
+        this.password = password;
+    }
 
     @Bean
     public JavaMailSenderImpl mailSender(){

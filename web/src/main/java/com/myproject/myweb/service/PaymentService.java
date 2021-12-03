@@ -27,8 +27,12 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
+    private static String webUrl;
+    @Value("${webUrl}")
+    public void setWebUrl(String webUrl){
+        this.webUrl = webUrl;
+    }
     private static String cid;
-
     @Value("${kakaopay.cid}")
     public void setCid(String cid){
         this.cid = cid;
@@ -48,7 +52,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
 
-        String myHost = "http://127.0.0.1:8080/order/payment";
+        String myHost = webUrl + "/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
         MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
