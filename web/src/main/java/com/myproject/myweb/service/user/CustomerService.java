@@ -10,6 +10,7 @@ import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +35,11 @@ public class CustomerService implements UserService{
     private final CouponRepository couponRepository;
     private final JavaMailSender emailSender; // Impl
     private final BCryptPasswordEncoder passwordEncoder;
+    private static String webUrl;
+    @Value("${webUrl}")
+    public void setWebUrl(String webUrl){
+        this.webUrl = webUrl;
+    }
 
     @Override
     public CustomerResponseDto loadUserByUsername(String email) { // login에 사용됨
@@ -82,7 +88,7 @@ public class CustomerService implements UserService{
         if(customer.getName() != null) name = customer.getName() + "님께 ";
         String context = "<h3>이메일 인증을 위하여 " + name
                 + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='http://127.0.0.1:8080/customer/certified?user="+customer.getId()
+                + "<a href='" + webUrl + "/customer/certified?user="+customer.getId()
                 + "&token="+customer.getCertificationToken()
                 + "'>여기를 클릭해주세요!</a>";
 
