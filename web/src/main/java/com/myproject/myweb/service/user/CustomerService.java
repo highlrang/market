@@ -35,6 +35,7 @@ public class CustomerService implements UserService{
     private final CouponRepository couponRepository;
     private final JavaMailSender emailSender; // Impl
     private final BCryptPasswordEncoder passwordEncoder;
+
     private static String webUrl;
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){

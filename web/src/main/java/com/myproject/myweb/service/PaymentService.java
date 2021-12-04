@@ -27,6 +27,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
+
     private static String webUrl;
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){

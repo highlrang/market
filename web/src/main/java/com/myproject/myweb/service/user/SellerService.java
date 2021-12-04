@@ -30,6 +30,7 @@ public class SellerService implements UserService{
     private final SellerRepository sellerRepository;
     private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
+
     private static String webUrl;
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){
