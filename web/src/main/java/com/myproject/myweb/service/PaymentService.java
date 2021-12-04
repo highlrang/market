@@ -32,6 +32,11 @@ public class PaymentService {
     public void setWebUrl(String webUrl){
         this.webUrl = webUrl;
     }
+    private static String port;
+    @Value("${server.port}")
+    public void setPort(String port){
+        this.port = port;
+    }
     private static String cid;
     @Value("${kakaopay.cid}")
     public void setCid(String cid){
@@ -52,7 +57,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
 
-        String myHost = webUrl + "/order/payment";
+        String myHost = webUrl + ":" + port + "/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
         MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
@@ -65,7 +70,7 @@ public class PaymentService {
         parameterMap.add("cancel_url", myHost + "/cancel?orderId=" + orderId);
         parameterMap.add("fail_url", myHost + "/fail?orderId=" + orderId);
 
-        Mono<PaymentReadyDto> mono = webClient
+        PaymentReadyDto paymentReadyDto = webClient
                     .mutate()
                     .baseUrl(kakaopayUrl)
                     // "application/x-www-form-urlencoded;charset=utf-8"
@@ -77,7 +82,8 @@ public class PaymentService {
                     .post()
                     .body(BodyInserters.fromFormData(parameterMap))
                     .retrieve()
-                    .bodyToMono(PaymentReadyDto.class);
+                    .bodyToMono(PaymentReadyDto.class)
+                    .block();
                     /*
                     .bodyToMono()
                     .onErrorResume(throwable -> {
@@ -92,7 +98,6 @@ public class PaymentService {
                      */
 
         // if(responseEntity.getStatusCode().is2xxSuccessful()) {}
-        PaymentReadyDto paymentReadyDto = mono.block();
         this.saveTid(orderId, paymentReadyDto.getTid());
         return paymentReadyDto.getNext_redirect_pc_url();
     }

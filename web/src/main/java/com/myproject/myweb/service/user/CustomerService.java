@@ -40,6 +40,11 @@ public class CustomerService implements UserService{
     public void setWebUrl(String webUrl){
         this.webUrl = webUrl;
     }
+    private static String port;
+    @Value("${server.port}")
+    public void setPort(String port){
+        this.port = port;
+    }
 
     @Override
     public CustomerResponseDto loadUserByUsername(String email) { // login에 사용됨
@@ -88,7 +93,7 @@ public class CustomerService implements UserService{
         if(customer.getName() != null) name = customer.getName() + "님께 ";
         String context = "<h3>이메일 인증을 위하여 " + name
                 + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='" + webUrl + "/customer/certified?user="+customer.getId()
+                + "<a href='" + webUrl + ":" + port + "/customer/certified?user="+customer.getId()
                 + "&token="+customer.getCertificationToken()
                 + "'>여기를 클릭해주세요!</a>";
 
