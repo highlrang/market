@@ -47,6 +47,9 @@ $(function(){
             error : function(request, status, error) {
                 console.log(request, status, error);
             }
+        });
+    });
+});
 
 
 $(function(){
@@ -74,6 +77,5 @@ $(function(){
                 console.log(request, status, error);
             }
         });
-
     });
 });
