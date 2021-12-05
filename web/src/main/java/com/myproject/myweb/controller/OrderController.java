@@ -182,10 +182,8 @@ public class OrderController {
     public ItemService.ListByPaging<OrderResponseDto> listApi(HttpSession session,
                                                               Pageable pageable){
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
-        return orderService.findByCustomerAndPaging(
-                customer.getId(),
-                PageRequest.of((int) (pageable.getOffset()-1), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"))
-        );
+        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        return orderService.findByCustomerAndPaging(customer.getId(), pageRequest);
     }
 
     @GetMapping("/detail/{id}")

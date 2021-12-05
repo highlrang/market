@@ -220,7 +220,7 @@ public class SellerController {
         SellerResponseDto seller = (SellerResponseDto) session.getAttribute("seller");
         return sellerNoticeService.findAllBySeller(
                 seller.getId(),
-                PageRequest.of((int) (pageable.getOffset()-1), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"))
+                PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"))
         );
     }
 

@@ -27,7 +27,7 @@ function orderListChange(data){
 $(function(){
     $("#size").change(function(){
         var size = $(this).val();
-        var data = {
+        var params = {
             page: "1",
             size: size
         };
@@ -35,7 +35,7 @@ $(function(){
         $.ajax({
             type: 'get',
             url: '/order/list/api',
-            data: data,
+            data: params,
             success: function(data) {
                 console.log(data);
                 $("#now_page").val("1");
@@ -58,7 +58,7 @@ $(function(){
         $(this).attr('class', 'btn btn-dark');
 
         var page = $(this).val();
-        var data = {
+        var params = {
             page: page,
             size: $("#size").val()
         };
@@ -66,7 +66,7 @@ $(function(){
         $.ajax({
             type: 'get',
             url: '/order/list/api',
-            data: data,
+            data: params,
             success: function(data) {
                 console.log(data);
                 $("#now_page").val(page);
