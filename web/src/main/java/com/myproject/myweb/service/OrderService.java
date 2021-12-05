@@ -69,6 +69,8 @@ public class OrderService {
         if(!couponId.equals("null")){
             Coupon coupon = couponRepository.findById(Long.valueOf(couponId)).orElseThrow(() -> new IllegalArgumentException("CouponNotFoundException"));
             coupon.setIsUsed(true); // 쿠폰 삭제시키지 않기에 사용여부 업데이트
+
+            // orderItem에 coupon 설정 + cartItem에 사용됐으면 제거
             orderItem.setCoupon(coupon);
         }
 

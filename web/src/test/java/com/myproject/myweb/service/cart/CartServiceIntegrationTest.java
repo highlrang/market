@@ -101,7 +101,6 @@ public class CartServiceIntegrationTest {
         // then
         Coupon afterCoupon = couponRepository.findById(coupon.getId()).get();
         assertThat(afterCoupon.getCartItem()).isNull();
-        assertThat(afterCoupon.getOrderItem()).isNotNull();
         boolean anyMatch = cartItemRepository.findAll()
                 .stream().anyMatch(c -> c.getCoupon() != null && c.getCoupon().equals(afterCoupon));
         assertThat(anyMatch).isFalse();
