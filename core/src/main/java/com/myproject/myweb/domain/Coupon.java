@@ -33,9 +33,6 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
     @OneToOne(mappedBy = "coupon", fetch = FetchType.LAZY)
     private CartItem cartItem;
 
-    @OneToOne(mappedBy = "coupon", fetch = FetchType.LAZY)
-    private OrderItem orderItem;
-
     public void setCustomer(Customer customer){
         this.customer = customer;
         customer.getCouponList().add(this);
@@ -55,9 +52,8 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
         this.cartItem = cartItem;
     }
 
-    public void setOrderItem(OrderItem orderItem){
-        this.orderItem = orderItem;
-        // cartItem 연관관계 끊기
+    // coupon을 orderItem에 사용하기에 cartItem과의 연관관계 끊기
+    public void disableCartItem(){
         this.cartItem.removeCoupon();
         this.cartItem = null;
     }

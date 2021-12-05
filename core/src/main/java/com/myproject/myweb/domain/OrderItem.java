@@ -37,7 +37,7 @@ public class OrderItem {
 
     public void setCoupon(Coupon coupon){
         this.coupon = coupon;
-        coupon.setOrderItem(this);
+        if(coupon.getCartItem() != null) coupon.disableCartItem();
     }
 
     public static OrderItem createOrderItem(Item item, int orderPrice, int count){
