@@ -52,7 +52,10 @@ public class OrderItem {
 
     public void cancel(){
         item.addStock(count);
-        if(coupon != null) coupon.setIsUsed(false);
+        if(coupon != null) {
+            coupon.setIsUsed(false);
+            coupon = null;
+        }
     }
 
     public int getTotalPrice(){

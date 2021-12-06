@@ -57,6 +57,13 @@ public class OrderService {
     }
 
     @Transactional
+    public void removeOrderStatusReady(Long customerId){
+        Order order = orderRepository.findByCustomer_IdAndOrderStatus(customerId, OrderStatus.READY)
+                .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        orderRepository.delete(order);
+    }
+
+    @Transactional
     public Long order(Long customerId, Long itemId, int count, String couponId) throws IllegalArgumentException, ItemStockException {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));

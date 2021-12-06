@@ -46,19 +46,15 @@ public class OrderController {
                                @RequestParam(value = "coupon", required = false) String couponId, // item?
                                @RequestParam(value = "cart_id", required = false) String cartId, // cart
                                HttpSession session){
+        Boolean orderPresent = orderService.orderImpossible(customerId);
+        if(orderPresent) orderService.removeOrderStatusReady(customerId);
 
-        Boolean orderImpossible = orderService.orderImpossible(customerId);
+        // 주문 페이지 따로 생기기 전까지는 item detail 또는 cart detail 페이지로
         String redirectUrl;
         if(cartId == null) {
             redirectUrl = "redirect:/item/detail/" + itemIds.get(0);
         }else{
             redirectUrl = "redirect:/cart/detail/" + cartId;
-        }
-
-        if(orderImpossible) {
-            orderRedirectAttributes("OrderAlreadyInProgress");
-            return redirectUrl;
-            // 주문 페이지 따로 생기기 전까지는 item detail 또는 cart detail 페이지로
         }
 
         Long orderId;

@@ -52,7 +52,7 @@ public class Coupon { // 사용 true 또는 만료기간 지나면 삭제되게 
         this.cartItem = cartItem;
     }
 
-    // coupon을 orderItem에 사용하기에 cartItem과의 연관관계 끊기
+    // coupon을 orderItem에 사용할 때 cartItem과의 연관관계 끊기
     public void disableCartItem(){
         this.cartItem.removeCoupon();
         this.cartItem = null;
