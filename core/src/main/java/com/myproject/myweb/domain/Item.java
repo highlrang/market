@@ -68,6 +68,11 @@ public class Item {
         stock = nowStock;
     }
 
+    public void addPhoto(List<Photo> photos){
+        photoList.addAll(photos);
+        photos.forEach(photo -> photo.setItem(this));
+    }
+
     public void removePhoto(List<Photo> photos){
         photoList.removeAll(photos);
     }
@@ -76,6 +81,6 @@ public class Item {
         this.name = name;
         this.price = price;
         this.stock = stock;
-        this.photoList.addAll(photoList);
+        this.addPhoto(photoList);
     }
 }

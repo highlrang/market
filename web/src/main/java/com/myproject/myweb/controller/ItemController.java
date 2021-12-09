@@ -65,18 +65,17 @@ public class ItemController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id,
+    public String detail(@PathVariable("id") Long itemId,
                          @RequestParam(value = "msg", required = false) String msg,
                          HttpSession session,
                          Model model){
-        ItemResponseDto item = itemService.findById(id);
+
+        ItemResponseDto item = itemService.findById(itemId);
         model.addAttribute("item", item);
 
         CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
-        if(customer != null){
-            List<CouponDto> coupons = couponService.findAvailableCouponByCustomer(customer.getId());
-            model.addAttribute("coupons", coupons);
-        }
+        List<CouponDto> coupons = couponService.findAvailableCouponByCustomer(customer.getId());
+        model.addAttribute("coupons", coupons);
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage(msg, null, Locale.getDefault()));
         return "item/detail";

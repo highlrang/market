@@ -76,7 +76,7 @@ public class ItemServiceIntegrationTest {
         assertThat(item.getPhotoList().size()).isEqualTo(2);
 
         // 남은 사진 전달
-        itemService.deletePhoto(item.getId(), Arrays.asList(photo.getId()));
+        itemService.deleteOtherPhoto(item.getId(), Arrays.asList(photo.getId()));
         assertThat(item.getPhotoList().size()).isEqualTo(1);
         assertThat(item.getPhotoList().get(0).getName()).isEqualTo("test photo name");
     }

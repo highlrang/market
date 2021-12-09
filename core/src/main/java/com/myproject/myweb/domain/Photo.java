@@ -28,8 +28,7 @@ public class Photo {
         this.path = path;
     }
 
-    public void setItem(Item item){ // 연관관계 매핑
+    public void setItem(Item item){
         this.item = item;
-        item.getPhotoList().add(this);
     }
 }

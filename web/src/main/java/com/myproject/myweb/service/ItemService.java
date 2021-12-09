@@ -4,6 +4,7 @@ import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
+import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.SellerNoticeRepository;
@@ -49,34 +50,37 @@ public class ItemService {
         Item item = Item.createItem(itemRequestDto.getCategory(), seller,
                 itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock());
 
-        itemRequestDto.getPhotos()
-                .forEach(photoDto -> {
-                    Photo photo = photoDto.toEntity();
-                    photo.setItem(item);
-                });
+        if(!itemRequestDto.getPhotos().isEmpty()) {
+            List<Photo> photos = itemRequestDto.getPhotos()
+                    .stream()
+                    .map(PhotoDto::toEntity)
+                    .collect(Collectors.toList());
+            item.addPhoto(photos);
+        }
+
         // cascade로 photo 까지 save ..
-        Item result = itemRepository.save(item);
-        return result.getId();
+        return itemRepository.save(item).getId();
     }
 
     @Transactional
-    public void deletePhoto(Long itemId, List<Long> photoIds) { // 실제 서버 사진까지 삭제
+    public void deleteOtherPhoto(Long itemId, List<Long> photoIds) { // 실제 서버 사진까지 삭제
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         // 모든 사진 삭제 요청
-        if (photoIds == null) {
+        if (photoIds == null && item.getPhotoList() != null && !item.getPhotoList().isEmpty()) {
             fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
             item.removePhoto(item.getPhotoList()); // 연관관계 매핑
             photoRepository.deleteAllInBatch();
 
         // 일부 사진 삭제 요청
-        } else {
+        } else if(photoIds != null && photoIds.size() != item.getPhotoList().size()) {
             List<Photo> photos = item.getPhotoList()
                     .stream()
                     .filter(photo -> !photoIds.contains(photo.getId()))
                     .collect(Collectors.toList());
+
             fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
-            item.removePhoto(photos); // 연관관계 매핑
+            item.removePhoto(photos); // 연관관계 제거
             photoRepository.deleteAllInBatch(photos);
         }
     }
@@ -88,11 +92,7 @@ public class ItemService {
         // 사진 추가
         List<Photo> photoList = itemRequestDto.getPhotos()
                 .stream()
-                .map(photoDto -> {
-                    Photo photo = photoDto.toEntity();
-                    photo.setItem(item);
-                    return photo;
-                })
+                .map(PhotoDto::toEntity)
                 .collect(Collectors.toList());
 
         item.update(itemRequestDto.getName(), itemRequestDto.getPrice(), itemRequestDto.getStock(), photoList);

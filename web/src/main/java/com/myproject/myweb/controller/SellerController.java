@@ -30,6 +30,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -115,18 +116,21 @@ public class SellerController {
                        @RequestParam(value="seller_id") Long sellerId, // form으로 생성하기
                        @RequestParam(value="name") String name,
                        @RequestParam(value="price") int price,
-                       @RequestParam(value="stock") int stock,
-                       @RequestParam(value="file", required = false) List<MultipartFile> files){
+                       @RequestParam(value="stock") int stock){
+                       // @RequestParam(value="file", required = false) List<MultipartFile> files){
 
-        List<PhotoDto> namedPhotos;
-        try {
-            namedPhotos = fileHandler.photoProcess(files);
-
-        }catch(IOException e){
-            RedirectAttributes attributes = new RedirectAttributesModelMap();
-            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
-            return "redirect:/seller/item/save";
+        List<PhotoDto> namedPhotos = new ArrayList<>();
+        /*
+        if(files != null) {
+            try {
+                namedPhotos = fileHandler.photoProcess(files);
+            } catch (IOException e) {
+                RedirectAttributes attributes = new RedirectAttributesModelMap();
+                attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
+                return "redirect:/seller/item/save";
+            }
         }
+         */
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .category(Category.valueOf(category))
@@ -180,22 +184,25 @@ public class SellerController {
     }
 
     @PostMapping("/item/update/{id}")
-    public String update(@PathVariable(value="id") Long id,
+    public String update(@PathVariable(value="id") Long itemId,
                          @RequestParam(value="name") String name,
                          @RequestParam(value="price") int price,
                          @RequestParam(value="stock") int stock,
-                         @RequestParam(value="file", required = false) List<MultipartFile> files,
+                         // @RequestParam(value="file", required = false) List<MultipartFile> files,
                          @RequestParam(value="photo", required = false) List<Long> photoIds){
 
-        List<PhotoDto> namedPhotos;
-        try {
-            namedPhotos = fileHandler.photoProcess(files);
-
-        }catch(IOException e){
-            RedirectAttributes attributes = new RedirectAttributesModelMap();
-            attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
-            return "redirect:/seller/item/update/" + id;
-        }
+        List<PhotoDto> namedPhotos = new ArrayList<>();
+        /*
+        if(files != null){
+            try {
+                namedPhotos = fileHandler.photoProcess(files);
+            }catch(IOException e){
+                RedirectAttributes attributes = new RedirectAttributesModelMap();
+                attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
+                return "redirect:/seller/item/update/" + itemId;
+            }
+         }
+         */
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .name(name)
@@ -204,9 +211,9 @@ public class SellerController {
                 .photos(namedPhotos)
                 .build();
 
-        itemService.deletePhoto(id, photoIds);
-        itemService.update(id, itemRequestDto);
-        return "redirect:/seller/item/detail/" + id;
+        itemService.deleteOtherPhoto(itemId, photoIds);
+        itemService.update(itemId, itemRequestDto);
+        return "redirect:/seller/item/detail/" + itemId;
     }
 
     @GetMapping("/notice")

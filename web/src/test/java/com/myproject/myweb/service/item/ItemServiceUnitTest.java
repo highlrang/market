@@ -106,7 +106,7 @@ public class ItemServiceUnitTest {
         doNothing().when(photoRepository)
                 .deleteAllInBatch();
 
-        itemService.deletePhoto(item.getId(), null);
+        itemService.deleteOtherPhoto(item.getId(), null);
         verify(fileHandler).photoDelete(any(List.class));
         verify(photoRepository).deleteAllInBatch();
         assertThat(item.getPhotoList().size()).isEqualTo(0);
