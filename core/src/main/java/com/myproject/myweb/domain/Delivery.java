@@ -31,6 +31,10 @@ public class Delivery {
         this.status = status;
     }
 
+    public void setAddress(Address address){
+        this.address = address;
+    }
+
     public void setOrder(Order order){ // 이후에 연관관계 추가
         this.order = order;
     }

@@ -1,6 +1,9 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.Item;
 import com.myproject.myweb.domain.OrderStatus;
+import com.myproject.myweb.domain.user.Address;
+import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.order.OrderItemDto;
 import com.myproject.myweb.dto.order.OrderResponseDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
@@ -9,6 +12,7 @@ import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.OrderService;
 import com.myproject.myweb.service.PaymentService;
+import com.myproject.myweb.service.user.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -31,62 +35,67 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/order")
 public class OrderController {
-
+    private final CustomerService customerService;
     private final OrderService orderService;
     private final CartService cartService;
     private final PaymentService paymentService;
     private final ItemService itemService;
     private final MessageSource messageSource;
 
+    @PostMapping("/ready")
+    public String orderReady(@RequestParam(value = "customer_id") Long customerId,
+                           @RequestParam(value = "item_id") Long itemId,
+                           @RequestParam(value = "count") String count,
+                           @RequestParam(value = "coupon", required = false) String couponId,
+                           Model model,
+                           HttpSession session){
 
-    @PostMapping("/payment/ready")
-    public String readyPayment(@RequestParam(value = "customer_id") Long customerId,
-                               @RequestParam(value = "item_id") List<Long> itemIds,
-                               @RequestParam(value = "count", required = false) String count, // item
-                               @RequestParam(value = "coupon", required = false) String couponId, // item?
-                               @RequestParam(value = "cart_id", required = false) String cartId, // cart
-                               HttpSession session){
         Boolean orderPresent = orderService.orderImpossible(customerId);
         if(orderPresent) orderService.removeOrderStatusReady(customerId);
 
-        // 주문 페이지 따로 생기기 전까지는 item detail 또는 cart detail 페이지로
-        String redirectUrl;
-        if(cartId == null) {
-            redirectUrl = "redirect:/item/detail/" + itemIds.get(0);
-        }else{
-            redirectUrl = "redirect:/cart/detail/" + cartId;
-        }
-
-        Long orderId;
         try {
-            if (cartId != null) {
-                // 장바구니에서 주문 (단건, 복수건) >> user exception >> common handler home redirect
-                orderId = cartService.order(customerId, itemIds);
-                session.setAttribute("order", "cart");
-            } else {
-                // 상품 단건 바로 주문 >> user or item exception >> common handler home redirect
-                orderId = orderService.order(customerId, itemIds.get(0), Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
-                session.setAttribute("order", "direct");
-            }
+            Long orderId = orderService.order(customerId, itemId, Integer.parseInt(count), couponId); // 여러 상품들 >> 하나의 주문서 생성
+            session.setAttribute("order", "direct");
+            model.addAttribute("order", orderService.findById(orderId));
+            model.addAttribute("item_id", itemId);
+            return "order/create";
 
         }catch (ItemStockException e){
             String msg = messageSource.getMessage(e.getMessage(), new String[]{e.getArgs()[1]}, Locale.getDefault());
             itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
             orderRedirectAttributes(msg);
-            return redirectUrl;
+            return "redirect:/item/detail/" + itemId;
+        }
+    }
+
+    @PostMapping("/payment/ready")
+    public String doOrderPayment(Map<String,String> params, HttpSession session){
+        Long orderId = Long.valueOf(params.get("order_id"));
+
+        if(params.get("address_checkbox").equals(Boolean.TRUE.toString())) {
+            Address address = Address.builder()
+                    .postCode(params.get("post_code"))
+                    .address(params.get("address"))
+                    .detailAddress(params.get("detail_address"))
+                    .extraAddress(params.get("extra_address"))
+                    .build();
+            orderService.updateDeliveryAddress(orderId, address);
         }
 
         try {
-            String paymentUrl = paymentService.ready(customerId, orderId);
-            if (paymentUrl != null) return "redirect:" + paymentUrl;
+            String paymentUrl =
+                    paymentService.ready(Long.valueOf(params.get("customer_id")), orderId);
+            return "redirect:" + paymentUrl;
 
         }catch (WebClientResponseException e){
-            log.error("카카오결제 준비 에러 = " + e.getResponseBodyAsString() + " >> 주문 삭제");
+            log.error("카카오결제 준비 에러 = " + e.getResponseBodyAsString() + " >> 주문 중단 및 삭제");
             e.printStackTrace();
             orderService.remove(orderId);
-        }
 
-        return redirectUrl;
+            String orderKind = (String) session.getAttribute("order");
+            if(orderKind.equals("direct")) return "redirect:/item/detail/" + params.get("item_id");
+            return "redirect:/cart/detail/" + params.get("cart_id");
+        }
     }
 
     @RequestMapping("/payment/cancel")

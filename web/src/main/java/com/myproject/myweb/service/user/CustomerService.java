@@ -1,6 +1,7 @@
 package com.myproject.myweb.service.user;
 
 import com.myproject.myweb.domain.Coupon;
+import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
@@ -40,6 +41,12 @@ public class CustomerService implements UserService{
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){
         this.webUrl = webUrl;
+    }
+
+    public CustomerResponseDto findById(Long customerId){
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        return new CustomerResponseDto(customer);
     }
 
     @Override
@@ -120,5 +127,13 @@ public class CustomerService implements UserService{
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         if(customer.getCertificationToken().equals(token)) customer.setCertified(true);
         return customer.getCertified();
+    }
+
+    @Transactional
+    public void updateAddress(Long customerId, Address address){
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+
+        customer.setAddress(address);
     }
 }

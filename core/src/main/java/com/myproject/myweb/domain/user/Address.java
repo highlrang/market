@@ -1,6 +1,7 @@
 package com.myproject.myweb.domain.user;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,14 +12,16 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address {
 
-    // 후에 추가
-    private String city;
-    private String street;
-    private String zipcode;
+    private String postCode;
+    private String address;
+    private String detailAddress;
+    private String extraAddress;
 
-    public Address(String city, String street, String zipcode){
-        this.city = city;
-        this.street = street;
-        this.zipcode = zipcode;
+    @Builder
+    public Address(String postCode, String address, String detailAddress, String extraAddress){
+        this.postCode = postCode;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.extraAddress = extraAddress;
     }
 }

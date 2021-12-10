@@ -1,5 +1,6 @@
 package com.myproject.myweb.controller;
 
+import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.service.user.CustomerService;
@@ -116,4 +117,16 @@ public class CustomerController {
         return "redirect:/";
     }
      */
+
+    @PostMapping("/address/api")
+    @ResponseBody
+    public String address_save(@RequestParam("customer_id") Long customerId,
+                             Address address,
+                             HttpSession session){
+        // Address 안되면 Map<String, String>
+        customerService.updateAddress(customerId, address);
+        CustomerResponseDto customer = customerService.findById(customerId);
+        session.setAttribute("customer", customer);
+        return "success";
+    }
 }

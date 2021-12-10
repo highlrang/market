@@ -5,8 +5,11 @@ import com.myproject.myweb.dto.cart.CartResponseDto;
 import com.myproject.myweb.dto.coupon.CouponDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
+import com.myproject.myweb.exception.ItemStockException;
 import com.myproject.myweb.service.CartService;
 import com.myproject.myweb.service.CouponService;
+import com.myproject.myweb.service.ItemService;
+import com.myproject.myweb.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -26,7 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/cart")
 public class CartController {
-
+    private final ItemService itemService;
+    private final OrderService orderService;
     private final CartService cartService;
     private final CouponService couponService;
     private final MessageSource messageSource;
@@ -39,8 +43,8 @@ public class CartController {
         CartResponseDto cart = cartService.findById(id);
         model.addAttribute("cart", cart);
 
-        CustomerResponseDto user = (CustomerResponseDto) session.getAttribute("customer");
-        model.addAttribute("coupons", couponService.findAvailableCouponByCustomer(user.getId()));
+        CustomerResponseDto customer = (CustomerResponseDto) session.getAttribute("customer");
+        model.addAttribute("coupons", couponService.findAvailableCouponByCustomer(customer.getId()));
 
         if(msg != null) model.addAttribute("msg", messageSource.getMessage("msg", null, Locale.getDefault()));
         return "cart/detail";
@@ -102,5 +106,30 @@ public class CartController {
         }
 
         return "redirect:/cart/detail/" + cartId;
+    }
+
+    @PostMapping("/order/ready")
+    public String orderReady(@RequestParam(value = "customer_id") Long customerId,
+                             @RequestParam(value = "item_id") List<Long> itemIds,
+                             @RequestParam(value = "cart_id") String cartId,
+                             Model model,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes){
+
+        Boolean orderPresent = orderService.orderImpossible(customerId);
+        if(orderPresent) orderService.removeOrderStatusReady(customerId);
+
+        try {
+            Long orderId = cartService.order(customerId, itemIds);
+            session.setAttribute("order", "cart");
+            model.addAttribute("order", orderService.findById(orderId));
+            return "order/create";
+
+        }catch (ItemStockException e){
+            String msg = messageSource.getMessage(e.getMessage(), new String[]{e.getArgs()[1]}, Locale.getDefault());
+            itemService.stockNotice(Long.valueOf(e.getArgs()[0]));
+            redirectAttributes.addAttribute("msg", msg);
+            return "redirect:/cart/detail/" + cartId;
+        }
     }
 }

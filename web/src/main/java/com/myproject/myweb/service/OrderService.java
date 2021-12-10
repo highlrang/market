@@ -1,6 +1,7 @@
 package com.myproject.myweb.service;
 
 import com.myproject.myweb.domain.*;
+import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.order.OrderResponseDto;
@@ -84,6 +85,13 @@ public class OrderService {
         // 배송, 주문상품 넣어서 >> 주문 생성
         Order order = Order.createOrder(customer, delivery, orderItem); // orderItem 따로 save 안 해도 저장됨(Cascade)
         return orderRepository.save(order).getId();
+    }
+
+    @Transactional
+    public void updateDeliveryAddress(Long orderId, Address address){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
+        order.getDelivery().setAddress(address);
     }
 
     @Transactional

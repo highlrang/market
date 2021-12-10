@@ -26,7 +26,7 @@ $(document).ready(function(){
 
         var form = document.createElement('form');
         form.setAttribute('method', 'post');
-        form.setAttribute('action', '/order/payment/ready');
+        form.setAttribute('action', '/cart/order/ready');
         document.charset = "utf-8";
         for (var key in data) {
             var hiddenField = document.createElement('input');
