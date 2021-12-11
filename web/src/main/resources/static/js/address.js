@@ -44,21 +44,24 @@ function execDaumPostcode() {
     }).open();
 }
 
-$("#address-save").click(function(){
-    var data = {
-        customer_id: $("#customer_id").val(),
-        postCode: $("#postcode").val(),
-        address: $("#address").val(),
-        detailAddress: $("#detailAddress").val(),
-        extraAddress: $("#extraAddress").val()
-    };
+$(function(){
+    $("#address-save").click(function(){
+        var data = {
+            customer_id: $("#customer_id").val(),
+            postCode: $("#postcode").val(),
+            address: $("#address").val(),
+            detailAddress: $("#detailAddress").val(),
+            extraAddress: $("#extraAddress").val()
+        };
 
-    $.ajax({
-        type: 'post',
-        data: data,
-        url: '/customer/address/api',
-        success: function(data){
-
-        }
+        $.ajax({
+            type: 'post',
+            url: '/customer/address/api',
+            data: data,
+            dataType: "text",
+            success: function(result){
+                console.log(result);
+            }
+        });
     });
 });

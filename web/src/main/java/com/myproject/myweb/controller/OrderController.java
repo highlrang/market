@@ -69,7 +69,7 @@ public class OrderController {
     }
 
     @PostMapping("/payment/ready")
-    public String doOrderPayment(Map<String,String> params, HttpSession session){
+    public String doOrderPayment(@RequestParam Map<String,String> params, HttpSession session){
         Long orderId = Long.valueOf(params.get("order_id"));
 
         if(params.get("address_checkbox").equals(Boolean.TRUE.toString())) {

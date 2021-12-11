@@ -6,8 +6,20 @@
 <th:block layout:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="/js/address.js"></script>
-    <script src="/js/order.js"></script>
     <script>
+        function address_check(){
+            var address_status = $("input:checkbox[id='address_checkbox']").prop("checked");
+
+            if(address_status == true && $("#postcode").val() == ""){
+                alert("주소를 입력해주세요.");
+                return false;
+            }else if(address_status == false && "[[ ${session.customer.address} ]]" == ""){
+                alert("주소를 입력해주세요.");
+                return false;
+            }
+            return true;
+        }
+
         $(function(){
             $("#address_checkbox").click(function(){
                 if($("input:checkbox[id='address_checkbox']").prop("checked")){
@@ -26,7 +38,11 @@
 </th:block>
 
 <div layout:fragment="content">
-    <form action="/order/payment/ready" method="post">
+    <blockquote class="blockquote">
+        <p>주문내역</p>
+    </blockquote>
+
+    <form action="/order/payment/ready" method="post" onsubmit="return address_check();">
         <input type="hidden" id="customer_id" name="customer_id" th:value="${session.customer.id}">
 
         <div th:if="${session.order} == 'direct'">
@@ -36,49 +52,72 @@
             <input type="hidden" name="cart_id" th:value="${session.customer.cartId}">
         </div>
 
-        <div>
-            <div th:object="${order}">
-                <div>
-                    <input type="hidden" name="order_id" th:value="*{id}">
+
+        <ul class="list-group list-group-flush" th:object="${order}">
+            <input type="hidden" name="order_id" th:value="*{id}">
+
+            <li class="list-group-item">
+                <ul th:each="orderItem : ${order.orderItems}">
+                    <li class="list-group-item" th:text="${orderItem.name}"></li>
+                    <span th:if="${orderItem.coupon != null}">
+                        <li class="list-group-item" th:text="${orderItem.coupon.name}"></li>
+                    </span>
+                    <li class="list-group-item" th:text="|${orderItem.price}원|"></li>
+                    <li class="list-group-item" th:text="|${orderItem.count}개|"></li>
+                    <li class="list-group-item" th:text="|총가격 ${orderItem.totalPrice}원|"></li>
+                </ul>
+            </li>
+
+            <li class="list-group-item" th:text="|주문 전체 금액 *{totalPrice}원|"></li>
+        </ul>
+        <br>
+        <div class="form-check">
+            <input class="form-check-input" id="address_checkbox" name="address_checkbox" type="checkbox" checked>
+            <label class="form-check-label" for="address_checkbox">새 주소지</label>
+        </div>
+
+        <div id="existing_address" style="display:none">
+            <span th:if="${session.customer.address != null}" th:object="${session.customer.address}">
+                <div class="mb-3">
+                    <input type="text" th:value="|우편번호 *{postCode}|" class="form-control" readonly>
                 </div>
-                <div th:each="orderItem : ${order.orderItems}">
-                    <div>
-                        <input type="text" th:value="${orderItem.name}">
-                        <input type="text" th:value="${orderItem.price}">
-                        <input type="text" th:value="${orderItem.count}">
-                        <span th:if="${orderItem.coupon != null}">
-                            <input type="text" th:value="${orderItem.coupon.name}">
-                        </span>
-                    </div>
-                </div>
                 <div>
-                    <input type="text" th:value="|주문 전체 금액 *{totalPrice}원|">
+                    <input type="text" th:value="|주소 *{address} *{detailAddress} (*{extraAddress})|" class="form-control" readonly>
+                </div>
+            </span>
+            <span th:if="${session.customer.address == null}">기존 주소지가 없습니다.</span>
+        </div>
+
+        <br>
+        <div id="new_address_setting" style="display:block">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" id="postcode" name="post_code" class="form-control" placeholder="우편번호" readonly>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기" class="form-control">
+                </div>
+                <br>
+                <div class="col-md-4">
+                    <input type="text" id="address" name="address" class="form-control" placeholder="주소" readonly>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" id="extraAddress" name="extra_address" class="form-control" placeholder="참고항목" readonly>
+                </div>
+                <div class="col-md-2"></div>
+                <br>
+                <div class="col-md-4">
+                    <input type="text" id="detailAddress" name="detail_address" class="form-control" placeholder="상세주소">
+                </div>
+                <div class="col-md-6">
+                    <input type="button" id="address-save" value="내 주소지로 저장">
                 </div>
             </div>
         </div>
 
-        <div>
-            <label for="address_checkbox">새 주소지</label>
-            <input type="checkbox" id="address_checkbox" name="address_checkbox" checked>
+        <br>
+        <div class="mb-3">
+            <input type="submit" value="결제하기">
         </div>
-
-        <div id="existing_address" style="display:none">
-            <span th:object="${session.customer.address}">
-                <input type="text" th:value="|우편번호 *{postCode}|">
-                <input type="text" th:value="|주소 *{address} *{detailAddress} (*{extraAddress})|">
-            </span>
-        </div>
-
-        <div id="new_address_setting" style="display:block">
-            <input type="text" id="postcode" name="post_code" placeholder="우편번호">
-            <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
-            <input type="text" id="address" name="address" placeholder="주소"><br>
-            <input type="text" id="detailAddress" name="detail_address" placeholder="상세주소">
-            <input type="text" id="extraAddress" name="extra_address" placeholder="참고항목">
-            <input type="button" id="address-save" value="내 주소지로 저장">
-        </div>
-
-        <input type="submit" value="결제하기">
     </form>
-
 </div>

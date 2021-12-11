@@ -123,10 +123,9 @@ public class CustomerController {
     public String address_save(@RequestParam("customer_id") Long customerId,
                              Address address,
                              HttpSession session){
-        // Address 안되면 Map<String, String>
         customerService.updateAddress(customerId, address);
         CustomerResponseDto customer = customerService.findById(customerId);
         session.setAttribute("customer", customer);
-        return "success";
+        return "address-update-success";
     }
 }
