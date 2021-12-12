@@ -6,15 +6,13 @@
 <div layout:fragment="content">
     <form action="/seller/login" method="post">
         <div class="mb-3">
-            <input type="text" class="form-control" placeholder="email" name="username">
+            <input type="text" class="form-control" placeholder="email" name="username" required>
         </div>
         <div class="mb-3">
-            <input type="password" class="form-control" placeholder="password" name="password">
+            <input type="password" class="form-control" placeholder="password" name="password" required>
         </div>
         <div class="mb-3">
             <input type="submit" value="로그인">
         </div>
     </form>
 </div>
-
-</html>

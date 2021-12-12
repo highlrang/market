@@ -62,7 +62,8 @@ public class SellerController {
     }
 
     @PostMapping("/certify")
-    public String certify(@Valid UserRequestDto userRequestDto, BindingResult bindingResult,
+    public String certify(@ModelAttribute @Valid UserRequestDto userRequestDto,
+                          BindingResult bindingResult,
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "seller/join";
 
@@ -70,8 +71,13 @@ public class SellerController {
         try {
             sellerId = sellerService.join(userRequestDto);
         }catch (IllegalStateException e){
-            bindingResult.rejectValue("email", e.getMessage());
-            return "redirect:/seller/join";
+            log.error(e.getMessage());
+            if(e.getMessage().equals("UserAlreadyExistException")) {
+                bindingResult.rejectValue("email", e.getMessage());
+            }else{
+                attributes.addAttribute("msg", messageSource.getMessage("CommonException", null, Locale.getDefault()));
+            }
+            return "seller/join";
         }
 
         String msg;

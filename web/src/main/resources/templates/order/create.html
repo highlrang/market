@@ -77,6 +77,7 @@
         </div>
 
         <div id="existing_address" style="display:none">
+            <br>
             <span th:if="${session.customer.address != null}" th:object="${session.customer.address}">
                 <div class="mb-3">
                     <input type="text" th:value="|우편번호 *{postCode}|" class="form-control" readonly>
@@ -88,8 +89,8 @@
             <span th:if="${session.customer.address == null}">기존 주소지가 없습니다.</span>
         </div>
 
-        <br>
         <div id="new_address_setting" style="display:block">
+            <br>
             <div class="row">
                 <div class="col-md-4">
                     <input type="text" id="postcode" name="post_code" class="form-control" placeholder="우편번호" readonly>

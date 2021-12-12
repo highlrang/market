@@ -39,17 +39,14 @@ public class OrderService {
     }
 
     public ItemService.ListByPaging<OrderResponseDto> findByCustomerAndPaging(Long customerId, PageRequest pageRequest){
-        /* controller에서 처음부터 pageRequest로 보냄
-           PageRequest pageRequest = PageRequest.of(pageable.getPageNumber() - 1,
-                                                    pageable.getPageSize(),
-                                                    Sort.by(Sort.Direction.DESC, "id"));
-         */
+        // controller에서 pageRequest로 보냄
         Page<Order> orders = orderRepository.findAllByCustomer_Id(customerId, pageRequest);
         return new ItemService.ListByPaging<>(
                 orders.getTotalPages(),
                 orders.getContent().stream()
-                    .map(OrderResponseDto::new)
-                    .collect(Collectors.toList())
+                        .filter(o -> !o.getOrderStatus().equals(OrderStatus.READY))
+                        .map(OrderResponseDto::new)
+                        .collect(Collectors.toList())
         );
     }
 

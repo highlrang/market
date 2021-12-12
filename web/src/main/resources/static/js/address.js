@@ -57,10 +57,15 @@ $(function(){
         $.ajax({
             type: 'post',
             url: '/customer/address/api',
+            // contentType: 'application/json',
             data: data,
             dataType: "text",
             success: function(result){
-                console.log(result);
+                if(result == "address-update-success"){
+                    alert("내 주소지로 저장했습니다.");
+                }else{
+                    alert("주소지 저장에 실패했습니다.");
+                }
             }
         });
     });

@@ -2,20 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout/basic">
-<body>
+
 <div layout:fragment="content">
     <form action="/customer/certify" method="post" th:object="${userRequestDto}">
         <div class="mb-3">
-            <input type="text" th:field="*{email}" class="form-control" placeholder="email">
-            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            <input type="text" th:field="*{email}" class="form-control" placeholder="email" required>
+        </div>
+        <div th:if="${#fields.hasErrors('email')}" class="mb-3">
+            <span th:errors="*{email}"></span>
         </div>
 
         <div class="mb-3">
-            <input type="password" th:field="*{password}" class="form-control" placeholder="password">
+            <input type="password" th:field="*{password}" class="form-control" placeholder="password" required>
         </div>
 
         <div class="mb-3">
-            <input type="text" th:field="*{name}" class="form-control" placeholder="name(nikname)">
+            <input type="text" th:field="*{name}" class="form-control" placeholder="name(nickname)">
         </div>
 
         <div class="mb-3">
@@ -23,5 +25,3 @@
         </div>
     </form>
 </div>
-</body>
-</html>

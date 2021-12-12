@@ -133,7 +133,7 @@ public class OrderController {
         try {
             paymentService.approve(customer.getId(), order.getId(), pg_token);
 
-            orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 없을 가능성이 높아 common handler로만 처리
+            orderService.updateOrderStatus(order.getId(), OrderStatus.COMP); // 결제완료된 orderId exception은 common handler로 처리
 
             if (orderKind.equals("cart")) cartService.remove(customer.getCartId(), itemIds);
 

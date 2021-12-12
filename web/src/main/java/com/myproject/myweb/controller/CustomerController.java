@@ -43,7 +43,8 @@ public class CustomerController {
     }
 
     @PostMapping("/certify")
-    public String certify(@Valid UserRequestDto userRequestDto, BindingResult bindingResult,
+    public String certify(@ModelAttribute @Valid UserRequestDto userRequestDto,
+                          BindingResult bindingResult,
                           RedirectAttributes attributes){
         if(bindingResult.hasErrors()) return "customer/join";
 
@@ -51,8 +52,13 @@ public class CustomerController {
         try {
             customerId = customerService.join(userRequestDto);
         }catch (IllegalStateException e){
-            bindingResult.rejectValue("email", e.getMessage());
-            return "redirect:/customer/join";
+            log.error(e.getMessage());
+            if(e.getMessage().equals("UserAlreadyExistException")) {
+                bindingResult.rejectValue("email", e.getMessage());
+            }else{
+                attributes.addAttribute("msg", messageSource.getMessage("CommonException", null, Locale.getDefault()));
+            }
+            return "customer/join";
         }
 
         String msg;

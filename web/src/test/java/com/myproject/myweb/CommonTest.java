@@ -66,12 +66,12 @@ public class CommonTest{
                         SellerNotice.builder()
                                 .seller(seller)
                                 .title("판매 100개 돌파")
-                                .content("축하합니다. 동물용품 카테고리의 A상품의 판매가 100개를 돌파했습니다.")
+                                .content("축하합니다. A 카테고리의 A상품의 판매가 100개를 돌파했습니다.")
                                 .build(),
                         SellerNotice.builder()
                                 .seller(seller)
                                 .title("재고 관련 알림")
-                                .content("동물용품 카테고리의 A상품의 재고가 소진되었습니다.")
+                                .content("A 카테고리의 A 상품의 재고가 소진되었습니다.")
                                 .build()
                 )
         );
@@ -119,7 +119,7 @@ public class CommonTest{
                 Seller.builder()
                         .name("김사장")
                         .email("seller@seller.com")
-                        .password("xhxh5314")
+                        .password("")
                         .build()
         );
         seller.setCertified(true);
