@@ -28,12 +28,12 @@ public class PaymentService {
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
 
-    private static String webUrl;
+    public static String webUrl;
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){
         this.webUrl = webUrl;
     }
-    private static String cid;
+    public static String cid;
     @Value("${kakaopay.cid}")
     public void setCid(String cid){
         this.cid = cid;

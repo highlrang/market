@@ -5,6 +5,7 @@ package com.myproject.myweb;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.*;
@@ -13,8 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
+import com.myproject.myweb.service.SenderService;
 import org.apache.tomcat.jni.Local;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
+@RunWith(SpringRunner.class)
 @Transactional
 public class CommonTest{
 
@@ -45,6 +50,17 @@ public class CommonTest{
     @Autowired SellerNoticeService noticeService;
     @Autowired BCryptPasswordEncoder passwordEncoder;
     @Autowired FileHandler fileHandler;
+    @Autowired SenderService senderService;
+
+    @Test
+    public void aws_ses_mail_test(){
+        senderService.send(SenderDto.builder()
+                .to(Arrays.asList("developoffi@gmail.com"))
+                .subject("test email")
+                .content("test content")
+                .build()
+        );
+    }
 
     @Test
     public void 쿠폰() {

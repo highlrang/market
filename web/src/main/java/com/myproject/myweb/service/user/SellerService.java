@@ -1,9 +1,11 @@
 package com.myproject.myweb.service.user;
 
 import com.myproject.myweb.domain.user.Seller;
+import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.repository.SellerRepository;
+import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 
 @Service
@@ -28,10 +31,11 @@ import java.util.UUID;
 public class SellerService implements UserService{
 
     private final SellerRepository sellerRepository;
+    private final SenderService senderService;
     private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    private static String webUrl;
+    public static String webUrl;
     @Value("${webUrl}")
     public void setWebUrl(String webUrl){
         this.webUrl = webUrl;
@@ -75,21 +79,29 @@ public class SellerService implements UserService{
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(createToken());
 
+        String subject = "쇼핑몰 웹사이트 회원가입 계정인증 이메일입니다.";
         String name = "";
         if(seller.getName() != null) name = seller.getName() + "님께 ";
-        String context = "<h3>이메일 인증을 위하여 " + name
+        String content = "<h3>이메일 인증을 위하여 " + name
                 + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
                 + "<a href='" + webUrl + "/seller/certified?user="+seller.getId()
                 + "&token="+seller.getCertificationToken()
                 + "'>여기를 클릭해주세요!</a>";
 
-        // SimpleMailMessage message = new SimpleMailMessage();
+        SenderDto senderDto = SenderDto.builder()
+                .to(Arrays.asList(seller.getEmail()))
+                .subject(subject)
+                .content(content)
+                .build();
+        senderService.send(senderDto);
+
+        /*
         MimeMessage message = emailSender.createMimeMessage();
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(seller.getEmail()));
-        message.setSubject("테스트 이메일 인증");
+        message.setSubject(subject);
         message.setText(context, "UTF-8", "html");
-
         emailSender.send(message);
+         */
     }
 
     @Override

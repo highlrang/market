@@ -31,3 +31,4 @@ internal-api/src/main/resources/*.yml
 admin-monitoring-server/src/main/resources/*.yml
 
 web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
+MailConfig.java
