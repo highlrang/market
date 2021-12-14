@@ -19,6 +19,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static com.myproject.myweb.config.Constants.KAKAOPAY_CID;
+import static com.myproject.myweb.config.Constants.WEB_URL;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,20 +31,9 @@ public class PaymentService {
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
 
-    public static String webUrl;
-    @Value("${webUrl}")
-    public void setWebUrl(String webUrl){
-        this.webUrl = webUrl;
-    }
-    public static String cid;
-    @Value("${kakaopay.cid}")
-    public void setCid(String cid){
-        this.cid = cid;
-    }
-
     private MultiValueMap<String, String> getParameterMap(@RequestParam("customer_id") Long customerId, Long orderId) {
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
-        parameterMap.add("cid", cid);
+        parameterMap.add("cid", KAKAOPAY_CID);
         parameterMap.add("partner_order_id", String.valueOf(orderId));
         parameterMap.add("partner_user_id", String.valueOf(customerId));
         return parameterMap;
@@ -53,7 +45,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
 
-        String myHost = webUrl + "/order/payment";
+        String myHost = WEB_URL + "/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
         MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);
@@ -130,7 +122,7 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
 
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
-        parameterMap.add("cid", cid);
+        parameterMap.add("cid", KAKAOPAY_CID);
         parameterMap.add("tid", order.getTid());
         parameterMap.add("cancel_amount", String.valueOf(order.getTotalPrice()));
         parameterMap.add("cancel_tax_free_amount", "0");

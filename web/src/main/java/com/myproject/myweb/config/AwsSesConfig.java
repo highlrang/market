@@ -16,7 +16,7 @@ public class AwsSesConfig {
     @Value("${aws.ses.secret-key}")
     private String secretKey;
 
-    public static final String AWS_REGION = "ap-northeast-2";
+    private static final String AWS_REGION = "ap-northeast-2";
 
     @Bean
     public AmazonSimpleEmailService amazonSimpleEmailService(){

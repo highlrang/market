@@ -22,7 +22,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.myproject.myweb.config.Constants.JOIN_MAIL_TEMPLATE;
+import static com.myproject.myweb.config.Constants.MAIL_ADDRESS;
 
 @Service
 @Slf4j
@@ -34,12 +39,6 @@ public class SellerService implements UserService{
     private final SenderService senderService;
     private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    public static String webUrl;
-    @Value("${webUrl}")
-    public void setWebUrl(String webUrl){
-        this.webUrl = webUrl;
-    }
 
     @Override
     public SellerResponseDto loadUserByUsername(String email) {
@@ -79,29 +78,14 @@ public class SellerService implements UserService{
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(createToken());
 
-        String subject = "쇼핑몰 웹사이트 회원가입 계정인증 이메일입니다.";
-        String name = "";
-        if(seller.getName() != null) name = seller.getName() + "님께 ";
-        String content = "<h3>이메일 인증을 위하여 " + name
-                + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='" + webUrl + "/seller/certified?user="+seller.getId()
-                + "&token="+seller.getCertificationToken()
-                + "'>여기를 클릭해주세요!</a>";
-
-        SenderDto senderDto = SenderDto.builder()
-                .to(Arrays.asList(seller.getEmail()))
-                .subject(subject)
-                .content(content)
-                .build();
-        senderService.send(senderDto);
-
-        /*
-        MimeMessage message = emailSender.createMimeMessage();
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(seller.getEmail()));
-        message.setSubject(subject);
-        message.setText(context, "UTF-8", "html");
-        emailSender.send(message);
-         */
+        Map<String, String> templateData = new HashMap<>();
+        templateData.put("username", seller.getName());
+        templateData.put("userId", String.valueOf(seller.getId()));
+        templateData.put("token", seller.getCertificationToken());
+        SenderDto senderDto = SenderDto.SenderTemplateDto(
+                MAIL_ADDRESS, Arrays.asList(seller.getEmail()),
+                JOIN_MAIL_TEMPLATE, templateData);
+        senderService.sendTemplate(senderDto);
     }
 
     @Override

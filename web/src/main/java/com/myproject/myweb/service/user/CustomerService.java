@@ -27,7 +27,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.myproject.myweb.config.Constants.JOIN_MAIL_TEMPLATE;
+import static com.myproject.myweb.config.Constants.MAIL_ADDRESS;
 
 @Slf4j
 @Service
@@ -41,11 +46,6 @@ public class CustomerService implements UserService{
     private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public static String webUrl;
-    @Value("${webUrl}")
-    public void setWebUrl(String webUrl){
-        this.webUrl = webUrl;
-    }
 
     public CustomerResponseDto findById(Long customerId){
         Customer customer = customerRepository.findById(customerId)
@@ -96,21 +96,14 @@ public class CustomerService implements UserService{
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         customer.setCertificationToken(createToken());
 
-        String subject = "쇼핑몰 웹사이트 회원가입 계정인증 이메일입니다.";
-        String name = "";
-        if(customer.getName() != null) name = customer.getName() + "님께 ";
-        String content = "<h3>이메일 인증을 위하여 " + name
-                + "발송된 인증메일입니다. 하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='" + webUrl + "/customer/certified?user="+customer.getId()
-                + "&token="+customer.getCertificationToken()
-                + "'>여기를 클릭해주세요!</a>";
-
-        SenderDto senderDto = SenderDto.builder()
-                .to(Arrays.asList(customer.getEmail()))
-                .subject(subject)
-                .content(content)
-                .build();
-        senderService.send(senderDto);
+        Map<String, String> templateData = new HashMap<>();
+        templateData.put("username", customer.getName());
+        templateData.put("userId", String.valueOf(customer.getId()));
+        templateData.put("token", customer.getCertificationToken());
+        SenderDto senderDto = SenderDto.SenderTemplateDto(
+                MAIL_ADDRESS, Arrays.asList(customer.getEmail()),
+                JOIN_MAIL_TEMPLATE, templateData);
+        senderService.sendTemplate(senderDto);
 
         /*
         MimeMessage message = emailSender.createMimeMessage();
