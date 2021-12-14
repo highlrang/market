@@ -54,6 +54,14 @@ public class CommonTest{
     @Test
     public void aws_ses_mail_test(){
         /*
+        MimeMessage message = emailSender.createMimeMessage();
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(customer.getEmail()));
+        message.setSubject(subject);
+        message.setText(context, "UTF-8", "html");
+        emailSender.send(message);
+         */
+
+        /*
         senderService.send(SenderDto.builder()
                 .from("developoffi@gmail.com")
                 .to(Arrays.asList("developoffi@gmail.com"))

@@ -8,19 +8,11 @@ import com.myproject.myweb.repository.SellerRepository;
 import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +29,6 @@ public class SellerService implements UserService{
 
     private final SellerRepository sellerRepository;
     private final SenderService senderService;
-    private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override

@@ -3,28 +3,19 @@ package com.myproject.myweb.service.user;
 import com.myproject.myweb.domain.Coupon;
 import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.domain.user.Customer;
-import com.myproject.myweb.domain.user.User;
 import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
-import com.myproject.myweb.dto.user.UserResponseDto;
 import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.CustomerRepository;
 import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +34,6 @@ public class CustomerService implements UserService{
     private final CustomerRepository customerRepository;
     private final CouponRepository couponRepository;
     private final SenderService senderService;
-    private final JavaMailSender emailSender;
     private final BCryptPasswordEncoder passwordEncoder;
 
 
@@ -104,14 +94,6 @@ public class CustomerService implements UserService{
                 MAIL_ADDRESS, Arrays.asList(customer.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
         senderService.sendTemplate(senderDto);
-
-        /*
-        MimeMessage message = emailSender.createMimeMessage();
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(customer.getEmail()));
-        message.setSubject(subject);
-        message.setText(context, "UTF-8", "html");
-        emailSender.send(message);
-         */
     }
 
     @Override
