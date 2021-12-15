@@ -1,9 +1,11 @@
 package com.myproject.myweb.service.user;
 
+import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
+import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.repository.SellerRepository;
 import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +70,7 @@ public class SellerService implements UserService{
 
     @Override
     @Transactional
-    public void certify(Long sellerId) throws MessagingException {
+    public void certify(Long sellerId) {
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(createToken());
 
@@ -80,7 +82,11 @@ public class SellerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(seller.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        senderService.sendTemplate(senderDto);
+        try{
+            senderService.sendTemplate(senderDto);
+        }catch(AwsSesMailSendingException e){
+            this.updateCertified(sellerId, false);
+        }
     }
 
     @Override
@@ -101,6 +107,12 @@ public class SellerService implements UserService{
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         if(seller.getCertificationToken().equals(token)) seller.setCertified(true);
         return seller.getCertified();
+    }
+
+    @Transactional
+    public void updateCertified(Long sellerId, Boolean status){
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        seller.setCertified(status);
     }
 
     public SellerResponseDto findById(Long id){

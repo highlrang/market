@@ -6,6 +6,7 @@ import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
+import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.CustomerRepository;
 import com.myproject.myweb.service.SenderService;
@@ -83,7 +84,7 @@ public class CustomerService implements UserService{
 
     @Override
     @Transactional
-    public void certify(Long customerId) throws MessagingException {
+    public void certify(Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         customer.setCertificationToken(createToken());
 
@@ -95,7 +96,11 @@ public class CustomerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(customer.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        senderService.sendTemplate(senderDto);
+        try{
+            senderService.sendTemplate(senderDto);
+        }catch(AwsSesMailSendingException e){
+            this.updateCertified(customerId, false);
+        }
     }
 
     @Override
@@ -116,6 +121,12 @@ public class CustomerService implements UserService{
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         if(customer.getCertificationToken().equals(token)) customer.setCertified(true);
         return customer.getCertified();
+    }
+
+    @Transactional
+    public void updateCertified(Long customerId, Boolean status){
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
+        customer.setCertified(status);
     }
 
     @Transactional

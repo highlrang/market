@@ -68,16 +68,11 @@ public class SenderDto {
                 .withData(text);
     }
 
-    public SendTemplatedEmailRequest toSendTemplatedRequestDto() {
+    public SendTemplatedEmailRequest toSendTemplatedRequestDto() throws JsonProcessingException {
         Destination destination = new Destination().withToAddresses(this.to);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonStringData = null;
-        try{
-            jsonStringData = objectMapper.writeValueAsString(this.template_data);
-        }catch (JsonProcessingException e){
-            log.error("Map to String converter error > " + e.getMessage());
-        }
+        String jsonStringData = objectMapper.writeValueAsString(this.template_data);
 
         return new SendTemplatedEmailRequest()
                 .withSource(this.from)

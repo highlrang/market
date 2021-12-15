@@ -20,6 +20,7 @@ import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +51,8 @@ public class CommonTest{
     @Autowired BCryptPasswordEncoder passwordEncoder;
     @Autowired FileHandler fileHandler;
     @Autowired SenderService senderService;
+    @Value("${webUrl}")
+    private String webUrl;
 
     @Test
     public void aws_ses_mail_test(){
@@ -83,6 +86,7 @@ public class CommonTest{
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("username", "test name");
+        templateData.put("webUrl", webUrl);
         templateData.put("userId", "test id");
         templateData.put("token", "test token");
         senderService.sendTemplate(SenderDto.SenderTemplateDto(
