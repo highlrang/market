@@ -70,7 +70,7 @@ public class SellerService implements UserService{
 
     @Override
     @Transactional
-    public void certify(Long sellerId) {
+    public void certify(Long sellerId) throws AwsSesMailSendingException{
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new IllegalArgumentException("UserNotFoundException"));
         seller.setCertificationToken(createToken());
 
@@ -82,11 +82,7 @@ public class SellerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(seller.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        try{
-            senderService.sendTemplate(senderDto);
-        }catch(AwsSesMailSendingException e){
-            this.updateCertified(sellerId, false);
-        }
+        senderService.sendTemplate(senderDto);
     }
 
     @Override

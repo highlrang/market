@@ -7,6 +7,7 @@ import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
+import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
@@ -85,8 +86,8 @@ public class SellerController {
             sellerService.certify(sellerId);
             msg = "UserJoinEmailCertification";
 
-        }catch(MessagingException e){
-            log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
+        }catch(AwsSesMailSendingException e){
+            sellerService.updateCertified(sellerId, false);
             sellerService.expireToken(sellerId);
             msg = "UserJoinCertificationFailed";
         }

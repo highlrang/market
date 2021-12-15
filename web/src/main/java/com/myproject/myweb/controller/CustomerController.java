@@ -3,6 +3,7 @@ package com.myproject.myweb.controller;
 import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
+import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.service.user.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,9 +66,8 @@ public class CustomerController {
         try {
             customerService.certify(customerId);
             msg = "UserJoinEmailCertification";
-
-        }catch(MessagingException e){
-            log.error(e.getMessage() + " 가입 인증 메일 전송 실패");
+        }catch(AwsSesMailSendingException e){
+            customerService.updateCertified(customerId, false);
             customerService.expireToken(customerId);
             msg = "UserJoinCertificationFailed";
         }

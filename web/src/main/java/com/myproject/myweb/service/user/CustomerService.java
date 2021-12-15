@@ -96,11 +96,7 @@ public class CustomerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(customer.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        try{
-            senderService.sendTemplate(senderDto);
-        }catch(AwsSesMailSendingException e){
-            this.updateCertified(customerId, false);
-        }
+        senderService.sendTemplate(senderDto);
     }
 
     @Override
