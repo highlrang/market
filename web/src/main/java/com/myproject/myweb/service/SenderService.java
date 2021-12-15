@@ -33,14 +33,24 @@ public class SenderService {
         }
     }
 
-    public void createTemplate(String subject, String templateName, String textPart, String htmlPart){
+    public void createTemplate(String templateName, String subject, String textPart, String htmlPart){
         Template template = new Template();
-        template.setSubjectPart(subject);
         template.setTemplateName(templateName);
+        template.setSubjectPart(subject);
         template.setTextPart(textPart);
         template.setHtmlPart(htmlPart);
         CreateTemplateRequest request = new CreateTemplateRequest().withTemplate(template);
         amazonSimpleEmailService.createTemplate(request);
+    }
+
+    public void updateTemplate(String templateName, String subject, String text, String html){
+        Template template = new Template();
+        template.setTemplateName(templateName);
+        template.setSubjectPart(subject);
+        template.setTextPart(text);
+        template.setHtmlPart(html);
+        UpdateTemplateRequest reqeust = new UpdateTemplateRequest().withTemplate(template);
+        amazonSimpleEmailService.updateTemplate(reqeust);
     }
 
     public void sendTemplate(SenderDto senderDto){

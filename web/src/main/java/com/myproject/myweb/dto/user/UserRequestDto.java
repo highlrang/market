@@ -22,7 +22,7 @@ public class UserRequestDto {
     private String password;
     private String name;
 
-    // private Address address;
+    // private Address address; // 마이페이지에서 따로 저장하게
 
     public Customer toCustomer(){
         return Customer.builder()

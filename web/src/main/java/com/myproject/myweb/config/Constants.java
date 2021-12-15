@@ -1,7 +1,9 @@
 package com.myproject.myweb.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class Constants {
 
     public static String WEB_URL;
