@@ -8,6 +8,7 @@ import com.myproject.myweb.repository.SellerRepository;
 import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,8 @@ public class SellerService implements UserService{
     private final SellerRepository sellerRepository;
     private final SenderService senderService;
     private final BCryptPasswordEncoder passwordEncoder;
+    @Value("${webUrl}")
+    private String webUrl;
 
     @Override
     public SellerResponseDto loadUserByUsername(String email) {
@@ -71,6 +74,7 @@ public class SellerService implements UserService{
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("username", seller.getName());
+        templateData.put("webUrl", webUrl);
         templateData.put("userId", String.valueOf(seller.getId()));
         templateData.put("token", seller.getCertificationToken());
         SenderDto senderDto = SenderDto.SenderTemplateDto(

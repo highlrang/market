@@ -20,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import static com.myproject.myweb.config.Constants.KAKAOPAY_CID;
-import static com.myproject.myweb.config.Constants.WEB_URL;
 
 @Slf4j
 @Service
@@ -30,6 +29,8 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final WebClient webClient = WebClient.create();
+    @Value("${webUrl}")
+    private String webUrl;
 
     private MultiValueMap<String, String> getParameterMap(@RequestParam("customer_id") Long customerId, Long orderId) {
         MultiValueMap<String, String> parameterMap = new LinkedMultiValueMap<>();
@@ -45,7 +46,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("OrderNotFoundException"));
         OrderResponseDto orderResponseDto = new OrderResponseDto(order);
 
-        String myHost = WEB_URL + "/order/payment";
+        String myHost = webUrl + "/order/payment";
         String kakaopayUrl = "https://kapi.kakao.com/v1/payment/ready";
 
         MultiValueMap<String, String> parameterMap = getParameterMap(customerId, orderId);

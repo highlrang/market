@@ -4,15 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class Constants {
-
-    public static String WEB_URL;
-    @Value("${webUrl}")
-    public void setWebUrl(String webUrl){
-        this.WEB_URL = webUrl;
-    }
+public class Constants {
     public static final String MAIL_ADDRESS = "developoffi@gmail.com";
     public static final String KAKAOPAY_CID = "TC0ONETIME";
-
     public static final String JOIN_MAIL_TEMPLATE = "JoinCertificationMailTemplate";
 }

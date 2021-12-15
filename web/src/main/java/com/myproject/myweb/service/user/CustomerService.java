@@ -11,6 +11,7 @@ import com.myproject.myweb.repository.CustomerRepository;
 import com.myproject.myweb.service.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +31,12 @@ import static com.myproject.myweb.config.Constants.MAIL_ADDRESS;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CustomerService implements UserService{
-
     private final CustomerRepository customerRepository;
     private final CouponRepository couponRepository;
     private final SenderService senderService;
     private final BCryptPasswordEncoder passwordEncoder;
-
+    @Value("${webUrl}")
+    private String webUrl;
 
     public CustomerResponseDto findById(Long customerId){
         Customer customer = customerRepository.findById(customerId)
@@ -88,6 +89,7 @@ public class CustomerService implements UserService{
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("username", customer.getName());
+        templateData.put("webUrl", webUrl);
         templateData.put("userId", String.valueOf(customer.getId()));
         templateData.put("token", customer.getCertificationToken());
         SenderDto senderDto = SenderDto.SenderTemplateDto(

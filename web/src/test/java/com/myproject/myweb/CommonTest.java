@@ -75,7 +75,7 @@ public class CommonTest{
         String subject = "쇼핑몰 웹사이트 회원가입 계정인증 이메일입니다.";
         String content = "<h3>이메일 인증을 위하여 {{ username }} 계정에 발송된 인증메일입니다. "
                 + "하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='" + WEB_URL + "/seller/certified?user={{ userId }}"
+                + "<a href='{{ webUrl }}/seller/certified?user={{ userId }}"
                 + "&token={{ token }}"
                 + "'>여기를 클릭해주세요!</a>";
         senderService.updateTemplate(JOIN_MAIL_TEMPLATE, subject,null, content);
