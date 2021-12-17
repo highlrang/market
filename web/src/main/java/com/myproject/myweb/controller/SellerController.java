@@ -8,7 +8,6 @@ import com.myproject.myweb.dto.notice.SellerNoticeDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.exception.AwsSesMailSendingException;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
 import com.myproject.myweb.service.user.SellerService;
@@ -44,7 +43,6 @@ public class SellerController {
     private final SellerService sellerService;
     private final SellerNoticeService sellerNoticeService;
     private final ItemService itemService;
-    private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
     @GetMapping("/login")

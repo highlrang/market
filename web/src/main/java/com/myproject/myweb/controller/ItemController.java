@@ -9,7 +9,6 @@ import com.myproject.myweb.dto.item.PhotoDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserResponseDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.service.CouponService;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.user.SellerService;
@@ -43,7 +42,6 @@ public class ItemController {
 
     private final ItemService itemService;
     private final CouponService couponService;
-    private final FileHandler fileHandler;
     private final MessageSource messageSource;
 
     // 판매자 상관없이 카테고리별 상품 목록

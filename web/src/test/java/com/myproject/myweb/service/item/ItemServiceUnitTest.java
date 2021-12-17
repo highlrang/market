@@ -7,7 +7,6 @@ import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerRepository;
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ItemServiceUnitTest {
-    @Mock private FileHandler fileHandler;
     @Mock private PhotoRepository photoRepository;
     @Mock private SellerRepository sellerRepository;
     @Mock private ItemRepository itemRepository;
@@ -100,13 +98,10 @@ public class ItemServiceUnitTest {
 
         given(itemRepository.findById(item.getId()))
                 .willReturn(Optional.of(item));
-        doNothing().when(fileHandler)
-                .photoDelete(any(List.class));
         doNothing().when(photoRepository)
                 .deleteAllInBatch();
 
         itemService.deleteOtherPhoto(item.getId(), null);
-        verify(fileHandler).photoDelete(any(List.class));
         verify(photoRepository).deleteAllInBatch();
         assertThat(item.getPhotoList().size()).isEqualTo(0);
     }

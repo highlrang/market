@@ -7,7 +7,6 @@ import com.myproject.myweb.domain.SellerNotice;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.notice.SellerNoticeDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerNoticeRepository;
@@ -43,7 +42,6 @@ public class ItemServiceIntegrationTest {
     @Autowired private SellerRepository sellerRepository;
     @Autowired private SellerNoticeRepository sellerNoticeRepository;
     @Autowired private ItemRepository itemRepository;
-    @Autowired private FileHandler fileHandler;
     @Autowired private PhotoRepository photoRepository;
     @Autowired private ItemService itemService;
     @Autowired private SellerNoticeService sellerNoticeService;

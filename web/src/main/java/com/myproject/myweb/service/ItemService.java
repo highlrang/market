@@ -5,7 +5,6 @@ import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.item.PhotoDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.SellerNoticeRepository;
 import com.myproject.myweb.repository.PhotoRepository;
@@ -34,7 +33,6 @@ public class ItemService {
     private final SellerRepository sellerRepository;
     private final PhotoRepository photoRepository;
     private final SellerNoticeRepository sellerNoticeRepository;
-    private final FileHandler fileHandler;
 
     public ItemResponseDto findById(Long id){
         Item item = itemRepository.findById(id)
@@ -68,7 +66,7 @@ public class ItemService {
 
         // 모든 사진 삭제 요청
         if (photoIds == null && item.getPhotoList() != null && !item.getPhotoList().isEmpty()) {
-            fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
+            // fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
             item.removePhoto(item.getPhotoList()); // 연관관계 매핑
             photoRepository.deleteAllInBatch();
 
@@ -79,7 +77,7 @@ public class ItemService {
                     .filter(photo -> !photoIds.contains(photo.getId()))
                     .collect(Collectors.toList());
 
-            fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
+            // fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
             item.removePhoto(photos); // 연관관계 제거
             photoRepository.deleteAllInBatch(photos);
         }

@@ -1,5 +1,6 @@
 package com.myproject.myweb.handler;
 
+import com.myproject.myweb.dto.user.CustomerResponseDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -15,7 +16,6 @@ public class CustomerLoginSuccessHandler implements AuthenticationSuccessHandler
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) {
-        System.out.println("customer login 완료 " + authentication.getPrincipal().toString());
         HttpSession session = request.getSession();
         session.setAttribute("customer", authentication.getPrincipal());
 

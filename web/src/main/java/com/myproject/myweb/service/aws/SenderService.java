@@ -1,4 +1,4 @@
-package com.myproject.myweb.service;
+package com.myproject.myweb.service.aws;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -50,11 +50,11 @@ public class SenderService {
         template.setSubjectPart(subject);
         template.setTextPart(text);
         template.setHtmlPart(html);
-        UpdateTemplateRequest reqeust = new UpdateTemplateRequest().withTemplate(template);
-        amazonSimpleEmailService.updateTemplate(reqeust);
+        UpdateTemplateRequest request = new UpdateTemplateRequest().withTemplate(template);
+        amazonSimpleEmailService.updateTemplate(request);
     }
 
-    public void sendTemplate(SenderDto senderDto){
+    public void sendTemplatedMail(SenderDto senderDto){
         SendTemplatedEmailRequest request = null;
         try {
             request = senderDto.toSendTemplatedRequestDto();

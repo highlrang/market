@@ -8,7 +8,6 @@ import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.SellerNoticeRepository;
 import com.myproject.myweb.repository.SellerRepository;
@@ -46,7 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class SellerControllerIntegrationTest {
-    @Autowired private FileHandler fileHandler;
     @Autowired private SellerNoticeRepository sellerNoticeRepository;
     @Autowired private SellerRepository sellerRepository;
     @Autowired private ItemRepository itemRepository;

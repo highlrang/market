@@ -6,10 +6,9 @@ import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
-import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.repository.CouponRepository;
 import com.myproject.myweb.repository.CustomerRepository;
-import com.myproject.myweb.service.SenderService;
+import com.myproject.myweb.service.aws.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,7 +94,7 @@ public class CustomerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(customer.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        senderService.sendTemplate(senderDto);
+        senderService.sendTemplatedMail(senderDto);
     }
 
     @Override

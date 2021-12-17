@@ -1,13 +1,12 @@
 package com.myproject.myweb.service.user;
 
-import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
 import com.myproject.myweb.dto.SenderDto;
 import com.myproject.myweb.dto.user.SellerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.repository.SellerRepository;
-import com.myproject.myweb.service.SenderService;
+import com.myproject.myweb.service.aws.SenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +80,7 @@ public class SellerService implements UserService{
         SenderDto senderDto = SenderDto.SenderTemplateDto(
                 MAIL_ADDRESS, Arrays.asList(seller.getEmail()),
                 JOIN_MAIL_TEMPLATE, templateData);
-        senderService.sendTemplate(senderDto);
+        senderService.sendTemplatedMail(senderDto);
     }
 
     @Override

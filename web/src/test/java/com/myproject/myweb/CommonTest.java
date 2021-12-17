@@ -5,18 +5,11 @@ package com.myproject.myweb;
 import com.myproject.myweb.domain.*;
 import com.myproject.myweb.domain.user.Customer;
 import com.myproject.myweb.domain.user.Seller;
-import com.myproject.myweb.dto.SenderDto;
-import com.myproject.myweb.dto.notice.SellerNoticeDto;
-import com.myproject.myweb.handler.FileHandler;
 import com.myproject.myweb.repository.*;
 
-import static com.myproject.myweb.config.Constants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
-import com.myproject.myweb.service.SenderService;
-import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,51 +39,7 @@ public class CommonTest{
     @Autowired SellerNoticeRepository sellerNoticeRepository;
     @Autowired SellerNoticeService noticeService;
     @Autowired BCryptPasswordEncoder passwordEncoder;
-    @Autowired FileHandler fileHandler;
-    @Autowired SenderService senderService;
-    @Value("${webUrl}")
-    private String webUrl;
-
-    @Test
-    public void aws_ses_mail_test(){
-        /*
-        MimeMessage message = emailSender.createMimeMessage();
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(customer.getEmail()));
-        message.setSubject(subject);
-        message.setText(context, "UTF-8", "html");
-        emailSender.send(message);
-         */
-
-        /*
-        senderService.send(SenderDto.builder()
-                .from("developoffi@gmail.com")
-                .to(Arrays.asList("developoffi@gmail.com"))
-                .subject("test email")
-                .content("test content")
-                .build()
-        );
-        */
-
-        /*
-        String subject = "쇼핑몰 웹사이트 회원가입 계정인증 이메일입니다.";
-        String content = "<h3>이메일 인증을 위하여 {{ username }} 계정에 발송된 인증메일입니다. "
-                + "하단의 링크를 클릭해서 인증을 완료해주세요.</h3>"
-                + "<a href='{{ webUrl }}/seller/certified?user={{ userId }}"
-                + "&token={{ token }}"
-                + "'>여기를 클릭해주세요!</a>";
-        senderService.updateTemplate(JOIN_MAIL_TEMPLATE, subject,null, content);
-        */
-
-        Map<String, String> templateData = new HashMap<>();
-        templateData.put("username", "test name");
-        templateData.put("webUrl", webUrl);
-        templateData.put("userId", "test id");
-        templateData.put("token", "test token");
-        senderService.sendTemplate(SenderDto.SenderTemplateDto(
-                MAIL_ADDRESS, Arrays.asList(MAIL_ADDRESS),
-                JOIN_MAIL_TEMPLATE, templateData)
-        );
-    }
+    @Value("${webUrl}") private String webUrl;
 
     @Test
     public void 쿠폰() {
