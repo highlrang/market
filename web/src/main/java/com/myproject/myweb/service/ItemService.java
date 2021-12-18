@@ -9,6 +9,7 @@ import com.myproject.myweb.repository.ItemRepository;
 import com.myproject.myweb.repository.SellerNoticeRepository;
 import com.myproject.myweb.repository.PhotoRepository;
 import com.myproject.myweb.repository.SellerRepository;
+import com.myproject.myweb.service.aws.FileUploadService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -33,6 +34,7 @@ public class ItemService {
     private final SellerRepository sellerRepository;
     private final PhotoRepository photoRepository;
     private final SellerNoticeRepository sellerNoticeRepository;
+    private final FileUploadService fileUploadService;
 
     public ItemResponseDto findById(Long id){
         Item item = itemRepository.findById(id)
@@ -61,12 +63,14 @@ public class ItemService {
     }
 
     @Transactional
-    public void deleteOtherPhoto(Long itemId, List<Long> photoIds) { // 실제 서버 사진까지 삭제
+    public void deleteOtherPhoto(Long itemId, List<Long> photoIds) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("ItemNotFoundException"));
 
         // 모든 사진 삭제 요청
-        if (photoIds == null && item.getPhotoList() != null && !item.getPhotoList().isEmpty()) {
-            // fileHandler.photoDelete(item.getPhotoList().stream().map(Photo::getName).collect(Collectors.toList()));
+        if (photoIds == null && (item.getPhotoList() != null && !item.getPhotoList().isEmpty())) {
+            for (Photo photo : item.getPhotoList()) { // S3 파일 삭제
+                fileUploadService.deleteS3File(photo.getName());
+            }
             item.removePhoto(item.getPhotoList()); // 연관관계 매핑
             photoRepository.deleteAllInBatch();
 
@@ -77,7 +81,10 @@ public class ItemService {
                     .filter(photo -> !photoIds.contains(photo.getId()))
                     .collect(Collectors.toList());
 
-            // fileHandler.photoDelete(photos.stream().map(Photo::getName).collect(Collectors.toList()));
+            for (Photo photo : photos) { // S3 파일 삭제
+                fileUploadService.deleteS3File(photo.getName());
+            }
+
             item.removePhoto(photos); // 연관관계 제거
             photoRepository.deleteAllInBatch(photos);
         }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.myproject.myweb.config.Constants.AWS_REGION;
+
 
 @Configuration
 public class AwsSesConfig {
@@ -17,8 +19,6 @@ public class AwsSesConfig {
 
     @Value("${aws.ses.secret-key}")
     private String secretKey;
-
-    private static final String AWS_REGION = Regions.AP_NORTHEAST_2.getName();
 
     @Bean
     public AmazonSimpleEmailService amazonSimpleEmailService(){

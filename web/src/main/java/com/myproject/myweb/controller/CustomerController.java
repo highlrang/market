@@ -4,6 +4,7 @@ import com.myproject.myweb.domain.user.Address;
 import com.myproject.myweb.dto.user.CustomerResponseDto;
 import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.exception.AwsSesMailSendingException;
+import com.myproject.myweb.service.aws.FileUploadService;
 import com.myproject.myweb.service.user.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final MessageSource messageSource;
+    private final FileUploadService fileUploadService;
 
     @GetMapping("/login")
     public String loginForm(@RequestParam(value = "msg", required = false) String msg,

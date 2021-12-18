@@ -1,5 +1,7 @@
 package com.myproject.myweb.controller;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.myproject.myweb.domain.Category;
 import com.myproject.myweb.dto.item.ItemRequestDto;
 import com.myproject.myweb.dto.item.ItemResponseDto;
@@ -10,6 +12,7 @@ import com.myproject.myweb.dto.user.UserRequestDto;
 import com.myproject.myweb.exception.AwsSesMailSendingException;
 import com.myproject.myweb.service.ItemService;
 import com.myproject.myweb.service.SellerNoticeService;
+import com.myproject.myweb.service.aws.FileUploadService;
 import com.myproject.myweb.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,7 @@ public class SellerController {
     private final SellerNoticeService sellerNoticeService;
     private final ItemService itemService;
     private final MessageSource messageSource;
+    private final FileUploadService fileUploadService;
 
     @GetMapping("/login")
     public String loginForm(@RequestParam(value = "msg", required = false) String msg,
@@ -121,21 +125,23 @@ public class SellerController {
                        @RequestParam(value="seller_id") Long sellerId, // form으로 생성하기
                        @RequestParam(value="name") String name,
                        @RequestParam(value="price") int price,
-                       @RequestParam(value="stock") int stock){
-                       // @RequestParam(value="file", required = false) List<MultipartFile> files){
+                       @RequestParam(value="stock") int stock,
+                       @RequestParam(value="file", required = false) List<MultipartFile> files,
+                       RedirectAttributes attributes){
 
         List<PhotoDto> namedPhotos = new ArrayList<>();
-        /*
         if(files != null) {
-            try {
-                namedPhotos = fileHandler.photoProcess(files);
-            } catch (IOException e) {
-                RedirectAttributes attributes = new RedirectAttributesModelMap();
-                attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
-                return "redirect:/seller/item/save";
+            for (MultipartFile file : files) {
+                try {
+                    PhotoDto photoDto = fileUploadService.uploadImage(file);
+                    namedPhotos.add(photoDto);
+                } catch (IOException | SdkClientException e) {
+                    log.error("File Upload Failed. => " + e.getMessage());
+                    attributes.addAttribute("msg", messageSource.getMessage("FileUploadFailedException", null, Locale.getDefault()));
+                    return "redirect:/seller/item/save";
+                }
             }
         }
-         */
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .category(Category.valueOf(category))
@@ -147,7 +153,6 @@ public class SellerController {
                 .build();
 
         Long id = itemService.save(itemRequestDto);
-
         return "redirect:/seller/item/detail/" + id;
     }
 
@@ -193,21 +198,23 @@ public class SellerController {
                          @RequestParam(value="name") String name,
                          @RequestParam(value="price") int price,
                          @RequestParam(value="stock") int stock,
-                         // @RequestParam(value="file", required = false) List<MultipartFile> files,
-                         @RequestParam(value="photo", required = false) List<Long> photoIds){
+                         @RequestParam(value="file", required = false) List<MultipartFile> files,
+                         @RequestParam(value="photo", required = false) List<Long> photoIds,
+                         RedirectAttributes attributes){
 
         List<PhotoDto> namedPhotos = new ArrayList<>();
-        /*
+
         if(files != null){
-            try {
-                namedPhotos = fileHandler.photoProcess(files);
-            }catch(IOException e){
-                RedirectAttributes attributes = new RedirectAttributesModelMap();
-                attributes.addAttribute("msg", messageSource.getMessage(e.getMessage(), null, Locale.getDefault()));
-                return "redirect:/seller/item/update/" + itemId;
+            for (MultipartFile file : files) {
+                try{
+                    namedPhotos.add(fileUploadService.uploadImage(file));
+                } catch (IOException | SdkClientException e) {
+                    log.error("File Upload Failed. => " + e.getMessage());
+                    attributes.addAttribute("msg", messageSource.getMessage("FileUploadFailedException", null, Locale.getDefault()));
+                    return "redirect:/seller/item/update/" + itemId;
+                }
             }
          }
-         */
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
                 .name(name)

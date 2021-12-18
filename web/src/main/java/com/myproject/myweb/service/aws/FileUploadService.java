@@ -3,6 +3,7 @@ package com.myproject.myweb.service.aws;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.myproject.myweb.dto.item.PhotoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,35 +21,28 @@ public class FileUploadService {
 
     private final AwsS3UploadService awsS3UploadService;
 
-    public String uploadImage(MultipartFile file){
+    public PhotoDto uploadImage(MultipartFile file) throws IOException, SdkClientException{
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());
         objectMetadata.setContentType(file.getContentType());
-        String fileName = createFileName(file.getOriginalFilename());
+        String fileName = createFileName(file.getContentType());
 
-        try (InputStream inputStream = file.getInputStream()) {
-            awsS3UploadService.uploadFile(inputStream, objectMetadata, fileName);
+        InputStream inputStream = file.getInputStream();
+        awsS3UploadService.uploadFile(inputStream, objectMetadata, fileName);
 
-        } catch (IOException e) {
-            throw new IllegalArgumentException(String.format("파일 변환 에러 발생으로 업로드 실패"));
+        String fileUrl = findFileUrl(fileName);
 
-        } catch (AmazonServiceException e) {
-            log.error("AWS S3 파일 업로드 실패 " + e.getMessage()
-                    + " ERROR_CODE : " + e.getErrorCode()
-                    + ", ERROR_MESSAGE : " + e.getErrorMessage());
-
-        } catch (SdkClientException e) {
-            log.error("AWS Clent로 인한 응답 전달 오류 " + e.getMessage());
-        }
-
-        return awsS3UploadService.getFileUrl(fileName);
-        // DB에 file_url 필드 생성해서 저장하기
+        return PhotoDto.builder()
+                .originName(file.getOriginalFilename())
+                .name(fileName)
+                .path(fileUrl)
+                .build();
     }
 
-    private String createFileName(String originalFileName){
+    private String createFileName(String contentType){
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String path = "upload/" + now;
-        String extension = extractedContentType(originalFileName.substring(originalFileName.lastIndexOf("."))); // photo.getContentType()
+        String extension = extractedContentType(contentType);
         String name = path + "/" + System.nanoTime() + extension; // ../nanoTime.png
         return name;
     }
