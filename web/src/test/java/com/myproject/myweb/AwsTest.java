@@ -75,45 +75,4 @@ public class AwsTest {
         );
     }
 
-    @Test
-    public void s3_file_upload_test() throws IOException {
-        String mockFile = "mock-img-upload-test.jpg";
-        FileInputStream inputStream = null;
-        MultipartFile multipartFile;
-        try {
-            inputStream = new FileInputStream("..\\upload\\20211010\\1497289876070200.jpg");
-            multipartFile =
-                    new MockMultipartFile(mockFile, mockFile, "image/jpeg",inputStream);
-        }finally{
-            inputStream.close();
-        }
-        PhotoDto photoDto = fileUploadService.uploadImage(multipartFile);
-        assertThat(photoDto.getOriginName()).isEqualTo(mockFile);
-        assertThat(photoDto.getName()).contains("upload");
-        assertThat(photoDto.getPath()).contains("s3");
-    }
-
-    @Test
-    public void s3_file_remove_test() throws IOException {
-        String mockFile = "mock-img-upload-test.jpg";
-        FileInputStream inputStream = null;
-        MultipartFile multipartFile;
-        try {
-            inputStream = new FileInputStream("..\\upload\\20211010\\1497289876070200.jpg");
-            multipartFile =
-                    new MockMultipartFile(mockFile, mockFile, "image/jpeg",inputStream);
-        }finally{
-            inputStream.close();
-        }
-        PhotoDto photoDto = fileUploadService.uploadImage(multipartFile);
-
-        //given
-        fileUploadService.deleteS3File(photoDto.getName());
-
-        //when
-        fileUploadService.findFileUrl(photoDto.getName()); // throw Exception?
-
-        //then
-
-    }
 }

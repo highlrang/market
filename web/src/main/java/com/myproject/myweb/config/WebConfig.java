@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(
-                        String.format("https://%s.s3.%s.amazonaws.com/"
+                        String.format("http://%s.s3-website.%s.amazonaws.com"
                         , component.getBucket(), AWS_REGION));
     }
 }
