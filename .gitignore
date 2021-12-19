@@ -32,3 +32,4 @@ admin-monitoring-server/src/main/resources/*.yml
 
 web/src/main/java/com/myproject/myweb/handler/EchoHandler.java
 MailConfig.java
+FileHandler.java
