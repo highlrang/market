@@ -11,7 +11,7 @@
     <li class="list-group-item" th:text="${item.price}"></li>
     <li class="list-group-item" th:text="${item.stock}"></li>
     <li class="list-group-item" th:each="photo: ${item.photos}">
-      <img th:src="|../../../${photo.name}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
+      <img th:src="|../../../${photo.path}|" class="img-thumbnail" th:alt="${photo.originName}" width="200" height="200">
     </li>
     <li class="list-group-item"><a class="btn btn-light" th:href="@{/seller/item/update/{id}(id = ${item.id})}">수정</a></li>
   </ul>
