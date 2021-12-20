@@ -69,7 +69,6 @@ public class CustomerController {
             customerService.certify(customerId);
             msg = "UserJoinEmailCertification";
         }catch(AwsSesMailSendingException e){
-            customerService.updateCertified(customerId, false);
             customerService.expireToken(customerId);
             msg = "UserJoinCertificationFailed";
         }

@@ -36,5 +36,6 @@ public class Customer extends User{
         this.setEmail(email);
         this.setPassword(password);
         this.setAddress(address);
+        this.setCertified(false);
     }
 }
