@@ -75,6 +75,7 @@ public class SellerService implements UserService{
         Map<String, String> templateData = new HashMap<>();
         templateData.put("username", seller.getName());
         templateData.put("webUrl", webUrl);
+        templateData.put("userType", "seller");
         templateData.put("userId", String.valueOf(seller.getId()));
         templateData.put("token", seller.getCertificationToken());
         SenderDto senderDto = SenderDto.SenderTemplateDto(

@@ -12,13 +12,12 @@ import static com.myproject.myweb.config.Constants.AWS_REGION;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final S3Component component;
+    private static final String uploadLocation =
+            "http://market-file-management.s3-website.ap-northeast-2.amazonaws.com";
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations(
-                        String.format("http://%s.s3-website.%s.amazonaws.com"
-                        , component.getBucket(), AWS_REGION));
+                .addResourceLocations(uploadLocation);
     }
 }

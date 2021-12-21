@@ -89,6 +89,7 @@ public class CustomerService implements UserService{
         Map<String, String> templateData = new HashMap<>();
         templateData.put("username", customer.getName());
         templateData.put("webUrl", webUrl);
+        templateData.put("userType", "customer");
         templateData.put("userId", String.valueOf(customer.getId()));
         templateData.put("token", customer.getCertificationToken());
         SenderDto senderDto = SenderDto.SenderTemplateDto(
