@@ -35,7 +35,5 @@
     + .travis.yml을 통해 travis에서 CI된 코드를 빌드
     + 프로젝트 jar 파일과 배포 스크립트를 묶어 AWS S3에 전달
     + AWS Codedeploy에서 S3에 업로드된 파일(빌드된 파일, appspec.yml, 쉘 스크립트)을 읽어 AWS EC2에 배포
-    + 웹 페이지 주소 - <http://ec2-13-124-45-59.ap-northeast-2.compute.amazonaws.com>
-    + 임시 계정(구매자 - customer@test.com test1234 판매자 - seller@test.com test1234)
 
 <br/><br/>  
